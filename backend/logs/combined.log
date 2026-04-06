@@ -1,0 +1,97 @@
+2026-04-06 01:06:28 [error]: ❌ MySQL connection failed:
+2026-04-06 01:07:17 [error]: ❌ MySQL connection failed:
+2026-04-06 01:12:00 [info]: ✅ MySQL connected successfully
+2026-04-06 01:12:00 [info]: 🚀 Server running on http://localhost:3000
+2026-04-06 01:12:00 [info]:    Environment: development
+2026-04-06 01:14:01 [info]: ✅ MySQL connected successfully
+2026-04-06 01:15:45 [info]: ✅ MySQL connected successfully
+2026-04-06 01:17:04 [info]: ✅ MySQL connected successfully
+2026-04-06 01:17:04 [info]: 🚀 Server running on http://localhost:5000
+2026-04-06 01:17:04 [info]:    Environment: development
+2026-04-06 01:32:49 [info]: ✅ MySQL connected successfully
+2026-04-06 01:32:49 [info]: 🚀 Server running on http://localhost:5000
+2026-04-06 01:32:49 [info]:    Environment: development
+2026-04-06 02:20:38 [info]: ✅ MySQL connected successfully
+2026-04-06 03:31:13 [info]: ✅ MySQL connected successfully
+2026-04-06 03:31:13 [info]: 🚀 Server running on http://localhost:5000
+2026-04-06 03:31:13 [info]:    Environment: development
+2026-04-06 14:02:56 [info]: ✅ MySQL connected successfully
+2026-04-06 14:02:56 [info]: 🚀 Server running on http://localhost:5000
+2026-04-06 14:02:56 [info]:    Environment: development
+2026-04-06 14:04:05 [info]: ✅ MySQL connected successfully
+2026-04-06 14:04:20 [info]: ✅ MySQL connected successfully
+2026-04-06 20:40:39 [error]: ❌ MySQL connection failed:
+2026-04-06 20:42:36 [error]: ❌ MySQL connection failed:
+2026-04-06 20:44:30 [info]: ✅ MySQL connected successfully
+2026-04-06 20:44:30 [info]: 🚀 Server running on http://localhost:5000
+2026-04-06 20:44:30 [info]:    Environment: development
+2026-04-06 20:49:55 [info]: ✅ MySQL connected successfully
+2026-04-06 20:50:55 [info]: ✅ MySQL connected successfully
+2026-04-06 20:50:55 [info]: 🚀 Server running on http://localhost:5000
+2026-04-06 20:50:55 [info]:    Environment: development
+2026-04-06 20:57:43 [info]: ✅ MySQL connected successfully
+2026-04-06 20:57:43 [info]: 🚀 Server running on http://localhost:5000
+2026-04-06 20:57:43 [info]:    Environment: development
+2026-04-06 21:01:39 [info]: ✅ MySQL connected successfully
+2026-04-06 21:01:39 [info]: 🚀 Server running on http://localhost:5000
+2026-04-06 21:01:39 [info]:    Environment: development
+2026-04-06 22:26:37 [info]: ✅ MySQL connected successfully
+2026-04-06 22:26:37 [info]: 🚀 Server running on http://localhost:5000
+2026-04-06 22:26:37 [info]:    Environment: development
+2026-04-06 22:48:34 [info]: ✅ MySQL connected successfully
+2026-04-06 22:48:34 [info]: 🚀 Server running on http://localhost:5000
+2026-04-06 22:48:34 [info]:    Environment: development
+2026-04-06 22:54:59 [info]: ✅ MySQL connected successfully
+2026-04-06 22:54:59 [info]: 🚀 Server running on http://localhost:5000
+2026-04-06 22:54:59 [info]:    Environment: development
+2026-04-06 22:57:46 [info]: ✅ MySQL connected successfully
+2026-04-06 22:57:46 [info]: 🚀 Server running on http://localhost:5000
+2026-04-06 22:57:46 [info]:    Environment: development
+2026-04-06 23:03:27 [info]: New user registered: akkariwassim11@gmail.com
+2026-04-06 23:03:27 [info]: Socket connected: boK-nt-Pa0N6WohaAAAB (user 4)
+2026-04-06 23:05:27 [info]: Socket disconnected: boK-nt-Pa0N6WohaAAAB — client namespace disconnect
+2026-04-06 23:05:40 [info]: User logged in: akkariwassim11@gmail.com
+2026-04-06 23:05:41 [info]: Socket connected: ru0log7vC0odBnbNAAAD (user 4)
+2026-04-06 23:08:29 [info]: Socket disconnected: ru0log7vC0odBnbNAAAD — transport close
+2026-04-06 23:13:08 [info]: ✅ MySQL connected successfully
+2026-04-06 23:13:15 [info]: ✅ MySQL connected successfully
+2026-04-06 23:13:21 [info]: ✅ MySQL connected successfully
+2026-04-06 23:13:26 [info]: ✅ MySQL connected successfully
+2026-04-06 23:13:31 [info]: ✅ MySQL connected successfully
+2026-04-06 23:14:28 [info]: ✅ MySQL connected successfully
+2026-04-06 23:14:54 [info]: Socket connected: q-reHnpCPUycg6yfAAAF (user 4)
+2026-04-06 23:14:58 [info]: Socket disconnected: q-reHnpCPUycg6yfAAAF — client namespace disconnect
+2026-04-06 23:15:03 [info]: Socket connected: yr_7zFMMG8pkItBdAAAH (user 4)
+2026-04-06 23:16:25 [info]: ✅ MySQL connected successfully
+2026-04-06 23:16:25 [info]: 🚀 Server running on http://localhost:5000
+2026-04-06 23:16:25 [info]:    Environment: development
+2026-04-06 23:16:26 [info]: Socket connected: 9u7rp3ihPA20GCx-AAAB (user 4)
+2026-04-06 23:16:49 [info]: Socket disconnected: 9u7rp3ihPA20GCx-AAAB — client namespace disconnect
+2026-04-06 23:16:52 [info]: Socket connected: M1GfPVKD4zee-aheAAAD (user 4)
+2026-04-06 23:16:52 [error]: Error: Unknown column 'user_id' in 'where clause'
+    at PromisePool.query (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\mysql2\lib\promise\pool.js:36:22)
+    at Object.findByUser (C:\Users\Wassim\Desktop\mon-application\backend\src\models\Geofence.js:10:31)
+    at getGeofences (C:\Users\Wassim\Desktop\mon-application\backend\src\controllers\geofencesController.js:11:38)
+    at Layer.handle [as handle_request] (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\layer.js:95:5)
+    at next (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\route.js:149:13)
+    at Route.dispatch (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\route.js:119:3)
+    at Layer.handle [as handle_request] (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\layer.js:95:5)
+    at C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\index.js:284:15
+    at router.process_params (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\index.js:280:10)
+2026-04-06 23:17:50 [error]: Error: Unknown column 'user_id' in 'where clause'
+    at PromisePool.query (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\mysql2\lib\promise\pool.js:36:22)
+    at Object.findByUser (C:\Users\Wassim\Desktop\mon-application\backend\src\models\Geofence.js:10:31)
+    at getGeofences (C:\Users\Wassim\Desktop\mon-application\backend\src\controllers\geofencesController.js:11:38)
+    at Layer.handle [as handle_request] (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\layer.js:95:5)
+    at next (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\route.js:149:13)
+    at Route.dispatch (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\route.js:119:3)
+    at Layer.handle [as handle_request] (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\layer.js:95:5)
+    at C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\index.js:284:15
+    at router.process_params (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\index.js:280:10)
+2026-04-06 23:18:03 [info]: ✅ MySQL connected successfully
+2026-04-06 23:18:03 [info]: 🚀 Server running on http://localhost:5000
+2026-04-06 23:18:03 [info]:    Environment: development
+2026-04-06 23:18:04 [info]: ✅ MySQL connected successfully
+2026-04-06 23:18:05 [info]: Socket connected: O_N8MrDw0EJOMMCRAAAB (user 4)

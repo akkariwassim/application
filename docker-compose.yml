@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  # ── MySQL Database ───────────────────────────────────────────
+  db:
+    image: mysql:8.0
+    container_name: smart_fence_db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE: smart_fence
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/01_schema.sql
+      - ./database/sample_data.sql:/docker-entrypoint-initdb.d/02_sample_data.sql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-prootpass"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── Backend API ───────────────────────────────────────────────
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: smart_fence_backend
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_NAME: smart_fence
+      DB_USER: root
+      DB_PASSWORD: rootpass
+      JWT_SECRET: CHANGE_ME_PRODUCTION_SECRET_32_CHARS
+      JWT_REFRESH_SECRET: CHANGE_ME_PRODUCTION_REFRESH_64_CHARS
+      JWT_EXPIRES_IN: 15m
+      JWT_REFRESH_EXPIRES_IN: 7d
+      LOG_LEVEL: info
+    ports:
+      - "3000:3000"
+    volumes:
+      - backend_logs:/app/logs
+
+volumes:
+  db_data:
+  backend_logs:

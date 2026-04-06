@@ -1,0 +1,62 @@
+{
+  "expo": {
+    "name": "Smart Fence",
+    "slug": "smart-fence",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "dark",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0A0F1E"
+    },
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.smartfence.app",
+      "newArchEnabled": false,
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "Smart Fence needs location to track animals.",
+        "NSLocationAlwaysUsageDescription": "Smart Fence needs always-on location for background tracking."
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#0A0F1E"
+      },
+      "package": "com.smartfence.app",
+      "newArchEnabled": false,
+      "permissions": [
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION",
+        "RECEIVE_BOOT_COMPLETED",
+        "VIBRATE",
+        "INTERNET"
+      ]
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/notification-icon.png",
+          "color": "#4F46E5"
+        }
+      ],
+      "expo-location",
+      "expo-secure-store"
+    ],
+    "scheme": "smartfence",
+    "extra": {
+      "API_URL": "http://192.168.100.156:5000",
+      "eas": {
+        "projectId": "your-eas-project-id"
+      }
+    }
+  }
+}
+
