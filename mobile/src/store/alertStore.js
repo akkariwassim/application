@@ -13,9 +13,15 @@ const useAlertStore = create((set, get) => ({
       if (filters.severity) params.append('severity', filters.severity);
       if (filters.status)   params.append('status',   filters.status);
       if (filters.animalId) params.append('animalId', filters.animalId);
+      if (filters.type)     params.append('type',     filters.type);
+      
       const { data } = await api.get(`/alerts?${params.toString()}`);
-      const unreadCount = data.filter((a) => a.status === 'active').length;
-      set({ alerts: data, unreadCount, isLoading: false });
+      
+      // Client-side sorting (newest first by default)
+      const sorted = [...data].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+      
+      const unreadCount = sorted.filter((a) => a.status === 'active').length;
+      set({ alerts: sorted, unreadCount, isLoading: false });
     } catch {
       set({ isLoading: false });
     }

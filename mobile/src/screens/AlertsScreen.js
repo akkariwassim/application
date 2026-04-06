@@ -1,123 +1,163 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import {
   View, Text, FlatList, TouchableOpacity, StyleSheet,
-  ActivityIndicator, RefreshControl,
+  ActivityIndicator, RefreshControl, Platform, ScrollView,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import useAlertStore from '../store/alertStore';
 
 const COLORS = {
-  primary:'#4F46E5', background:'#0A0F1E', surface:'#131929',
-  card:'#1E2A45', text:'#F0F4FF', subtext:'#94A3B8',
-  safe:'#22C55E', warning:'#F59E0B', danger:'#EF4444', offline:'#6B7280',
-  border:'rgba(255,255,255,0.08)', info:'#3B82F6',
+  primary:    '#4F46E5',
+  background: '#0A0F1E',
+  surface:    '#131929',
+  card:       '#1E2A45',
+  text:       '#F0F4FF',
+  subtext:    '#94A3B8',
+  danger:     '#EF4444',
+  warning:    '#F59E0B',
+  success:    '#22C55E',
+  info:       '#3B82F6',
+  border:     'rgba(255,255,255,0.08)',
 };
 
 const SEV_COLOR = { info: COLORS.info, warning: COLORS.warning, critical: COLORS.danger };
 const SEV_ICON  = { info: 'information-circle', warning: 'warning', critical: 'alert-circle' };
+const TYPE_ICON = { 
+  geofence_breach: 'map', 
+  temperature: 'thermometer', 
+  activity: 'pulse' 
+};
 
-function AlertCard({ alert, onAcknowledge, onResolve }) {
+function AlertCard({ alert, onPress, onAcknowledge, onResolve }) {
   const color = SEV_COLOR[alert.severity] || COLORS.warning;
-  const date  = new Date(alert.created_at).toLocaleString();
+  const date  = new Date(alert.created_at);
+  const timeStr = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  const dateStr = date.toLocaleDateString();
 
   return (
-    <View style={[styles.card, { borderLeftColor: color }]}>
+    <TouchableOpacity style={[styles.card, { borderLeftColor: color }]} onPress={() => onPress(alert)} activeOpacity={0.8}>
       <View style={styles.cardHeader}>
-        <View style={[styles.sevBadge, { backgroundColor: color + '22' }]}>
-          <Ionicons name={SEV_ICON[alert.severity]} size={14} color={color} />
-          <Text style={[styles.sevText, { color }]}>{alert.severity.toUpperCase()}</Text>
+        <View style={[styles.typeBadge, { backgroundColor: color + '22' }]}>
+          <Ionicons name={TYPE_ICON[alert.type] || 'alert-circle'} size={14} color={color} />
+          <Text style={[styles.typeText, { color }]}>{alert.type.replace('_', ' ').toUpperCase()}</Text>
         </View>
         <Text style={styles.statusChip}>{alert.status}</Text>
       </View>
 
-      <Text style={styles.animalName}>🐄 {alert.animal_name}</Text>
-      <Text style={styles.message}>{alert.message}</Text>
-      <Text style={styles.date}>{date}</Text>
-
-      {alert.status === 'active' && (
-        <View style={styles.actions}>
-          <TouchableOpacity style={[styles.actionBtn, { borderColor: COLORS.warning }]}
-            onPress={() => onAcknowledge(alert.id)}>
-            <Text style={[styles.actionText, { color: COLORS.warning }]}>Acknowledge</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={[styles.actionBtn, { borderColor: COLORS.safe }]}
-            onPress={() => onResolve(alert.id)}>
-            <Text style={[styles.actionText, { color: COLORS.safe }]}>Resolve</Text>
-          </TouchableOpacity>
+      <View style={styles.cardBody}>
+        <View style={styles.animalInfo}>
+          <Text style={styles.animalName}>🐄 {alert.animal_name}</Text>
+          <Text style={styles.severityTag}>{alert.severity.toUpperCase()}</Text>
         </View>
-      )}
-    </View>
+        <Text style={styles.message} numberOfLines={2}>{alert.message}</Text>
+      </View>
+
+      <View style={styles.cardFooter}>
+        <Text style={styles.date}>{dateStr} • {timeStr}</Text>
+        <Ionicons name="chevron-forward" size={16} color={COLORS.subtext} />
+      </View>
+    </TouchableOpacity>
   );
 }
 
-export default function AlertsScreen() {
+export default function AlertsScreen({ navigation }) {
   const insets = useSafeAreaInsets();
   const { alerts, unreadCount, fetchAlerts, acknowledgeAlert, resolveAlert, isLoading } = useAlertStore();
+  
   const [filterSev, setFilterSev] = useState(null);
+  const [filterType, setFilterType] = useState(null);
   const [filterStatus, setFilterStatus] = useState('active');
+  const [sortBy, setSortBy] = useState('date'); // 'date', 'severity'
 
   useEffect(() => {
-    fetchAlerts({ severity: filterSev, status: filterStatus });
-  }, [filterSev, filterStatus]);
+    fetchAlerts({ severity: filterSev, status: filterStatus, type: filterType });
+  }, [filterSev, filterStatus, filterType]);
 
-  const filters = ['active','acknowledged','resolved'];
+  const sortedAlerts = useMemo(() => {
+    let list = [...alerts];
+    if (sortBy === 'severity') {
+      const sevOrder = { critical: 0, warning: 1, info: 2 };
+      list.sort((a, b) => sevOrder[a.severity] - sevOrder[b.severity]);
+    }
+    return list;
+  }, [alerts, sortBy]);
+
+  const filters = ['active', 'acknowledged', 'resolved'];
+  const types = ['geofence_breach', 'temperature', 'activity'];
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
-      {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.title}>Alerts</Text>
-        {unreadCount > 0 && (
-          <View style={styles.badge}>
-            <Text style={styles.badgeText}>{unreadCount} active</Text>
-          </View>
-        )}
+        <View>
+          <Text style={styles.title}>Alerts Center</Text>
+          <Text style={styles.subtitle}>{unreadCount} active notifications</Text>
+        </View>
+        <TouchableOpacity style={styles.refreshBtn} onPress={() => fetchAlerts({ severity: filterSev, status: filterStatus, type: filterType })}>
+          <Ionicons name="refresh" size={20} color={COLORS.text} />
+        </TouchableOpacity>
       </View>
 
-      {/* Status Filter */}
+      {/* Primary Status Filters */}
       <View style={styles.filterRow}>
         {filters.map((s) => (
-          <TouchableOpacity key={s} style={[styles.filterBtn, filterStatus === s && styles.filterActive]}
+          <TouchableOpacity key={s} style={[styles.statusBtn, filterStatus === s && styles.statusBtnActive]}
             onPress={() => setFilterStatus(filterStatus === s ? null : s)}>
-            <Text style={[styles.filterText, filterStatus === s && styles.filterTextActive]}>
+            <Text style={[styles.statusBtnText, filterStatus === s && styles.statusBtnTextActive]}>
               {s.charAt(0).toUpperCase() + s.slice(1)}
             </Text>
           </TouchableOpacity>
         ))}
       </View>
 
-      {/* Severity Filter */}
-      <View style={styles.filterRow}>
-        {['critical','warning','info'].map((s) => (
-          <TouchableOpacity key={s} style={[styles.filterBtn, filterSev === s && { borderColor: SEV_COLOR[s], backgroundColor: SEV_COLOR[s] + '22' }]}
-            onPress={() => setFilterSev(filterSev === s ? null : s)}>
-            <Ionicons name={SEV_ICON[s]} size={14} color={SEV_COLOR[s]} />
-            <Text style={[styles.filterText, { color: SEV_COLOR[s] }]}>{s}</Text>
-          </TouchableOpacity>
-        ))}
+      {/* Sub Filters & Sorting */}
+      <View style={styles.subFilterRow}>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.subFilterScroll}>
+          {/* Type Filters */}
+          {types.map((t) => (
+            <TouchableOpacity key={t} style={[styles.subFilterBtn, filterType === t && styles.subFilterActive]}
+              onPress={() => setFilterType(filterType === t ? null : t)}>
+              <Ionicons name={TYPE_ICON[t]} size={12} color={filterType === t ? COLORS.primary : COLORS.subtext} />
+              <Text style={[styles.subFilterText, filterType === t && styles.subFilterTextActive]}>{t.split('_')[0]}</Text>
+            </TouchableOpacity>
+          ))}
+          <View style={styles.divider} />
+          {/* Severity Filters */}
+          {['critical', 'warning'].map((s) => (
+            <TouchableOpacity key={s} style={[styles.subFilterBtn, filterSev === s && { borderColor: SEV_COLOR[s] }]}
+              onPress={() => setFilterSev(filterSev === s ? null : s)}>
+              <View style={[styles.dot, { backgroundColor: SEV_COLOR[s] }]} />
+              <Text style={[styles.subFilterText, filterSev === s && { color: SEV_COLOR[s] }]}>{s}</Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
       </View>
 
       {isLoading && !alerts.length ? (
-        <ActivityIndicator color={COLORS.primary} size="large" style={{ marginTop: 40 }} />
+        <View style={styles.centered}>
+          <ActivityIndicator color={COLORS.primary} size="large" />
+        </View>
       ) : (
         <FlatList
-          data={alerts}
+          data={sortedAlerts}
           keyExtractor={(item) => String(item.id)}
-          contentContainerStyle={{ padding: 16, paddingBottom: 40 }}
+          contentContainerStyle={styles.list}
           refreshControl={
-            <RefreshControl refreshing={isLoading} onRefresh={() => fetchAlerts({ severity: filterSev, status: filterStatus })} tintColor={COLORS.primary} />
+            <RefreshControl refreshing={isLoading} onRefresh={() => fetchAlerts({ severity: filterSev, status: filterStatus, type: filterType })} tintColor={COLORS.primary} />
           }
           ListEmptyComponent={
             <View style={styles.empty}>
-              <Ionicons name="checkmark-done-circle" size={64} color={COLORS.safe} />
-              <Text style={styles.emptyTitle}>All Clear</Text>
-              <Text style={styles.emptyText}>No alerts matching your filters</Text>
+              <View style={styles.emptyIconBox}>
+                <Ionicons name="notifications-off-outline" size={48} color={COLORS.subtext} />
+              </View>
+              <Text style={styles.emptyTitle}>All caught up!</Text>
+              <Text style={styles.emptyText}>No alerts matching the current filters.</Text>
             </View>
           }
           renderItem={({ item }) => (
             <AlertCard
               alert={item}
+              onPress={(a) => navigation.navigate('AlertDetail', { alert: a })}
               onAcknowledge={acknowledgeAlert}
               onResolve={resolveAlert}
             />
@@ -129,28 +169,46 @@ export default function AlertsScreen() {
 }
 
 const styles = StyleSheet.create({
-  container:       { flex:1, backgroundColor:COLORS.background },
-  header:          { flexDirection:'row', alignItems:'center', paddingHorizontal:20, paddingVertical:16, gap:12 },
-  title:           { fontSize:24, fontWeight:'800', color:COLORS.text, flex:1 },
-  badge:           { backgroundColor:'rgba(239,68,68,0.2)', borderRadius:12, paddingHorizontal:10, paddingVertical:4 },
-  badgeText:       { color:COLORS.danger, fontSize:12, fontWeight:'700' },
-  filterRow:       { flexDirection:'row', paddingHorizontal:16, gap:8, marginBottom:4 },
-  filterBtn:       { flexDirection:'row', alignItems:'center', gap:4, paddingHorizontal:12, paddingVertical:6, borderRadius:20, borderWidth:1, borderColor:COLORS.border, backgroundColor:COLORS.surface },
-  filterActive:    { backgroundColor:COLORS.primary+'33', borderColor:COLORS.primary },
-  filterText:      { color:COLORS.subtext, fontSize:12 },
-  filterTextActive:{ color:COLORS.primary, fontWeight:'600' },
-  card:            { backgroundColor:COLORS.card, borderRadius:16, padding:16, marginBottom:12, borderWidth:1, borderColor:COLORS.border, borderLeftWidth:4 },
-  cardHeader:      { flexDirection:'row', alignItems:'center', justifyContent:'space-between', marginBottom:8 },
-  sevBadge:        { flexDirection:'row', alignItems:'center', gap:4, paddingHorizontal:8, paddingVertical:3, borderRadius:10 },
-  sevText:         { fontSize:11, fontWeight:'700' },
-  statusChip:      { fontSize:11, color:COLORS.subtext, textTransform:'capitalize' },
-  animalName:      { color:COLORS.text, fontWeight:'700', fontSize:15, marginBottom:4 },
-  message:         { color:COLORS.subtext, fontSize:13, lineHeight:19, marginBottom:8 },
-  date:            { color:COLORS.subtext, fontSize:11 },
-  actions:         { flexDirection:'row', gap:8, marginTop:12 },
-  actionBtn:       { flex:1, paddingVertical:8, borderRadius:10, borderWidth:1, alignItems:'center' },
-  actionText:      { fontSize:13, fontWeight:'600' },
-  empty:           { alignItems:'center', paddingTop:60 },
-  emptyTitle:      { color:COLORS.text, fontSize:20, fontWeight:'700', marginTop:16 },
-  emptyText:       { color:COLORS.subtext, fontSize:14, marginTop:8 },
+  container:       { flex: 1, backgroundColor: COLORS.background },
+  header:          { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingVertical: 16 },
+  title:           { fontSize: 24, fontWeight: '800', color: COLORS.text },
+  subtitle:        { fontSize: 13, color: COLORS.subtext, marginTop: 2 },
+  refreshBtn:      { width: 40, height: 40, borderRadius: 20, backgroundColor: COLORS.surface, alignItems: 'center', justifyContent: 'center' },
+  
+  filterRow:       { flexDirection: 'row', paddingHorizontal: 20, gap: 8, marginBottom: 12 },
+  statusBtn:       { flex: 1, height: 40, borderRadius: 12, backgroundColor: COLORS.surface, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: COLORS.border },
+  statusBtnActive: { backgroundColor: COLORS.primary, borderColor: COLORS.primary },
+  statusBtnText:   { color: COLORS.subtext, fontSize: 13, fontWeight: '600' },
+  statusBtnTextActive: { color: '#fff' },
+
+  subFilterRow:    { marginBottom: 8 },
+  subFilterScroll: { paddingHorizontal: 20, gap: 8, alignItems: 'center' },
+  subFilterBtn:    { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 12, paddingVertical: 6, borderRadius: 20, borderWidth: 1, borderColor: COLORS.border, backgroundColor: COLORS.surface },
+  subFilterActive: { borderColor: COLORS.primary, backgroundColor: COLORS.primary + '11' },
+  subFilterText:   { color: COLORS.subtext, fontSize: 11, fontWeight: '600', textTransform: 'capitalize' },
+  subFilterTextActive: { color: COLORS.primary },
+  dot:             { width: 6, height: 6, borderRadius: 3 },
+  divider:         { width: 1, height: 20, backgroundColor: COLORS.border, marginHorizontal: 4 },
+
+  list:            { padding: 20, paddingBottom: 100 },
+  card:            { backgroundColor: COLORS.card, borderRadius: 20, padding: 16, marginBottom: 16, borderWidth: 1, borderColor: COLORS.border, borderLeftWidth: 4 },
+  cardHeader:      { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 },
+  typeBadge:       { flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 8, paddingVertical: 3, borderRadius: 8 },
+  typeText:        { fontSize: 10, fontWeight: '800' },
+  statusChip:      { fontSize: 10, color: COLORS.subtext, textTransform: 'uppercase', fontWeight: '700' },
+  
+  cardBody:        { marginBottom: 12 },
+  animalInfo:      { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 },
+  animalName:      { color: COLORS.text, fontWeight: '800', fontSize: 16 },
+  severityTag:     { color: COLORS.subtext, fontSize: 9, fontWeight: '700', letterSpacing: 0.5 },
+  message:         { color: COLORS.text, fontSize: 13, lineHeight: 18, opacity: 0.8 },
+  
+  cardFooter:      { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', borderTopWidth: 1, borderTopColor: COLORS.border, paddingTop: 10 },
+  date:            { color: COLORS.subtext, fontSize: 10, fontWeight: '600' },
+
+  centered:        { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  empty:           { alignItems: 'center', paddingTop: 60 },
+  emptyIconBox:    { width: 80, height: 80, borderRadius: 40, backgroundColor: COLORS.surface, alignItems: 'center', justifyContent: 'center', marginBottom: 20 },
+  emptyTitle:      { color: COLORS.text, fontSize: 18, fontWeight: '700' },
+  emptyText:       { color: COLORS.subtext, fontSize: 14, marginTop: 8, textAlign: 'center', paddingHorizontal: 40 },
 });

@@ -4,7 +4,7 @@ const Position       = require('../models/Position');
 const Animal         = require('../models/Animal');
 const Geofence       = require('../models/Geofence');
 const { checkBreach }         = require('../services/geofenceService');
-const { createGeofenceAlert, markAnimalSafe } = require('../services/alertService');
+const { createGeofenceAlert, createHealthAlert, markAnimalSafe } = require('../services/alertService');
 const { emitPositionUpdate }  = require('../config/socket');
 const logger         = require('../utils/logger');
 
@@ -78,8 +78,42 @@ async function submitPosition(req, res, next) {
           distanceM, radiusM: geofence.radius_m
         });
       } else {
-        // Animal returned inside — mark safe
         await markAnimalSafe(animalId, userId);
+      }
+    }
+
+    // --- Health checks ---
+    if (temperature != null) {
+      const t = parseFloat(temperature);
+      if (t > animal.max_temp) {
+        await createHealthAlert({
+          animalId, userId, type: 'temperature', severity: 'critical',
+          message: `High temperature detected: ${t}°C (Threshold: ${animal.max_temp}°C)`,
+          latitude, longitude
+        });
+      } else if (t < animal.min_temp) {
+        await createHealthAlert({
+          animalId, userId, type: 'temperature', severity: 'warning',
+          message: `Low temperature detected: ${t}°C (Threshold: ${animal.min_temp}°C)`,
+          latitude, longitude
+        });
+      }
+    }
+
+    if (activity != null) {
+      const a = parseFloat(activity);
+      if (a < animal.min_activity) {
+        await createHealthAlert({
+          animalId, userId, type: 'activity', severity: 'warning',
+          message: `Low activity level: ${a}% (Threshold: ${animal.min_activity}%)`,
+          latitude, longitude
+        });
+      } else if (a > animal.max_activity) {
+        await createHealthAlert({
+          animalId, userId, type: 'activity', severity: 'critical',
+          message: `Abnormal high activity: ${a}% (Threshold: ${animal.max_activity}%)`,
+          latitude, longitude
+        });
       }
     }
 

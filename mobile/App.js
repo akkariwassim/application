@@ -27,6 +27,8 @@ import HistoryScreen from './src/screens/HistoryScreen';
 import ProfileScreen from './src/screens/ProfileScreen';
 import GeofenceScreen from './src/screens/GeofenceScreen';
 import AnimalViewScreen from './src/screens/AnimalViewScreen';
+import AlertDetailScreen from './src/screens/AlertDetailScreen';
+import AnimalSettingsScreen from './src/screens/AnimalSettingsScreen';
 
 const Tab   = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -118,7 +120,9 @@ function AnimalsStack() {
       <Stack.Screen name="AnimalsList"  component={AnimalsScreen}      options={{ title: 'My Animals' }} />
       <Stack.Screen name="AnimalView"   component={AnimalViewScreen}    options={{ title: 'Dashboard' }} />
       <Stack.Screen name="AnimalDetail" component={AnimalDetailScreen}  options={{ title: 'Animal Details' }} />
+      <Stack.Screen name="AnimalSettings" component={AnimalSettingsScreen} options={{ title: 'Thresholds' }} />
       <Stack.Screen name="History"      component={HistoryScreen}       options={{ title: 'Movement History' }} />
+      <Stack.Screen name="AlertDetail"  component={AlertDetailScreen}   options={{ title: 'Alert Details' }} />
     </Stack.Navigator>
   );
 }

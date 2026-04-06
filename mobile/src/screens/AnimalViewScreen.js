@@ -93,9 +93,9 @@ export default function AnimalViewScreen({ route, navigation }) {
         </View>
         <TouchableOpacity 
           style={styles.editBtn} 
-          onPress={() => navigation.navigate('AnimalDetail', { animal, mode: 'edit' })}
+          onPress={() => navigation.navigate('AnimalSettings', { animal })}
         >
-          <Ionicons name="settings-outline" size={22} color={COLORS.primary} />
+          <Ionicons name="options-outline" size={22} color={COLORS.primary} />
         </TouchableOpacity>
       </View>
 
