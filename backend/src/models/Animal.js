@@ -55,12 +55,13 @@ const Animal = {
   /**
    * Create a new animal.
    */
-  async create({ userId, name, type, breed, weightKg, birthDate, rfidTag, deviceId, colorHex, notes }) {
+  async create({ userId, name, type, breed, weightKg, birthDate, rfidTag, deviceId, colorHex, notes, minTemp, maxTemp, minActivity, maxActivity }) {
     const [result] = await pool.query(
-      `INSERT INTO animals (user_id, name, type, breed, weight_kg, birth_date, rfid_tag, device_id, color_hex, notes)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO animals (user_id, name, type, breed, weight_kg, birth_date, rfid_tag, device_id, color_hex, notes, min_temp, max_temp, min_activity, max_activity)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [userId, name, type, breed || null, weightKg || null, birthDate || null,
-       rfidTag || null, deviceId || null, colorHex || '#4CAF50', notes || null]
+       rfidTag || null, deviceId || null, colorHex || '#4CAF50', notes || null,
+       minTemp || 37.5, maxTemp || 40.0, minActivity || 20, maxActivity || 80]
     );
     return result.insertId;
   },
@@ -69,14 +70,17 @@ const Animal = {
    * Update an animal.
    */
   async update(id, userId, fields) {
-    const { name, type, breed, weightKg, birthDate, rfidTag, deviceId, colorHex, notes } = fields;
+    const { name, type, breed, weightKg, birthDate, rfidTag, deviceId, colorHex, notes, minTemp, maxTemp, minActivity, maxActivity } = fields;
     const [result] = await pool.query(
       `UPDATE animals SET
          name = ?, type = ?, breed = ?, weight_kg = ?, birth_date = ?,
-         rfid_tag = ?, device_id = ?, color_hex = ?, notes = ?
+         rfid_tag = ?, device_id = ?, color_hex = ?, notes = ?,
+         min_temp = ?, max_temp = ?, min_activity = ?, max_activity = ?
        WHERE id = ? AND user_id = ?`,
       [name, type, breed || null, weightKg || null, birthDate || null,
        rfidTag || null, deviceId || null, colorHex || '#4CAF50', notes || null,
+       minTemp != null ? minTemp : 37.5, maxTemp != null ? maxTemp : 40.0, 
+       minActivity != null ? minActivity : 20, maxActivity != null ? maxActivity : 80,
        id, userId]
     );
     return result.affectedRows > 0;
