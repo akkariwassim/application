@@ -95,3 +95,75 @@
 2026-04-06 23:18:03 [info]:    Environment: development
 2026-04-06 23:18:04 [info]: ✅ MySQL connected successfully
 2026-04-06 23:18:05 [info]: Socket connected: O_N8MrDw0EJOMMCRAAAB (user 4)
+2026-04-06 23:18:56 [info]: Socket disconnected: O_N8MrDw0EJOMMCRAAAB — client namespace disconnect
+2026-04-06 23:18:59 [info]: Socket connected: mv8zcSFF2RNvs5qLAAAD (user 4)
+2026-04-06 23:35:28 [info]: ✅ MySQL connected successfully
+2026-04-06 23:35:28 [info]: ✅ MySQL connected successfully
+2026-04-06 23:35:28 [info]: 🚀 Server running on http://localhost:5000
+2026-04-06 23:35:28 [info]:    Environment: development
+2026-04-06 23:35:34 [info]: ✅ MySQL connected successfully
+2026-04-06 23:35:34 [info]: 🚀 Server running on http://localhost:5000
+2026-04-06 23:35:34 [info]:    Environment: development
+2026-04-06 23:35:34 [info]: ✅ MySQL connected successfully
+2026-04-06 23:38:01 [info]: ✅ MySQL connected successfully
+2026-04-06 23:38:01 [info]: 🚀 Server running on http://localhost:5000
+2026-04-06 23:38:01 [info]:    Environment: development
+2026-04-06 23:38:02 [info]: ✅ MySQL connected successfully
+2026-04-06 23:38:22 [info]: ✅ MySQL connected successfully
+2026-04-06 23:38:22 [info]: 🚀 Server running on http://localhost:5000
+2026-04-06 23:38:22 [info]:    Environment: development
+2026-04-06 23:38:22 [info]: ✅ MySQL connected successfully
+2026-04-06 23:38:27 [error]: Error: Unknown column 'temperature_c' in 'field list'
+    at PromisePool.query (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\mysql2\lib\promise\pool.js:36:22)
+    at Object.create (C:\Users\Wassim\Desktop\mon-application\backend\src\models\Position.js:11:33)
+    at submitPosition (C:\Users\Wassim\Desktop\mon-application\backend\src\controllers\positionsController.js:42:39)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+2026-04-06 23:38:30 [error]: Error: Unknown column 'temperature_c' in 'field list'
+    at PromisePool.query (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\mysql2\lib\promise\pool.js:36:22)
+    at Object.create (C:\Users\Wassim\Desktop\mon-application\backend\src\models\Position.js:11:33)
+    at submitPosition (C:\Users\Wassim\Desktop\mon-application\backend\src\controllers\positionsController.js:42:39)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+2026-04-06 23:38:33 [error]: Error: Unknown column 'temperature_c' in 'field list'
+    at PromisePool.query (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\mysql2\lib\promise\pool.js:36:22)
+    at Object.create (C:\Users\Wassim\Desktop\mon-application\backend\src\models\Position.js:11:33)
+    at submitPosition (C:\Users\Wassim\Desktop\mon-application\backend\src\controllers\positionsController.js:42:39)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+2026-04-06 23:38:45 [error]: Error: Unknown column 'temperature_c' in 'field list'
+    at PromisePool.query (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\mysql2\lib\promise\pool.js:36:22)
+    at Object.create (C:\Users\Wassim\Desktop\mon-application\backend\src\models\Position.js:11:33)
+    at submitPosition (C:\Users\Wassim\Desktop\mon-application\backend\src\controllers\positionsController.js:42:39)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+2026-04-06 23:38:48 [error]: Error: Unknown column 'temperature_c' in 'field list'
+    at PromisePool.query (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\mysql2\lib\promise\pool.js:36:22)
+    at Object.create (C:\Users\Wassim\Desktop\mon-application\backend\src\models\Position.js:11:33)
+    at submitPosition (C:\Users\Wassim\Desktop\mon-application\backend\src\controllers\positionsController.js:42:39)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+2026-04-06 23:38:51 [error]: Error: Unknown column 'temperature_c' in 'field list'
+    at PromisePool.query (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\mysql2\lib\promise\pool.js:36:22)
+    at Object.create (C:\Users\Wassim\Desktop\mon-application\backend\src\models\Position.js:11:33)
+    at submitPosition (C:\Users\Wassim\Desktop\mon-application\backend\src\controllers\positionsController.js:42:39)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+2026-04-06 23:39:51 [info]: ✅ MySQL connected successfully
+2026-04-06 23:41:03 [info]: ✅ MySQL connected successfully
+2026-04-06 23:41:03 [info]: 🚀 Server running on http://localhost:5000
+2026-04-06 23:41:03 [info]:    Environment: development
+2026-04-06 23:41:31 [info]: Socket connected: ZsjPKqFP9QOPQBV8AAAB (user 4)
+2026-04-06 23:42:18 [info]: Socket disconnected: ZsjPKqFP9QOPQBV8AAAB — client namespace disconnect
+2026-04-06 23:42:35 [info]: Socket connected: tWecxkTCRgtgWgwYAAAD (user 4)
+2026-04-06 23:42:44 [info]: Socket disconnected: tWecxkTCRgtgWgwYAAAD — client namespace disconnect
+2026-04-06 23:43:43 [info]: Socket connected: TI_QwPy0KYL-bFn8AAAF (user 4)
+2026-04-06 23:44:55 [info]: ✅ MySQL connected successfully
+2026-04-06 23:44:55 [info]: 🚀 Server running on http://localhost:5000
+2026-04-06 23:44:55 [info]:    Environment: development
+2026-04-06 23:44:57 [info]: Socket connected: lNaq-KQ5F6oYdjkMAAAB (user 4)
+2026-04-06 23:45:53 [info]: ✅ MySQL connected successfully
+2026-04-06 23:46:00 [info]: ✅ MySQL connected successfully
+2026-04-06 23:46:00 [info]: 🚀 Server running on http://localhost:5000
+2026-04-06 23:46:00 [info]:    Environment: development
+2026-04-06 23:46:00 [info]: Socket connected: BeAfcHyCO4frRrp1AAAB (user 4)
+2026-04-06 23:46:17 [info]: Socket disconnected: BeAfcHyCO4frRrp1AAAB — client namespace disconnect
+2026-04-06 23:46:22 [info]: Socket connected: 6p5ZtiSPK3lwiT4gAAAD (user 4)
+2026-04-06 23:50:31 [info]: Socket disconnected: 6p5ZtiSPK3lwiT4gAAAD — client namespace disconnect
+2026-04-06 23:53:30 [info]: Socket connected: PL8OyEzrBTVaY6xaAAAF (user 4)
+2026-04-06 23:57:24 [info]: Socket disconnected: PL8OyEzrBTVaY6xaAAAF — client namespace disconnect
+2026-04-06 23:57:28 [info]: Socket connected: 1rPfGW6X4o6rebd1AAAH (user 4)

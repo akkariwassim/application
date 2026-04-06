@@ -19,7 +19,8 @@ async function submitPosition(req, res, next) {
       deviceId, animalId: bodyAnimalId,
       latitude, longitude,
       accuracy, speed, altitude, heading,
-      timestamp, satellites, hdop
+      timestamp, satellites, hdop,
+      temperature, activity
     } = req.body;
 
     // Resolve animal
@@ -48,12 +49,18 @@ async function submitPosition(req, res, next) {
       headingDeg: heading   != null ? parseFloat(heading)   : null,
       satellites: satellites != null ? parseInt(satellites)  : null,
       hdop:       hdop      != null ? parseFloat(hdop)      : null,
+      temperatureC: temperature != null ? parseFloat(temperature) : null,
+      activityScore: activity    != null ? parseFloat(activity)    : null,
       deviceId:   deviceId  || animal.device_id,
       recordedAt: timestamp ? new Date(timestamp) : new Date()
     });
 
     // Emit position update via WebSocket
-    emitPositionUpdate(animalId, { latitude, longitude, speed, satellites, timestamp: new Date().toISOString() });
+    emitPositionUpdate(animalId, { 
+      latitude, longitude, speed, satellites, 
+      temperature, activity,
+      timestamp: new Date().toISOString() 
+    });
 
     // --- Geofence check ---
     const geofence = await Geofence.findByAnimal(animalId, userId);
