@@ -6,6 +6,7 @@ import MapView, { Polygon, Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import { Ionicons } from '@expo/vector-icons';
 import useGeofenceStore from '../store/geofenceStore';
 import useAnimalStore   from '../store/animalStore';
+import { calculateCentroid } from '../utils/geoUtils';
 
 const COLORS = {
   primary: '#4F46E5', background: '#0A0F1E', surface: '#131929',
@@ -38,9 +39,12 @@ export default function GeofenceScreen() {
     }
 
     try {
+      const centroid = calculateCentroid(newPolygon);
       await createGeofence({
         type: 'polygon',
         polygonCoords: newPolygon,
+        centerLat: centroid.latitude,
+        centerLon: centroid.longitude,
       });
       setIsDrawing(false);
       setNewPolygon([]);

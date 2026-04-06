@@ -70,6 +70,13 @@ export function subscribeAnimal(animalId) {
 }
 
 /**
+ * Unsubscribe from updates for a specific animal.
+ */
+export function unsubscribeAnimal(animalId) {
+  socket?.emit('unsubscribe-animal', { animalId });
+}
+
+/**
  * Disconnect and clean up.
  */
 export function disconnectSocket() {

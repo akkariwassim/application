@@ -10,6 +10,8 @@ import useAnimalStore from '../store/animalStore';
 import useAlertStore  from '../store/alertStore';
 import { subscribeAnimal } from '../services/socketService';
 import useGeofenceStore from '../store/geofenceStore';
+import * as Location from 'expo-location';
+import { DEFAULT_LOCATION, FARM_METADATA } from '../config/mapConfig';
 
 const { width } = Dimensions.get('window');
 
@@ -38,11 +40,52 @@ export default function MapScreen() {
   const [selectedAnimal, setSelectedAnimal] = useState(null);
   const [mapRef, setMapRef]   = useState(null);
   const [filterStatus, setFilterStatus] = useState(null);
+  const [userLocation, setUserLocation] = useState(null);
+  const [permissionGranted, setPermissionGranted] = useState(false);
 
   useEffect(() => {
-    fetchAnimals();
-    fetchGeofences();
-  }, []);
+    const init = async () => {
+      await fetchAnimals();
+      const zones = await fetchGeofences();
+      await requestLocationPermission();
+      
+      // Auto-center on the primary farm zone if it exists
+      if (zones && zones.length > 0) {
+        const primaryZone = zones.find(z => z.is_active) || zones[0];
+        if (primaryZone.center_lat && primaryZone.center_lon && mapRef) {
+          mapRef.animateToRegion({
+            latitude: parseFloat(primaryZone.center_lat),
+            longitude: parseFloat(primaryZone.center_lon),
+            latitudeDelta: 0.015,
+            longitudeDelta: 0.015,
+          }, 1500);
+        }
+      }
+    };
+    init();
+  }, [mapRef]);
+
+  const requestLocationPermission = async () => {
+    try {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status === 'granted') {
+        const location = await Location.getCurrentPositionAsync({});
+        setUserLocation(location.coords);
+        setPermissionGranted(true);
+        // Smooth transition to user location if permitted
+        if (mapRef) {
+          mapRef.animateToRegion({
+            latitude: location.coords.latitude,
+            longitude: location.coords.longitude,
+            latitudeDelta: 0.015,
+            longitudeDelta: 0.015,
+          }, 1500);
+        }
+      }
+    } catch (err) {
+      console.warn('[Map] Location permission error:', err);
+    }
+  };
 
   useEffect(() => {
     animals.forEach((a) => subscribeAnimal(a.id));
@@ -61,9 +104,25 @@ export default function MapScreen() {
     );
   }, [mapRef, validAnimals]);
 
-  const initialRegion = validAnimals[0]
-    ? { latitude: parseFloat(validAnimals[0].latitude), longitude: parseFloat(validAnimals[0].longitude), latitudeDelta: 0.05, longitudeDelta: 0.05 }
-    : { latitude: 35.038, longitude: 9.484, latitudeDelta: 0.1, longitudeDelta: 0.1 };
+  const initialRegion = DEFAULT_LOCATION;
+
+  const goToMyLocation = async () => {
+    if (!permissionGranted) {
+      await requestLocationPermission();
+      return;
+    }
+    const location = await Location.getCurrentPositionAsync({});
+    mapRef?.animateToRegion({
+      latitude: location.coords.latitude,
+      longitude: location.coords.longitude,
+      latitudeDelta: 0.01,
+      longitudeDelta: 0.01,
+    }, 1000);
+  };
+
+  const goToFarm = () => {
+    mapRef?.animateToRegion(DEFAULT_LOCATION, 1000);
+  };
 
   const FilterBtn = ({ status, label }) => (
     <TouchableOpacity
@@ -131,7 +190,36 @@ export default function MapScreen() {
           }
           return null;
         })}
+
+        {/* Farm (Default/Zone Location) Marker */}
+        {(() => {
+          const activeZone = geofences.find(z => z.is_active) || geofences[0];
+          const farmLat = activeZone?.center_lat ? parseFloat(activeZone.center_lat) : DEFAULT_LOCATION.latitude;
+          const farmLon = activeZone?.center_lon ? parseFloat(activeZone.center_lon) : DEFAULT_LOCATION.longitude;
+          
+          return (
+            <Marker
+              coordinate={{ latitude: farmLat, longitude: farmLon }}
+              title={activeZone ? `Zone #${activeZone.id} Center` : FARM_METADATA.name}
+              description={activeZone ? "Calculated zone center" : FARM_METADATA.description}
+            >
+              <View style={styles.farmMarker}>
+                <Ionicons name="home" size={24} color={COLORS.primary} />
+              </View>
+            </Marker>
+          );
+        })()}
       </MapView>
+
+      {/* Floating Action Buttons */}
+      <View style={[styles.fabContainer, { bottom: insets.bottom + 85 }]}>
+        <TouchableOpacity style={styles.fab} onPress={goToFarm} activeOpacity={0.8}>
+          <Ionicons name="business" size={22} color={COLORS.text} />
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.fab} onPress={goToMyLocation} activeOpacity={0.8}>
+          <Ionicons name="navigate" size={22} color={COLORS.primary} />
+        </TouchableOpacity>
+      </View>
 
       {/* Top Bar */}
       <View style={[styles.topBar, { paddingTop: insets.top + 8 }]}>
@@ -236,4 +324,7 @@ const styles = StyleSheet.create({
   sheetMeta:      { color:COLORS.subtext, fontSize:13, marginTop:2 },
   sheetCoords:    { color:COLORS.subtext, fontSize:12, marginTop:4 },
   loadingOverlay: { ...StyleSheet.absoluteFillObject, backgroundColor:'rgba(0,0,0,0.4)', alignItems:'center', justifyContent:'center' },
+  farmMarker:     { backgroundColor:COLORS.surface, padding:6, borderRadius:15, borderWidth:2, borderColor:COLORS.primary },
+  fabContainer:   { position:'absolute', right:16, gap:12 },
+  fab:            { width:48, height:48, borderRadius:24, backgroundColor:COLORS.card, alignItems:'center', justifyContent:'center', elevation:4, shadowColor:'#000', shadowOffset:{width:0,height:2}, shadowOpacity:0.3, shadowRadius:4, borderWidth:1, borderColor:COLORS.border },
 });

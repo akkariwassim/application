@@ -76,7 +76,14 @@ const useAnimalStore = create((set, get) => ({
     set((state) => ({
       animals: state.animals.map((a) =>
         a.id === animalId
-          ? { ...a, latitude: positionData.latitude, longitude: positionData.longitude, last_seen: positionData.timestamp }
+          ? { 
+              ...a, 
+              latitude: positionData.latitude, 
+              longitude: positionData.longitude, 
+              temperature: positionData.temperature,
+              activity: positionData.activity,
+              last_seen: positionData.timestamp 
+            }
           : a
       ),
     }));

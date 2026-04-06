@@ -7,15 +7,16 @@ const Position = {
    * Insert a new GPS position.
    */
   async create({ animalId, latitude, longitude, accuracyM, altitudeM, speedMps,
-                 headingDeg, satellites, hdop, deviceId, recordedAt }) {
+                 headingDeg, satellites, hdop, temperatureC, activityScore, deviceId, recordedAt }) {
     const [result] = await pool.query(
       `INSERT INTO positions
          (animal_id, latitude, longitude, accuracy_m, altitude_m, speed_mps,
-          heading_deg, satellites, hdop, device_id, recorded_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          heading_deg, satellites, hdop, temperature_c, activity_score, device_id, recorded_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [animalId, latitude, longitude,
        accuracyM  || null, altitudeM  || null, speedMps   || null,
        headingDeg || null, satellites || null, hdop       || null,
+       temperatureC || null, activityScore || null,
        deviceId   || null, recordedAt || new Date()]
     );
     return result.insertId;

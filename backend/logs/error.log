@@ -24,3 +24,33 @@
     at C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\index.js:284:15
     at router.process_params (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\index.js:346:12)
     at next (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\index.js:280:10)
+2026-04-06 23:38:27 [error]: Error: Unknown column 'temperature_c' in 'field list'
+    at PromisePool.query (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\mysql2\lib\promise\pool.js:36:22)
+    at Object.create (C:\Users\Wassim\Desktop\mon-application\backend\src\models\Position.js:11:33)
+    at submitPosition (C:\Users\Wassim\Desktop\mon-application\backend\src\controllers\positionsController.js:42:39)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+2026-04-06 23:38:30 [error]: Error: Unknown column 'temperature_c' in 'field list'
+    at PromisePool.query (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\mysql2\lib\promise\pool.js:36:22)
+    at Object.create (C:\Users\Wassim\Desktop\mon-application\backend\src\models\Position.js:11:33)
+    at submitPosition (C:\Users\Wassim\Desktop\mon-application\backend\src\controllers\positionsController.js:42:39)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+2026-04-06 23:38:33 [error]: Error: Unknown column 'temperature_c' in 'field list'
+    at PromisePool.query (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\mysql2\lib\promise\pool.js:36:22)
+    at Object.create (C:\Users\Wassim\Desktop\mon-application\backend\src\models\Position.js:11:33)
+    at submitPosition (C:\Users\Wassim\Desktop\mon-application\backend\src\controllers\positionsController.js:42:39)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+2026-04-06 23:38:45 [error]: Error: Unknown column 'temperature_c' in 'field list'
+    at PromisePool.query (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\mysql2\lib\promise\pool.js:36:22)
+    at Object.create (C:\Users\Wassim\Desktop\mon-application\backend\src\models\Position.js:11:33)
+    at submitPosition (C:\Users\Wassim\Desktop\mon-application\backend\src\controllers\positionsController.js:42:39)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+2026-04-06 23:38:48 [error]: Error: Unknown column 'temperature_c' in 'field list'
+    at PromisePool.query (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\mysql2\lib\promise\pool.js:36:22)
+    at Object.create (C:\Users\Wassim\Desktop\mon-application\backend\src\models\Position.js:11:33)
+    at submitPosition (C:\Users\Wassim\Desktop\mon-application\backend\src\controllers\positionsController.js:42:39)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+2026-04-06 23:38:51 [error]: Error: Unknown column 'temperature_c' in 'field list'
+    at PromisePool.query (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\mysql2\lib\promise\pool.js:36:22)
+    at Object.create (C:\Users\Wassim\Desktop\mon-application\backend\src\models\Position.js:11:33)
+    at submitPosition (C:\Users\Wassim\Desktop\mon-application\backend\src\controllers\positionsController.js:42:39)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)

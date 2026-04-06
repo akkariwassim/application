@@ -32,6 +32,21 @@ function AnimalCard({ animal, onPress, onDelete }) {
           {animal.last_seen && (
             <Text style={styles.lastSeen}>Last seen: {new Date(animal.last_seen).toLocaleTimeString()}</Text>
           )}
+          
+          <View style={styles.metricsRow}>
+            <View style={styles.metricItem}>
+              <Ionicons name="thermometer" size={12} color="#FF4D4D" />
+              <Text style={styles.metricText}>
+                {animal.temperature ? `${parseFloat(animal.temperature).toFixed(1)}°` : '--'}
+              </Text>
+            </View>
+            <View style={styles.metricItem}>
+              <Ionicons name="walk" size={12} color="#4DFF88" />
+              <Text style={styles.metricText}>
+                {animal.activity ? `${Math.round(animal.activity)}%` : '--'}
+              </Text>
+            </View>
+          </View>
         </View>
       </View>
       <View style={styles.cardRight}>
@@ -106,7 +121,7 @@ export default function AnimalsScreen({ navigation }) {
         renderItem={({ item }) => (
           <AnimalCard
             animal={item}
-            onPress={() => navigation.navigate('AnimalDetail', { animal: item, mode: 'view' })}
+            onPress={() => navigation.navigate('AnimalView', { animalId: item.id })}
             onDelete={handleDelete}
           />
         )}
@@ -131,7 +146,10 @@ const styles = StyleSheet.create({
   emoji:        { fontSize:24 },
   animalName:   { color:COLORS.text, fontWeight:'700', fontSize:16 },
   animalMeta:   { color:COLORS.subtext, fontSize:12, marginTop:2 },
-  lastSeen:     { color:COLORS.subtext, fontSize:11, marginTop:1 },
+  lastSeen:     { color:COLORS.subtext, fontSize:10, marginTop:1 },
+  metricsRow:   { flexDirection:'row', gap:10, marginTop:6 },
+  metricItem:   { flexDirection:'row', alignItems:'center', gap:3 },
+  metricText:   { color:COLORS.text, fontSize:11, fontWeight:'600' },
   cardRight:    { alignItems:'flex-end', gap:8 },
   statusBadge:  { flexDirection:'row', alignItems:'center', gap:4, paddingHorizontal:8, paddingVertical:4, borderRadius:10 },
   statusDot:    { width:6, height:6, borderRadius:3 },
