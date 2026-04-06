@@ -47,6 +47,21 @@ const useGeofenceStore = create((set, get) => ({
       throw err;
     }
   },
+
+  setPrimaryZone: async (id) => {
+    try {
+      // Find the zone to get its data
+      const zone = get().geofences.find(z => z.id === id);
+      if (!zone) return;
+      
+      // Update with isPrimary: 1
+      await api.put(`/geofences/${id}`, { ...zone, isPrimary: 1 });
+      await get().fetchGeofences();
+    } catch (err) {
+      set({ error: err.message });
+      throw err;
+    }
+  },
 }));
 
 export default useGeofenceStore;

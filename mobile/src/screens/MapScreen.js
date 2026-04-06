@@ -51,13 +51,13 @@ export default function MapScreen() {
       
       // Auto-center on the primary farm zone if it exists
       if (zones && zones.length > 0) {
-        const primaryZone = zones.find(z => z.is_active) || zones[0];
+        const primaryZone = zones.find(z => z.is_primary) || zones.find(z => z.is_active) || zones[0];
         if (primaryZone.center_lat && primaryZone.center_lon && mapRef) {
           mapRef.animateToRegion({
             latitude: parseFloat(primaryZone.center_lat),
             longitude: parseFloat(primaryZone.center_lon),
-            latitudeDelta: 0.015,
-            longitudeDelta: 0.015,
+            latitudeDelta: 0.012,
+            longitudeDelta: 0.012,
           }, 1500);
         }
       }
@@ -153,7 +153,7 @@ export default function MapScreen() {
           return (
             <React.Fragment key={animal.id}>
               {/* Geofence circle */}
-              {animal.center_lat && animal.radius_m && (
+              {!!(animal.center_lat && animal.radius_m) && (
                 <Circle
                   center={{ latitude: parseFloat(animal.center_lat), longitude: parseFloat(animal.center_lon) }}
                   radius={parseFloat(animal.radius_m)}
@@ -193,18 +193,18 @@ export default function MapScreen() {
 
         {/* Farm (Default/Zone Location) Marker */}
         {(() => {
-          const activeZone = geofences.find(z => z.is_active) || geofences[0];
+          const activeZone = geofences.find(z => z.is_primary) || geofences.find(z => z.is_active) || geofences[0];
           const farmLat = activeZone?.center_lat ? parseFloat(activeZone.center_lat) : DEFAULT_LOCATION.latitude;
           const farmLon = activeZone?.center_lon ? parseFloat(activeZone.center_lon) : DEFAULT_LOCATION.longitude;
           
           return (
             <Marker
               coordinate={{ latitude: farmLat, longitude: farmLon }}
-              title={activeZone ? `Zone #${activeZone.id} Center` : FARM_METADATA.name}
+              title={activeZone?.name || (activeZone ? `Zone #${activeZone.id}` : FARM_METADATA.name)}
               description={activeZone ? "Calculated zone center" : FARM_METADATA.description}
             >
-              <View style={styles.farmMarker}>
-                <Ionicons name="home" size={24} color={COLORS.primary} />
+              <View style={[styles.farmMarker, activeZone?.is_primary && { borderColor: COLORS.success }]}>
+                <Ionicons name="location" size={24} color={activeZone?.is_primary ? COLORS.success : COLORS.primary} />
               </View>
             </Marker>
           );

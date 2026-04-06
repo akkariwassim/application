@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import {
   View, Text, StyleSheet, TouchableOpacity, FlatList, Alert, ActivityIndicator,
+  Modal, TextInput,
 } from 'react-native';
 import MapView, { Polygon, Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import { Ionicons } from '@expo/vector-icons';
@@ -21,6 +22,11 @@ export default function GeofenceScreen() {
   const [isDrawing, setIsDrawing] = useState(false);
   const [newPolygon, setNewPolygon] = useState([]);
   const [mapRef, setMapRef] = useState(null);
+  
+  // New state for naming modal
+  const [showSaveModal, setShowSaveModal] = useState(false);
+  const [zoneName, setZoneName] = useState('');
+  const [isPrimary, setIsPrimary] = useState(false);
 
   useEffect(() => {
     fetchGeofences();
@@ -32,9 +38,9 @@ export default function GeofenceScreen() {
     setNewPolygon([...newPolygon, { latitude, longitude }]);
   };
 
-  const handleSave = async () => {
-    if (newPolygon.length < 3) {
-      Alert.alert('Invalid Zone', 'A polygon must have at least 3 points.');
+  const handleSaveFinal = async () => {
+    if (!zoneName.trim()) {
+      Alert.alert('Required', 'Please enter a name for this zone.');
       return;
     }
 
@@ -42,16 +48,29 @@ export default function GeofenceScreen() {
       const centroid = calculateCentroid(newPolygon);
       await createGeofence({
         type: 'polygon',
+        name: zoneName,
         polygonCoords: newPolygon,
         centerLat: centroid.latitude,
         centerLon: centroid.longitude,
+        isPrimary: isPrimary,
       });
       setIsDrawing(false);
       setNewPolygon([]);
-      Alert.alert('Success', 'Virtual zone saved successfully.');
+      setShowSaveModal(false);
+      setZoneName('');
+      setIsPrimary(false);
+      Alert.alert('Success', `Zone "${zoneName}" saved successfully.`);
     } catch (err) {
       Alert.alert('Error', 'Failed to save zone.');
     }
+  };
+
+  const handleSaveRequest = () => {
+    if (newPolygon.length < 3) {
+      Alert.alert('Invalid Zone', 'A polygon must have at least 3 points.');
+      return;
+    }
+    setShowSaveModal(true);
   };
 
   const handleCancel = () => {
@@ -72,9 +91,16 @@ export default function GeofenceScreen() {
       : item.polygon_coords;
     
     return (
-      <View style={styles.zoneCard}>
+      <View style={[styles.zoneCard, item.is_primary && styles.primaryCard]}>
         <View style={styles.zoneInfo}>
-          <Text style={styles.zoneTitle}>Polygon Zone #{item.id}</Text>
+          <View style={styles.nameRow}>
+            <Text style={styles.zoneTitle}>{item.name || `Polygon Zone #${item.id}`}</Text>
+            {!!item.is_primary && (
+              <View style={styles.primaryBadge}>
+                <Text style={styles.primaryText}>PRIMARY</Text>
+              </View>
+            )}
+          </View>
           <Text style={styles.zoneMeta}>{coords.length} vertices · {item.is_active ? 'Active' : 'Inactive'}</Text>
         </View>
         <TouchableOpacity style={styles.deleteBtn} onPress={() => deleteZone(item.id)}>
@@ -139,7 +165,7 @@ export default function GeofenceScreen() {
           )}
 
           {/* Animals Markers for context */}
-          {animals.map((a) => a.latitude && (
+          {animals.map((a) => !!a.latitude && (
             <Marker
               key={a.id}
               coordinate={{ latitude: parseFloat(a.latitude), longitude: parseFloat(a.longitude) }}
@@ -156,7 +182,7 @@ export default function GeofenceScreen() {
               <Ionicons name="close" size={20} color={COLORS.text} />
               <Text style={styles.controlText}>Cancel</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={[styles.controlBtn, styles.saveBtn]} onPress={handleSave}>
+            <TouchableOpacity style={[styles.controlBtn, styles.saveBtn]} onPress={handleSaveRequest}>
               <Ionicons name="save-outline" size={20} color="#fff" />
               <Text style={[styles.controlText, { color: '#fff' }]}>Save Zone</Text>
             </TouchableOpacity>
@@ -166,6 +192,57 @@ export default function GeofenceScreen() {
             <Ionicons name="add" size={30} color="#fff" />
           </TouchableOpacity>
         )}
+
+        {/* Save Modal */}
+        <Modal
+          visible={showSaveModal}
+          transparent
+          animationType="slide"
+          onRequestClose={() => setShowSaveModal(false)}
+        >
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalTitle}>Zone Details</Text>
+              
+              <Text style={styles.label}>Unique Name</Text>
+              <TextInput
+                style={styles.input}
+                value={zoneName}
+                onChangeText={setZoneName}
+                placeholder="e.g. North Pasture"
+                placeholderTextColor={COLORS.subtext}
+                autoFocus
+              />
+
+              <TouchableOpacity 
+                style={styles.toggleRow} 
+                onPress={() => setIsPrimary(!isPrimary)}
+              >
+                <Ionicons 
+                  name={isPrimary ? "checkbox" : "square-outline"} 
+                  size={24} 
+                  color={isPrimary ? COLORS.primary : COLORS.subtext} 
+                />
+                <Text style={styles.toggleText}>Set as Default Farm Center</Text>
+              </TouchableOpacity>
+
+              <View style={styles.modalActions}>
+                <TouchableOpacity 
+                  style={[styles.modalBtn, styles.cancelBtn]} 
+                  onPress={() => setShowSaveModal(false)}
+                >
+                  <Text style={styles.cancelBtnText}>Cancel</Text>
+                </TouchableOpacity>
+                <TouchableOpacity 
+                  style={[styles.modalBtn, styles.confirmBtn]} 
+                  onPress={handleSaveFinal}
+                >
+                  <Text style={styles.confirmBtnText}>Confirm Save</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </Modal>
       </View>
 
       <View style={styles.listContainer}>
@@ -200,9 +277,28 @@ const styles = StyleSheet.create({
   controlText:    { color: COLORS.text, fontWeight: '600' },
   vertexMarker:   { width: 10, height: 10, borderRadius: 5, backgroundColor: COLORS.success, borderWidth: 2, borderColor: '#fff' },
   zoneCard:       { flexDirection: 'row', backgroundColor: COLORS.card, borderRadius: 16, padding: 16, marginBottom: 10, alignItems: 'center', borderWidth: 1, borderColor: COLORS.border },
+  primaryCard:    { borderColor: COLORS.primary, borderLeftWidth: 6 },
   zoneInfo:       { flex: 1 },
+  nameRow:        { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 4 },
   zoneTitle:      { color: COLORS.text, fontSize: 16, fontWeight: '700' },
-  zoneMeta:       { color: COLORS.subtext, fontSize: 12, marginTop: 2 },
+  primaryBadge:   { backgroundColor: COLORS.primary, paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4 },
+  primaryText:    { color: '#fff', fontSize: 10, fontWeight: '800' },
+  zoneMeta:       { color: COLORS.subtext, fontSize: 12 },
   deleteBtn:      { padding: 8 },
   emptyText:      { color: COLORS.subtext, textAlign: 'center', marginTop: 40, fontSize: 14 },
+
+  // Modal Styles
+  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'center', padding: 20 },
+  modalContent: { backgroundColor: COLORS.surface, borderRadius: 24, padding: 24, borderWidth: 1, borderColor: COLORS.border },
+  modalTitle:   { color: COLORS.text, fontSize: 22, fontWeight: '800', marginBottom: 24 },
+  label:        { color: COLORS.subtext, fontSize: 12, fontWeight: '600', marginBottom: 8, marginLeft: 4 },
+  input:        { height: 56, backgroundColor: COLORS.card, borderRadius: 16, paddingHorizontal: 16, color: COLORS.text, fontSize: 16, borderWidth: 1, borderColor: COLORS.border, marginBottom: 20 },
+  toggleRow:    { flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 30 },
+  toggleText:   { color: COLORS.text, fontSize: 15, fontWeight: '600' },
+  modalActions: { flexDirection: 'row', gap: 12 },
+  modalBtn:     { flex: 1, height: 50, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
+  cancelBtn:    { backgroundColor: 'transparent', borderWidth: 1, borderColor: COLORS.border },
+  confirmBtn:   { backgroundColor: COLORS.primary },
+  cancelBtnText: { color: COLORS.subtext, fontWeight: '600' },
+  confirmBtnText: { color: '#fff', fontWeight: '700' },
 });

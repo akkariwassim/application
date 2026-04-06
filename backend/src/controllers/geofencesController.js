@@ -20,16 +20,18 @@ async function getGeofences(req, res, next) {
  */
 async function createGeofence(req, res, next) {
   try {
-    const { type, centerLat, centerLon, radiusM, polygonCoords, animalId } = req.body;
+    const { type, name, centerLat, centerLon, radiusM, polygonCoords, animalId, isPrimary } = req.body;
     
     const geofenceId = await Geofence.create({
       userId: req.user.id,
       animalId,
       type: type || 'polygon',
+      name,
       centerLat,
       centerLon,
       radiusM,
-      polygonCoords
+      polygonCoords,
+      isPrimary: isPrimary ? 1 : 0
     });
     
     res.status(201).json({ id: geofenceId, message: 'Geofence created successfully' });
@@ -44,10 +46,10 @@ async function createGeofence(req, res, next) {
 async function updateGeofence(req, res, next) {
   try {
     const { id } = req.params;
-    const { type, centerLat, centerLon, radiusM, polygonCoords, isActive } = req.body;
+    const { type, name, centerLat, centerLon, radiusM, polygonCoords, isActive, isPrimary } = req.body;
     
     await Geofence.update(id, req.user.id, {
-      type, centerLat, centerLon, radiusM, polygonCoords, isActive
+      type, name, centerLat, centerLon, radiusM, polygonCoords, isActive, isPrimary
     });
     
     res.json({ message: 'Geofence updated successfully' });
