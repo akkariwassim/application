@@ -32,15 +32,11 @@ const Geofence = {
   /**
    * Create a new geofence.
    */
-  async create({ userId, animalId, type, centerLat, centerLon, radiusM, polygonCoords }) {
+  async create({ animalId, userId, type, name, radiusM, centerLat, centerLon, polygonCoords, isActive = 1, isPrimary = 0 }) {
     const [result] = await pool.query(
-      `INSERT INTO geofences (user_id, animal_id, type, center_lat, center_lon, radius_m, polygon_coords, is_active)
-       VALUES (?, ?, ?, ?, ?, ?, ?, 1)`,
-      [userId, animalId || null, type || 'circle',
-       centerLat     || null,
-       centerLon     || null,
-       radiusM       || null,
-       polygonCoords ? JSON.stringify(polygonCoords) : null]
+      `INSERT INTO geofences (animal_id, user_id, type, name, radius_m, center_lat, center_lon, polygon_coords, is_active, is_primary)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [animalId || null, userId, type, name || null, radiusM || null, centerLat, centerLon, JSON.stringify(polygonCoords) || null, isActive, isPrimary]
     );
     return result.insertId;
   },
@@ -48,16 +44,23 @@ const Geofence = {
   /**
    * Update an existing geofence.
    */
-  async update(id, userId, { type, centerLat, centerLon, radiusM, polygonCoords, isActive }) {
-    await pool.query(
-      `UPDATE geofences 
-       SET type = ?, center_lat = ?, center_lon = ?, radius_m = ?, polygon_coords = ?, is_active = ? 
+  async update(id, userId, fields) {
+    const { type, name, radiusM, centerLat, centerLon, polygonCoords, isActive, isPrimary } = fields;
+    
+    // If setting as primary, unset others for this user
+    if (isPrimary) {
+      await pool.query('UPDATE geofences SET is_primary = 0 WHERE user_id = ?', [userId]);
+    }
+
+    const [result] = await pool.query(
+      `UPDATE geofences SET
+         type = ?, name = ?, radius_m = ?, center_lat = ?, center_lon = ?, 
+         polygon_coords = ?, is_active = ?, is_primary = ?
        WHERE id = ? AND user_id = ?`,
-      [type, centerLat, centerLon, radiusM, 
-       polygonCoords ? JSON.stringify(polygonCoords) : null,
-       isActive !== undefined ? isActive : 1,
-       id, userId]
+      [type, name || null, radiusM || null, centerLat, centerLon, 
+       JSON.stringify(polygonCoords) || null, isActive, isPrimary, id, userId]
     );
+    return result.affectedRows > 0;
   },
 
   /**
