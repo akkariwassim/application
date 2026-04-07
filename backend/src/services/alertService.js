@@ -13,7 +13,7 @@ const { isPointInPolygon } = require('../utils/geoUtils');
  * Handles alert creation, deduplication, and real-time notifications.
  */
 
-async function createGeofenceAlert({ animalId, userId, latitude, longitude, distanceM, radiusM }) {
+async function createGeofenceAlert({ animalId, userId, latitude, longitude, distanceM, radiusM, geofenceId, geofenceName }) {
   try {
     // Deduplication: check if an active geofence alert exists in the last 15 mins
     const [recent] = await pool.query(
@@ -22,9 +22,10 @@ async function createGeofenceAlert({ animalId, userId, latitude, longitude, dist
     );
     if (recent.length > 0) return null;
 
-    const message = distanceM !== null
-      ? `Animal a franchi le périmètre de sécurité ! Distance : ${distanceM}m (rayon : ${radiusM}m).`
-      : `Animal a franchi le périmètre de sécurité (zone polygone).`;
+    const zoneLabel = geofenceName ? `la zone "${geofenceName}"` : "la zone de sécurité";
+    const message = radiusM 
+      ? `L'animal a quitté ${zoneLabel} ! Distance : ${Math.round(distanceM || 0)}m (rayon : ${radiusM}m).`
+      : `L'animal a quitté ${zoneLabel} (clôture polygonale).`;
 
     const alertId = await Alert.create({
       animalId,
@@ -34,7 +35,7 @@ async function createGeofenceAlert({ animalId, userId, latitude, longitude, dist
       message,
       latitude,
       longitude,
-      geofenceId: radiusM ? null : undefined // Will be set by processZoneMonitoring if polygon
+      geofenceId: geofenceId
     });
 
     await Animal.updateStatus(animalId, 'danger');
@@ -167,11 +168,12 @@ async function processZoneMonitoring(animal, currentPos) {
       }
 
       if (!isInside) {
-        // Trigger alert with linked geofenceId
+        // Trigger alert with linked geofenceId and Name
         await createGeofenceAlert({
           animalId, userId, latitude, longitude,
           distanceM: null, radiusM: activeFence.radius_m,
-          geofenceId: activeFence.id 
+          geofenceId: activeFence.id,
+          geofenceName: activeFence.name
         });
       } else if (animal.status === 'danger') {
         // Auto-safe if back in zone

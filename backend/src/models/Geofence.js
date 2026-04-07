@@ -19,6 +19,17 @@ const Geofence = {
   },
 
   /**
+   * Find a geofence by name for a user (for uniqueness check).
+   */
+  async findByName(userId, name) {
+    const [rows] = await pool.query(
+      'SELECT id FROM geofences WHERE user_id = ? AND name = ? LIMIT 1',
+      [userId, name]
+    );
+    return rows[0] || null;
+  },
+
+  /**
    * Get the active geofence for an animal.
    * Checks both animal-specific and user-level zones.
    */

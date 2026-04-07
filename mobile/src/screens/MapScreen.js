@@ -1,245 +1,225 @@
-import React, { useEffect, useState, useCallback } from 'react';
-import {
-  View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Modal,
-  Dimensions, Platform,
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { 
+  View, Text, StyleSheet, TouchableOpacity, Image, Dimensions, 
+  ActivityIndicator, Modal, FlatList, ScrollView, Animated
 } from 'react-native';
-import MapView, { Marker, Circle, Polyline, Polygon, PROVIDER_GOOGLE } from 'react-native-maps';
+import MapView, { Marker, Polygon, PROVIDER_GOOGLE, Callout } from 'react-native-maps';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import useAnimalStore from '../store/animalStore';
-import useAlertStore  from '../store/alertStore';
-import { subscribeAnimal } from '../services/socketService';
-import useGeofenceStore from '../store/geofenceStore';
 import * as Location from 'expo-location';
+import useAnimalStore from '../store/animalStore';
+import useGeofenceStore from '../store/geofenceStore';
 import { isPointInPolygon } from '../utils/geoUtils';
-import { DEFAULT_LOCATION, FARM_METADATA } from '../config/mapConfig';
 
-const { width } = Dimensions.get('window');
-
-const COLORS = {
-  primary:'#4F46E5', background:'#0A0F1E', surface:'#131929',
-  card:'#1E2A45', text:'#F0F4FF', subtext:'#94A3B8',
-  safe:'#22C55E', warning:'#F59E0B', danger:'#EF4444', offline:'#6B7280',
-  border:'rgba(255,255,255,0.08)',
-};
+const { width, height } = Dimensions.get('window');
 
 const STATUS_COLOR = {
-  safe: COLORS.safe, warning: COLORS.warning,
-  danger: COLORS.danger, offline: COLORS.offline,
+  safe: '#22C55E',
+  warning: '#F59E0B',
+  danger: '#EF4444',
+  offline: '#94A3B8'
 };
 
-const STATUS_ICON = {
-  safe: 'checkmark-circle', warning: 'warning',
-  danger: 'alert-circle', offline: 'cloud-offline',
+const COLORS = {
+  primary: '#4F46E5',
+  background: '#0A0F1E',
+  surface: '#131929',
+  card: '#1E2A45',
+  text: '#F0F4FF',
+  subtext: '#94A3B8',
+  danger: '#EF4444',
+  success: '#22C55E',
+  border: 'rgba(255,255,255,0.08)',
 };
 
-export default function MapScreen({ route, navigation }) {
-  const insets   = useSafeAreaInsets();
+export default function MapScreen() {
+  const insets = useSafeAreaInsets();
+  const mapRef = useRef(null);
   const { animals, fetchAnimals, isLoading } = useAnimalStore();
   const { geofences, fetchGeofences } = useGeofenceStore();
-  const unreadCount = useAlertStore((s) => s.unreadCount);
   const [selectedAnimal, setSelectedAnimal] = useState(null);
-  const [mapRef, setMapRef]   = useState(null);
   const [showZonesList, setShowZonesList] = useState(false);
   const [userLocation, setUserLocation] = useState(null);
-  const [permissionGranted, setPermissionGranted] = useState(false);
+  const [locationPermission, setLocationPermission] = useState(null);
 
   useEffect(() => {
-    const init = async () => {
-      await fetchAnimals();
-      const zones = await fetchGeofences();
-      await requestLocationPermission();
-      
-      // Check for focusZone from navigation
-      const focusZone = route.params?.focusZone;
-      if (focusZone && mapRef) {
-        const coords = typeof focusZone.polygon_coords === 'string' ? JSON.parse(focusZone.polygon_coords) : focusZone.polygon_coords;
-        if (coords && coords.length > 0) {
-          mapRef.animateToRegion({
-            latitude: parseFloat(focusZone.center_lat),
-            longitude: parseFloat(focusZone.center_lon),
-            latitudeDelta: 0.005,
-            longitudeDelta: 0.005,
-          }, 1000);
-          setSelectedAnimal({ isZone: true, ...focusZone, area: focusZone.area_sqm });
-        }
-      } else if (zones && zones.length > 0) {
-        // Auto-fit all zones on first load
-        fitAllZonesDirect(zones);
-      }
-    };
-    init();
-  }, [mapRef]);
+    fetchAnimals();
+    fetchGeofences();
+    
+    // Auto-center on user upon load
+    centerOnUser();
 
-  const requestLocationPermission = async () => {
+    const interval = setInterval(fetchAnimals, 5000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const centerOnUser = async () => {
     try {
-      const { status } = await Location.requestForegroundPermissionsAsync();
-      if (status === 'granted') {
-        const location = await Location.getCurrentPositionAsync({});
-        setUserLocation(location.coords);
-        setPermissionGranted(true);
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      setLocationPermission(status === 'granted');
+      
+      if (status !== 'granted') {
+        Alert.alert(
+          'Permission Refusée',
+          'L\'accès à la localisation est nécessaire pour vous situer sur la carte. Veuillez l\'activer dans vos paramètres.'
+        );
+        return;
       }
+
+      let location = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
+      const coord = { latitude: location.coords.latitude, longitude: location.coords.longitude };
+      
+      setUserLocation(coord);
+      mapRef.current?.animateToRegion({
+        ...coord,
+        latitudeDelta: 0.005,
+        longitudeDelta: 0.005,
+      }, 1000);
     } catch (err) {
-      console.warn('[Map] Location permission error:', err);
+      Alert.alert('Erreur GPS', 'Impossible de récupérer votre position. Vérifiez que votre GPS est bien activé.');
     }
   };
 
-  useEffect(() => {
-    animals.forEach((a) => subscribeAnimal(a.id));
-  }, [animals.length]);
-
-  const validAnimals = animals.filter(
-    (a) => a.latitude != null && a.longitude != null
-  );
-
-  const fitAll = useCallback(() => {
-    if (!mapRef || validAnimals.length === 0) return;
-    mapRef.fitToCoordinates(
-      validAnimals.map((a) => ({ latitude: parseFloat(a.latitude), longitude: parseFloat(a.longitude) })),
-      { edgePadding: { top: 150, right: 60, bottom: 200, left: 60 }, animated: true }
-    );
-  }, [mapRef, validAnimals]);
-
-  const fitAllZonesDirect = (zones = geofences) => {
-    if (!zones || zones.length === 0 || !mapRef) return;
+  const fitAllZones = () => {
+    if (!geofences || geofences.length === 0) return;
     
-    let allCoords = [];
-    zones.forEach(gf => {
-      const coords = typeof gf.polygon_coords === 'string' ? JSON.parse(gf.polygon_coords) : gf.polygon_coords;
-      if (coords && Array.isArray(coords)) {
-        allCoords = [...allCoords, ...coords];
+    const allCoords = geofences.flatMap(gf => {
+      if (gf.type === 'polygon' && gf.polygon_coords) {
+        return typeof gf.polygon_coords === 'string' ? JSON.parse(gf.polygon_coords) : gf.polygon_coords;
       }
+      return [];
     });
 
     if (allCoords.length > 0) {
-      mapRef.fitToCoordinates(allCoords, {
-        edgePadding: { top: 150, right: 80, bottom: 150, left: 80 },
+      mapRef.current?.fitToCoordinates(allCoords, {
+        edgePadding: { top: 50, right: 50, bottom: 150, left: 50 },
         animated: true,
       });
     }
-  };
-
-  const goToMyLocation = async () => {
-    if (!permissionGranted) {
-      await requestLocationPermission();
-      return;
-    }
-    const location = await Location.getCurrentPositionAsync({});
-    mapRef?.animateToRegion({
-      latitude: location.coords.latitude,
-      longitude: location.coords.longitude,
-      latitudeDelta: 0.01,
-      longitudeDelta: 0.01,
-    }, 1000);
-  };
-
-  const onZonesPress = () => {
-    fitAllZonesDirect();
     setShowZonesList(true);
   };
 
-  const initialRegion = DEFAULT_LOCATION;
+  const focusZone = (gf) => {
+    setShowZonesList(false);
+    if (!gf.center_lat || !gf.center_lon) return;
+
+    if (gf.type === 'polygon' && gf.polygon_coords) {
+      const coords = typeof gf.polygon_coords === 'string' ? JSON.parse(gf.polygon_coords) : gf.polygon_coords;
+      mapRef.current?.fitToCoordinates(coords, {
+        edgePadding: { top: 100, right: 100, bottom: 250, left: 100 },
+        animated: true,
+      });
+    } else {
+      mapRef.current?.animateToRegion({
+        latitude: parseFloat(gf.center_lat),
+        longitude: parseFloat(gf.center_lon),
+        latitudeDelta: 0.005,
+        longitudeDelta: 0.005,
+      }, 1000);
+    }
+    
+    // Select the zone to show stats
+    const coords = typeof gf.polygon_coords === 'string' ? JSON.parse(gf.polygon_coords) : gf.polygon_coords;
+    const animalsInside = animals.filter(a => !!a.latitude && isPointInPolygon({ latitude: parseFloat(a.latitude), longitude: parseFloat(a.longitude) }, coords)).length;
+    setSelectedAnimal({ isZone: true, ...gf, animalsInside, area: gf.area_sqm });
+  };
 
   return (
     <View style={styles.container}>
       <MapView
-        ref={setMapRef}
+        ref={mapRef}
         style={StyleSheet.absoluteFillObject}
         provider={PROVIDER_GOOGLE}
-        initialRegion={initialRegion}
         mapType="hybrid"
-        showsUserLocation
-        showsCompass
+        initialRegion={{
+          latitude: 35.038,
+          longitude: 9.484,
+          latitudeDelta: 0.02,
+          longitudeDelta: 0.02,
+        }}
       >
-        {/* Animal Markers */}
-        {validAnimals.map((animal) => {
-          const lat = parseFloat(animal.latitude);
-          const lon = parseFloat(animal.longitude);
-          const color = STATUS_COLOR[animal.status] || COLORS.offline;
-
-          return (
-            <React.Fragment key={`animal-${animal.id}`}>
-              {!!(animal.center_lat && animal.radius_m) && (
-                <Circle
-                  center={{ latitude: parseFloat(animal.center_lat), longitude: parseFloat(animal.center_lon) }}
-                  radius={parseFloat(animal.radius_m)}
-                  strokeColor={color + '99'}
-                  fillColor={color + '22'}
-                  strokeWidth={2}
-                />
-              )}
-              <Marker
-                coordinate={{ latitude: lat, longitude: lon }}
-                title={animal.name}
-                description={`${animal.status.toUpperCase()} • ${animal.type}`}
-                pinColor={color}
-                onPress={() => setSelectedAnimal(animal)}
-              />
-            </React.Fragment>
-          );
-        })}
-
-        {/* Polygons (Zones) */}
+        {/* Render Geofences */}
         {geofences.map((gf) => {
-          const coords = gf.polygon_coords ? (typeof gf.polygon_coords === 'string' ? JSON.parse(gf.polygon_coords) : gf.polygon_coords) : [];
-          if (gf.type === 'polygon' && coords.length > 0) {
-            const animalsInside = animals.filter(a => !!a.latitude && isPointInPolygon({ latitude: parseFloat(a.latitude), longitude: parseFloat(a.longitude) }, coords)).length;
-            const isSelected = selectedAnimal?.isZone && selectedAnimal.id === gf.id;
-            
+          if (gf.type === 'polygon' && gf.polygon_coords) {
+            const coords = typeof gf.polygon_coords === 'string' ? JSON.parse(gf.polygon_coords) : gf.polygon_coords;
             return (
               <Polygon
                 key={`poly-${gf.id}`}
                 coordinates={coords}
-                strokeColor={isSelected ? '#FFFFFF' : (gf.fill_color || COLORS.primary + 'AA')}
-                fillColor={isSelected ? (gf.fill_color || COLORS.primary) + '66' : (gf.fill_color || COLORS.primary) + '22'}
-                strokeWidth={isSelected ? 4 : 2}
-                tappable
-                onPress={() => setSelectedAnimal({ isZone: true, ...gf, animalsInside, area: gf.area_sqm })}
+                fillColor={gf.fill_color ? `${gf.fill_color}44` : 'rgba(79, 70, 229, 0.2)'}
+                strokeColor={gf.fill_color || COLORS.primary}
+                strokeWidth={2}
               />
             );
           }
           return null;
         })}
 
-        {/* Zone Markers (Centers) */}
+        {/* Zone Markers (Centers) with Labels */}
         {geofences.map((gf) => {
           if (!gf.center_lat || !gf.center_lon) return null;
           return (
             <Marker
               key={`marker-${gf.id}`}
               coordinate={{ latitude: parseFloat(gf.center_lat), longitude: parseFloat(gf.center_lon) }}
-              onPress={() => {
-                const coords = typeof gf.polygon_coords === 'string' ? JSON.parse(gf.polygon_coords) : gf.polygon_coords;
-                const animalsInside = animals.filter(a => !!a.latitude && isPointInPolygon({ latitude: parseFloat(a.latitude), longitude: parseFloat(a.longitude) }, coords)).length;
-                setSelectedAnimal({ isZone: true, ...gf, animalsInside, area: gf.area_sqm });
-              }}
+              onPress={() => focusZone(gf)}
             >
-              <View style={[styles.farmMarker, gf.is_primary && { borderColor: COLORS.success }]}>
-                <Ionicons name="location" size={18} color={gf.is_primary ? COLORS.success : COLORS.primary} />
+              <View style={styles.zoneMarkerWrapper}>
+                <View style={[styles.farmMarker, gf.is_primary && { borderColor: COLORS.success }]}>
+                  <Ionicons name="location" size={18} color={gf.is_primary ? COLORS.success : COLORS.primary} />
+                </View>
+                {gf.name && (
+                  <View style={styles.zoneLabelContainer}>
+                    <Text style={styles.zoneLabelText} numberOfLines={1}>
+                      {gf.name} • {(gf.area_sqm / 10000).toFixed(2)} Ha
+                    </Text>
+                  </View>
+                )}
               </View>
             </Marker>
           );
         })}
+
+        {/* User Location Marker */}
+        {userLocation && (
+          <Marker
+            coordinate={userLocation}
+            title="Ma Position"
+            zIndex={100}
+          >
+            <View style={styles.userMarker}>
+              <Ionicons name="person-circle" size={24} color="#4F46E5" />
+            </View>
+          </Marker>
+        )}
+
+        {/* Animal Markers */}
+        {animals.map((animal) => (
+          <Marker
+            key={animal.id}
+            coordinate={{
+              latitude: parseFloat(animal.latitude),
+              longitude: parseFloat(animal.longitude)
+            }}
+            onPress={() => setSelectedAnimal({ ...animal, isZone: false })}
+          >
+            <View style={[styles.animalMarker, { borderColor: STATUS_COLOR[animal.status] || COLORS.offline }]}>
+              <Ionicons name="paw" size={16} color={STATUS_COLOR[animal.status] || COLORS.offline} />
+            </View>
+          </Marker>
+        ))}
       </MapView>
 
-      {/* Primary Controls (Top) */}
-      <View style={[styles.dualButtonContainer, { top: insets.top + 12 }]}>
-        <TouchableOpacity 
-          style={styles.mainControlBtn} 
-          onPress={onZonesPress} 
-          activeOpacity={0.8}
-        >
-          <Ionicons name="layers" size={20} color={COLORS.primary} />
-          <Text style={styles.btnLabel}>Mes Zones</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity 
-          style={styles.mainControlBtn} 
-          onPress={goToMyLocation} 
-          activeOpacity={0.8}
-        >
+      {/* Top Controls */}
+      <View style={[styles.dualButtonContainer, { top: insets.top + 10 }]}>
+        <TouchableOpacity style={styles.mainControlBtn} onPress={centerOnUser}>
           <Ionicons name="navigate-circle" size={20} color={COLORS.primary} />
           <Text style={styles.btnLabel}>Ma Position</Text>
+        </TouchableOpacity>
+        
+        <TouchableOpacity style={styles.mainControlBtn} onPress={fitAllZones}>
+          <Ionicons name="map-outline" size={20} color={COLORS.primary} />
+          <Text style={styles.btnLabel}>Mes Zones</Text>
         </TouchableOpacity>
       </View>
 
@@ -255,39 +235,30 @@ export default function MapScreen({ route, navigation }) {
           <View style={styles.zonesBottomSheet}>
             <View style={styles.sheetHandle} />
             <Text style={styles.sheetTitle}>Mes Zones</Text>
-            {geofences.length === 0 ? (
-              <Text style={styles.emptyText}>Aucune zone créée</Text>
-            ) : (
-              <View style={styles.zonesGrid}>
-                {geofences.map(gf => {
-                  const coords = gf.polygon_coords ? (typeof gf.polygon_coords === 'string' ? JSON.parse(gf.polygon_coords) : gf.polygon_coords) : [];
-                  const animalsInside = animals.filter(a => !!a.latitude && isPointInPolygon({ latitude: parseFloat(a.latitude), longitude: parseFloat(a.longitude) }, coords)).length;
-                  return (
-                    <TouchableOpacity 
-                      key={gf.id} 
-                      style={styles.zoneQuickCard}
-                      onPress={() => {
-                        setShowZonesList(false);
-                        mapRef?.animateToRegion({
-                          latitude: parseFloat(gf.center_lat),
-                          longitude: parseFloat(gf.center_lon),
-                          latitudeDelta: 0.005,
-                          longitudeDelta: 0.005,
-                        }, 1000);
-                        setSelectedAnimal({ isZone: true, ...gf, animalsInside, area: gf.area_sqm });
-                      }}
-                    >
-                      <View style={[styles.typeMarker, { backgroundColor: gf.fill_color || COLORS.primary }]} />
-                      <View style={{ flex: 1 }}>
-                        <Text style={styles.zoneQuickName} numberOfLines={1}>{gf.name || `Zone #${gf.id}`}</Text>
-                        <Text style={styles.zoneQuickMeta}>{animalsInside} animaux · {(gf.area_sqm / 10000).toFixed(1)} Ha</Text>
-                      </View>
-                      <Ionicons name="chevron-forward" size={16} color={COLORS.subtext} />
-                    </TouchableOpacity>
-                  );
-                })}
-              </View>
-            )}
+            
+            <FlatList
+              data={geofences}
+              keyExtractor={(item) => item.id.toString()}
+              contentContainerStyle={styles.zonesGrid}
+              ListEmptyComponent={<Text style={styles.emptyText}>Aucune zone créée</Text>}
+              renderItem={({ item }) => {
+                const coords = typeof item.polygon_coords === 'string' ? JSON.parse(item.polygon_coords) : item.polygon_coords;
+                const animalsInside = animals.filter(a => !!a.latitude && isPointInPolygon({ latitude: parseFloat(a.latitude), longitude: parseFloat(a.longitude) }, coords)).length;
+                
+                return (
+                  <TouchableOpacity style={styles.zoneQuickCard} onPress={() => focusZone(item)}>
+                    <View style={[styles.typeMarker, { backgroundColor: item.fill_color || COLORS.primary }]} />
+                    <View style={{ flex: 1 }}>
+                      <Text style={styles.zoneQuickName}>{item.name || `Zone #${item.id}`}</Text>
+                      <Text style={styles.zoneQuickMeta}>
+                        📂 {item.zone_type} · {(item.area_sqm / 10000).toFixed(2)} Ha · {animalsInside} Animaux
+                      </Text>
+                    </View>
+                    <Ionicons name="chevron-forward" size={20} color={COLORS.subtext} />
+                  </TouchableOpacity>
+                );
+              }}
+            />
           </View>
         </View>
       </Modal>
@@ -342,6 +313,7 @@ const styles = StyleSheet.create({
   sheetMeta:      { color:COLORS.subtext, fontSize:13, marginTop:2 },
   sheetCoords:    { color:COLORS.subtext, fontSize:12, marginTop:4 },
   loadingOverlay: { ...StyleSheet.absoluteFillObject, backgroundColor:'rgba(0,0,0,0.4)', alignItems:'center', justifyContent:'center' },
+  animalMarker:   { backgroundColor:'#FFF', padding:4, borderRadius:12, borderWidth:2 },
   farmMarker:     { backgroundColor:COLORS.surface, padding:6, borderRadius:15, borderWidth:2, borderColor:COLORS.primary },
   dualButtonContainer: { position: 'absolute', left: 16, right: 16, flexDirection: 'row', gap: 10, justifyContent: 'center' },
   mainControlBtn: { flex: 1, height: 48, backgroundColor: 'rgba(19,25,41,0.92)', borderRadius: 12, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.2, shadowRadius: 4, elevation: 4, borderWidth: 1, borderColor: COLORS.border },
@@ -356,4 +328,8 @@ const styles = StyleSheet.create({
   zoneQuickName: { color: COLORS.text, fontSize: 16, fontWeight: '700', marginBottom: 2 },
   zoneQuickMeta: { color: COLORS.subtext, fontSize: 12 },
   emptyText: { color: COLORS.subtext, fontSize: 16, textAlign: 'center', marginVertical: 40 },
+  zoneMarkerWrapper: { alignItems: 'center', justifyContent: 'center' },
+  zoneLabelContainer: { backgroundColor: 'rgba(19,25,41,0.85)', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4, marginTop: 2, borderWidth: 1, borderColor: 'rgba(255,255,255,0.15)', shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.5, shadowRadius: 1, elevation: 2 },
+  zoneLabelText: { color: '#FFFFFF', fontSize: 10, fontWeight: '800', textAlign: 'center', textTransform: 'uppercase', letterSpacing: 0.5 },
+  userMarker: { backgroundColor: '#FFF', borderRadius: 15, padding: 2, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.3, shadowRadius: 3, elevation: 5 },
 });
