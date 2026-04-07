@@ -4,7 +4,7 @@ const Position       = require('../models/Position');
 const Animal         = require('../models/Animal');
 const Geofence       = require('../models/Geofence');
 const { checkBreach }         = require('../services/geofenceService');
-const { createGeofenceAlert, createHealthAlert, markAnimalSafe } = require('../services/alertService');
+const { createGeofenceAlert, createHealthAlert, markAnimalSafe, processZoneMonitoring } = require('../services/alertService');
 const { emitPositionUpdate }  = require('../config/socket');
 const logger         = require('../utils/logger');
 
@@ -62,24 +62,10 @@ async function submitPosition(req, res, next) {
       timestamp: new Date().toISOString() 
     });
 
-    // --- Geofence check ---
-    const geofence = await Geofence.findByAnimal(animalId, userId);
-    let alertResult = null;
-
-    if (geofence) {
-      const { breached, distanceM } = checkBreach(
-        parseFloat(latitude), parseFloat(longitude), geofence
-      );
-
-      if (breached) {
-        alertResult = await createGeofenceAlert({
-          animalId, userId,
-          latitude,  longitude,
-          distanceM, radiusM: geofence.radius_m
-        });
-      } else {
-        await markAnimalSafe(animalId, userId);
-      }
+    // --- Advanced Zone Monitoring (Entry/Exit, Breaches) ---
+    const monitorResult = await processZoneMonitoring(animal, { latitude, longitude });
+    if (monitorResult && monitorResult.breach_alert) {
+      alertResult = monitorResult.breach_alert;
     }
 
     // --- Health checks ---

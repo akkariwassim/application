@@ -26,6 +26,7 @@ import AnimalDetailScreen from './src/screens/AnimalDetailScreen';
 import HistoryScreen from './src/screens/HistoryScreen';
 import ProfileScreen from './src/screens/ProfileScreen';
 import GeofenceScreen from './src/screens/GeofenceScreen';
+import ZonesListScreen from './src/screens/ZonesListScreen';
 import AnimalViewScreen from './src/screens/AnimalViewScreen';
 import AlertDetailScreen from './src/screens/AlertDetailScreen';
 import AnimalSettingsScreen from './src/screens/AnimalSettingsScreen';
@@ -127,6 +128,21 @@ function AnimalsStack() {
   );
 }
 
+// ── Zones Stack ──────────────────────────────────────────────
+function ZonesStack() {
+  return (
+    <Stack.Navigator
+      screenOptions={{
+        headerStyle: { backgroundColor: COLORS.surface },
+        headerTintColor: COLORS.text,
+      }}
+    >
+      <Stack.Screen name="ZonesList" component={ZonesListScreen} options={{ title: 'My Zones', headerShown: false }} />
+      <Stack.Screen name="Geofence"  component={GeofenceScreen}  options={{ title: 'Zone Editor' }} />
+    </Stack.Navigator>
+  );
+}
+
 // ── Main Tab Navigator ────────────────────────────────────────
 function MainNavigator() {
   const unreadCount        = useAlertStore((s) => s.unreadCount);
@@ -171,7 +187,7 @@ function MainNavigator() {
       })}
     >
       <Tab.Screen name="Map"     component={MapScreen}      options={{ title: '🗺 Live Map', headerShown: false }} />
-      <Tab.Screen name="Zones"   component={GeofenceScreen} options={{ title: '🛡 Zones' }} />
+      <Tab.Screen name="Zones"   component={ZonesStack} options={{ title: '🛡 Zones' }} />
       <Tab.Screen name="Alerts"  component={AlertsScreen} options={{
         title: 'Alerts',
         tabBarBadge: unreadCount > 0 ? unreadCount : undefined,

@@ -5,6 +5,8 @@ const Animal  = require('../models/Animal');
 const { pool } = require('../config/database');
 const { emitAlert, emitStatusChange } = require('../config/socket');
 const logger  = require('../utils/logger');
+const Geofence = require('../models/Geofence');
+const { isPointInPolygon } = require('../utils/geoUtils');
 
 /**
  * Alert Service
@@ -31,7 +33,8 @@ async function createGeofenceAlert({ animalId, userId, latitude, longitude, dist
       severity:  'critical',
       message,
       latitude,
-      longitude
+      longitude,
+      geofenceId: radiusM ? null : undefined // Will be set by processZoneMonitoring if polygon
     });
 
     await Animal.updateStatus(animalId, 'danger');
@@ -108,8 +111,83 @@ async function markAnimalSafe(animalId, userId) {
   emitStatusChange(userId, animalId, 'safe');
 }
 
+/**
+ * Enhanced Geofence & Zone Monitoring
+ * Checks all user zones for transitions and breaches.
+ */
+async function processZoneMonitoring(animal, currentPos) {
+  const { id: animalId, user_id: userId, current_zone_id: lastZoneId } = animal;
+  const { latitude, longitude } = currentPos;
+  const point = { latitude, longitude };
+
+  try {
+    // 1. Fetch all zones for this user
+    const zones = await Geofence.findByUser(userId);
+    let matchedZone = null;
+
+    // 2. Find which zone the animal is currently in
+    for (const zone of zones) {
+      if (zone.type === 'polygon' && zone.polygon_coords) {
+        const coords = typeof zone.polygon_coords === 'string' ? JSON.parse(zone.polygon_coords) : zone.polygon_coords;
+        if (isPointInPolygon(point, coords)) {
+          matchedZone = zone;
+          break; // Stop at the first highest-priority zone found (due to sorting in findByUser)
+        }
+      }
+    }
+
+    const matchedId = matchedZone ? matchedZone.id : null;
+
+    // 3. Handle Transitions (Entry/Exit)
+    if (matchedId !== lastZoneId) {
+      if (lastZoneId) {
+        await Geofence.logEvent(lastZoneId, animalId, 'exit');
+        logger.info(`🚶 Animal ${animalId} exited zone ${lastZoneId}`);
+      }
+      if (matchedId) {
+        await Geofence.logEvent(matchedId, animalId, 'enter');
+        logger.info(`🚩 Animal ${animalId} entered zone ${matchedId} (${matchedZone.name})`);
+      }
+      await Animal.updateCurrentZone(animalId, matchedId);
+    }
+
+    // 4. Breach Detection for "Animal-Specific" Active Geofence
+    // Or if the animal is NOT in any grazing zone and it's supposed to be.
+    // If there's an active primary zone, the animal SHOULD be in it or another grazing zone.
+    
+    // For now, if animal has a specific geofence (from Geofence.findByAnimal)
+    const activeFence = await Geofence.findByAnimal(animalId, userId);
+    if (activeFence) {
+      let isInside = false;
+      if (activeFence.type === 'polygon' && activeFence.polygon_coords) {
+        const coords = typeof activeFence.polygon_coords === 'string' ? JSON.parse(activeFence.polygon_coords) : activeFence.polygon_coords;
+        isInside = isPointInPolygon(point, coords);
+      } else if (activeFence.type === 'circle' && activeFence.center_lat) {
+        // (Circle logic check would go here)
+      }
+
+      if (!isInside) {
+        // Trigger alert with linked geofenceId
+        await createGeofenceAlert({
+          animalId, userId, latitude, longitude,
+          distanceM: null, radiusM: activeFence.radius_m,
+          geofenceId: activeFence.id 
+        });
+      } else if (animal.status === 'danger') {
+        // Auto-safe if back in zone
+        await markAnimalSafe(animalId, userId);
+      }
+    }
+
+    return matchedZone;
+  } catch (err) {
+    logger.error(`Error in processZoneMonitoring for animal ${animalId}:`, err.message);
+  }
+}
+
 module.exports = {
   createGeofenceAlert,
   createHealthAlert,
-  markAnimalSafe
+  markAnimalSafe,
+  processZoneMonitoring
 };
