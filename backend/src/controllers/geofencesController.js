@@ -22,6 +22,14 @@ async function createGeofence(req, res, next) {
   try {
     const { type, name, centerLat, centerLon, radiusM, polygonCoords, animalId, isPrimary } = req.body;
     
+    // Check for unique name
+    if (name) {
+      const existing = await Geofence.findByName(req.user.id, name);
+      if (existing) {
+        return res.status(400).json({ error: 'NAME_TAKEN', message: `Le nom "${name}" est déjà utilisé.` });
+      }
+    }
+
     const geofenceId = await Geofence.create({
       userId: req.user.id,
       animalId,
@@ -48,6 +56,14 @@ async function updateGeofence(req, res, next) {
     const { id } = req.params;
     const { type, name, centerLat, centerLon, radiusM, polygonCoords, isActive, isPrimary } = req.body;
     
+    // Check for unique name (exclude self)
+    if (name) {
+      const existing = await Geofence.findByName(req.user.id, name);
+      if (existing && existing.id !== parseInt(id)) {
+        return res.status(400).json({ error: 'NAME_TAKEN', message: `Le nom "${name}" est déjà utilisé pour une autre zone.` });
+      }
+    }
+
     await Geofence.update(id, req.user.id, {
       type, name, centerLat, centerLon, radiusM, polygonCoords, isActive, isPrimary
     });

@@ -59,8 +59,9 @@ export default function GeofenceScreen({ route }) {
   };
 
   const handleSaveFinal = async () => {
-    if (!zoneName.trim()) {
-      Alert.alert('Required', 'Please enter a name for this zone.');
+    const trimmedName = zoneName.trim();
+    if (!trimmedName) {
+      Alert.alert('Champs Requis', 'Veuillez saisir un nom unique pour cette zone.');
       return;
     }
 
@@ -70,7 +71,7 @@ export default function GeofenceScreen({ route }) {
       
       const payload = {
         type: 'polygon',
-        name: zoneName,
+        name: trimmedName,
         polygonCoords: newPolygon,
         centerLat: centroid.latitude,
         centerLon: centroid.longitude,
@@ -94,9 +95,16 @@ export default function GeofenceScreen({ route }) {
       setEditingId(null);
       setZoneName('');
       setIsPrimary(false);
-      Alert.alert('Success', `Zone "${zoneName}" ${editingId ? 'updated' : 'saved'} successfully.`);
+      Alert.alert('Succès', `La zone "${trimmedName}" a été ${editingId ? 'mise à jour' : 'créée'} avec succès.`);
     } catch (err) {
-      Alert.alert('Error', 'Failed to save zone.');
+      const errorMsg = err.response?.data?.message || 'Échec de l\'enregistrement de la zone.';
+      const errorCode = err.response?.data?.error;
+      
+      if (errorCode === 'NAME_TAKEN') {
+        Alert.alert('Nom déjà utilisé', errorMsg);
+      } else {
+        Alert.alert('Erreur', errorMsg);
+      }
     }
   };
 
@@ -273,22 +281,22 @@ export default function GeofenceScreen({ route }) {
 
               <View style={styles.row}>
                 <View style={{ flex: 1 }}>
-                  <Text style={styles.label}>Type</Text>
+                  <Text style={styles.label}>Type de Zone</Text>
                   <View style={styles.pickerContainer}>
                     <TouchableOpacity onPress={() => setZoneType('grazing')} style={[styles.typeBtn, zoneType === 'grazing' && styles.activeType]}>
-                      <Text style={styles.typeBtnText}>Grazing</Text>
+                      <Text style={styles.typeBtnText}>Pâturage</Text>
                     </TouchableOpacity>
                     <TouchableOpacity onPress={() => setZoneType('water')} style={[styles.typeBtn, zoneType === 'water' && styles.activeType]}>
-                      <Text style={styles.typeBtnText}>Water</Text>
+                      <Text style={styles.typeBtnText}>Eau</Text>
                     </TouchableOpacity>
                     <TouchableOpacity onPress={() => setZoneType('rest')} style={[styles.typeBtn, zoneType === 'rest' && styles.activeType]}>
-                      <Text style={styles.typeBtnText}>Rest</Text>
+                      <Text style={styles.typeBtnText}>Repos</Text>
                     </TouchableOpacity>
                   </View>
                 </View>
               </View>
 
-              <Text style={styles.label}>Area: {(area / 10000).toFixed(2)} Ha ({area.toFixed(0)} m²)</Text>
+              <Text style={styles.label}>📐 Superficie: {area >= 10000 ? `${(area / 10000).toFixed(2)} Ha` : `${area.toFixed(0)} m²`}</Text>
 
               <TouchableOpacity 
                 style={styles.toggleRow} 
