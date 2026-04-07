@@ -1,117 +1,78 @@
 'use strict';
 
-const { pool } = require('../config/database');
+const mongoose = require('mongoose');
 
-const Animal = {
-  /**
-   * List all animals for a user, including latest position.
-   */
-  async findByUser(userId) {
-    const [rows] = await pool.query(
-      `SELECT a.*,
-              p.latitude, p.longitude, p.speed_mps, p.recorded_at AS last_seen,
-              g.center_lat, g.center_lon, g.radius_m, g.type AS geofence_type,
-              z.name as current_zone_name
-       FROM animals a
-       LEFT JOIN positions p ON p.id = (
-         SELECT id FROM positions WHERE animal_id = a.id ORDER BY recorded_at DESC LIMIT 1
-       )
-       LEFT JOIN geofences g ON g.animal_id = a.id AND g.is_active = 1
-       LEFT JOIN geofences z ON a.current_zone_id = z.id
-       WHERE a.user_id = ?
-       ORDER BY a.name`,
-      [userId]
-    );
-    return rows;
+const animalSchema = new mongoose.Schema({
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true,
   },
-
-  /**
-   * Get a single animal (must belong to userId).
-   */
-  async findById(id, userId) {
-    const [rows] = await pool.query(
-      `SELECT a.*,
-              p.latitude, p.longitude, p.speed_mps, p.recorded_at AS last_seen
-       FROM animals a
-       LEFT JOIN positions p ON p.id = (
-         SELECT id FROM positions WHERE animal_id = a.id ORDER BY recorded_at DESC LIMIT 1
-       )
-       WHERE a.id = ? AND a.user_id = ?
-       LIMIT 1`,
-      [id, userId]
-    );
-    return rows[0] || null;
+  name: {
+    type: String,
+    required: [true, 'Animal name is required'],
+    trim: true,
   },
-
-  /**
-   * Get an animal by device_id (for firmware POST /positions).
-   */
-  async findByDeviceId(deviceId) {
-    const [rows] = await pool.query(
-      'SELECT * FROM animals WHERE device_id = ? LIMIT 1',
-      [deviceId]
-    );
-    return rows[0] || null;
+  type: {
+    type: String,
+    required: [true, 'Animal type is required (e.g., cow, sheep)'],
+    trim: true,
   },
-
-  /**
-   * Create a new animal.
-   */
-  async create({ userId, name, type, breed, weightKg, birthDate, rfidTag, deviceId, colorHex, notes, minTemp, maxTemp, minActivity, maxActivity }) {
-    const [result] = await pool.query(
-      `INSERT INTO animals (user_id, name, type, breed, weight_kg, birth_date, rfid_tag, device_id, color_hex, notes, min_temp, max_temp, min_activity, max_activity)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [userId, name, type, breed || null, weightKg || null, birthDate || null,
-       rfidTag || null, deviceId || null, colorHex || '#4CAF50', notes || null,
-       minTemp || 37.5, maxTemp || 40.0, minActivity || 20, maxActivity || 80]
-    );
-    return result.insertId;
+  breed: String,
+  weightKg: Number,
+  birthDate: Date,
+  rfidTag: {
+    type: String,
+    unique: true,
+    sparse: true, // Allow nulls while maintaining uniqueness
   },
-
-  /**
-   * Update an animal.
-   */
-  async update(id, userId, fields) {
-    const { name, type, breed, weightKg, birthDate, rfidTag, deviceId, colorHex, notes, minTemp, maxTemp, minActivity, maxActivity } = fields;
-    const [result] = await pool.query(
-      `UPDATE animals SET
-         name = ?, type = ?, breed = ?, weight_kg = ?, birth_date = ?,
-         rfid_tag = ?, device_id = ?, color_hex = ?, notes = ?,
-         min_temp = ?, max_temp = ?, min_activity = ?, max_activity = ?
-       WHERE id = ? AND user_id = ?`,
-      [name, type, breed || null, weightKg || null, birthDate || null,
-       rfidTag || null, deviceId || null, colorHex || '#4CAF50', notes || null,
-       minTemp != null ? minTemp : 37.5, maxTemp != null ? maxTemp : 40.0, 
-       minActivity != null ? minActivity : 20, maxActivity != null ? maxActivity : 80,
-       id, userId]
-    );
-    return result.affectedRows > 0;
+  deviceId: {
+    type: String,
+    unique: true,
+    sparse: true,
   },
-
-  /**
-   * Update animal status.
-   */
-  async updateStatus(id, status) {
-    await pool.query('UPDATE animals SET status = ? WHERE id = ?', [status, id]);
+  colorHex: {
+    type: String,
+    default: '#4CAF50',
   },
-
-  /**
-   * Delete an animal (only if owned by userId).
-   */
-  async delete(id, userId) {
-    const [result] = await pool.query(
-      'DELETE FROM animals WHERE id = ? AND user_id = ?',
-      [id, userId]
-    );
-    return result.affectedRows > 0;
+  notes: String,
+  status: {
+    type: String,
+    enum: ['healthy', 'sick', 'out_of_zone', 'inactive', 'warning'],
+    default: 'healthy',
   },
-
-  /**
-   * Update animal's current zone.
-   */
-  async updateCurrentZone(id, zoneId) {
-    await pool.query('UPDATE animals SET current_zone_id = ? WHERE id = ?', [zoneId, id]);
+  currentLocation: {
+    type: {
+      type: String,
+      enum: ['Point'],
+      default: 'Point',
+    },
+    coordinates: {
+      type: [Number], // [longitude, latitude]
+      default: [0, 0],
+    }
+  },
+  currentZoneId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Zone',
+  },
+  settings: {
+    minTemp: { type: Number, default: 37.5 },
+    maxTemp: { type: Number, default: 40.0 },
+    minActivity: { type: Number, default: 20 },
+    maxActivity: { type: Number, default: 80 },
+  },
+  lastSeen: {
+    type: Date,
+    default: Date.now,
   }
-};
+}, {
+  timestamps: true,
+});
+
+// Geo-spatial index for location queries
+animalSchema.index({ currentLocation: '2dsphere' });
+
+const Animal = mongoose.model('Animal', animalSchema);
 
 module.exports = Animal;

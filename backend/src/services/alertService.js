@@ -2,62 +2,70 @@
 
 const Alert   = require('../models/Alert');
 const Animal  = require('../models/Animal');
-const { pool } = require('../config/database');
+const Zone    = require('../models/Zone');
 const { emitAlert, emitStatusChange } = require('../config/socket');
-const logger  = require('../utils/logger');
-const Geofence = require('../models/Geofence');
-const { isPointInPolygon } = require('../utils/geoUtils');
+const winston = require('winston');
+const { checkBreach } = require('./geofenceService');
 
 /**
  * Alert Service
  * Handles alert creation, deduplication, and real-time notifications.
  */
 
-async function createGeofenceAlert({ animalId, userId, latitude, longitude, distanceM, radiusM, geofenceId, geofenceName }) {
+/**
+ * Create a geofence breach alert.
+ */
+async function createGeofenceAlert({ animalId, userId, latitude, longitude, distanceM, radiusM, zoneId, zoneName }) {
   try {
     // Deduplication: check if an active geofence alert exists in the last 15 mins
-    const [recent] = await pool.query(
-      "SELECT id FROM alerts WHERE animal_id = ? AND type = 'geofence_breach' AND created_at > NOW() - INTERVAL 15 MINUTE LIMIT 1",
-      [animalId]
-    );
-    if (recent.length > 0) return null;
+    const fifteenMinsAgo = new Date(Date.now() - 15 * 60 * 1000);
+    const recent = await Alert.findOne({
+      animalId,
+      type: 'geofence_exit',
+      status: 'active',
+      createdAt: { $gt: fifteenMinsAgo }
+    });
 
-    const zoneLabel = geofenceName ? `la zone "${geofenceName}"` : "la zone de sécurité";
+    if (recent) return null;
+
+    const zoneLabel = zoneName ? `la zone "${zoneName}"` : "la zone de sécurité";
     const message = radiusM 
       ? `L'animal a quitté ${zoneLabel} ! Distance : ${Math.round(distanceM || 0)}m (rayon : ${radiusM}m).`
       : `L'animal a quitté ${zoneLabel} (clôture polygonale).`;
 
-    const alertId = await Alert.create({
+    const alert = await Alert.create({
       animalId,
       userId,
-      type:      'geofence_breach',
+      zoneId,
+      type:      'geofence_exit',
       severity:  'critical',
       message,
-      latitude,
-      longitude,
-      geofenceId: geofenceId
+      location: {
+        type: 'Point',
+        coordinates: [longitude, latitude]
+      }
     });
 
-    await Animal.updateStatus(animalId, 'danger');
+    // Update animal status
+    await Animal.findByIdAndUpdate(animalId, { $set: { status: 'out_of_zone' } });
 
     const alertPayload = {
-      id: alertId,
+      id: alert._id,
       animalId,
-      type: 'geofence_breach',
-      severity: 'critical',
+      type: alert.type,
+      severity: alert.severity,
       message,
-      latitude,
-      longitude,
-      createdAt: new Date().toISOString()
+      location: alert.location,
+      createdAt: alert.createdAt
     };
 
     emitAlert(userId, animalId, alertPayload);
-    emitStatusChange(userId, animalId, 'danger');
+    emitStatusChange(userId, animalId, 'out_of_zone');
 
-    logger.warn(`🚨 Geofence breach — animal ${animalId}: ${message}`);
-    return { alertId, ...alertPayload };
+    winston.warn(`🚨 Geofence breach — animal ${animalId}: ${message}`);
+    return alert;
   } catch (err) {
-    logger.error('Failed to create geofence alert:', err.message);
+    winston.error('Failed to create geofence alert:', err.message);
     throw err;
   }
 }
@@ -68,38 +76,49 @@ async function createGeofenceAlert({ animalId, userId, latitude, longitude, dist
 async function createHealthAlert({ animalId, userId, type, severity, message, latitude, longitude }) {
   try {
     // Deduplication: check if similar active alert exists in the last 30 mins
-    const [recent] = await pool.query(
-      "SELECT id FROM alerts WHERE animal_id = ? AND type = ? AND created_at > NOW() - INTERVAL 30 MINUTE LIMIT 1",
-      [animalId, type]
-    );
-    if (recent.length > 0) return null;
+    const thirtyMinsAgo = new Date(Date.now() - 30 * 60 * 1000);
+    const recent = await Alert.findOne({
+      animalId,
+      type,
+      status: 'active',
+      createdAt: { $gt: thirtyMinsAgo }
+    });
 
-    const alertId = await Alert.create({
-      animalId, userId, type, severity, message, latitude, longitude
+    if (recent) return null;
+
+    const alert = await Alert.create({
+      animalId,
+      userId,
+      type,
+      severity,
+      message,
+      location: {
+        type: 'Point',
+        coordinates: [longitude, latitude]
+      }
     });
 
     // Update animal status if critical
     if (severity === 'critical') {
-      await Animal.updateStatus(animalId, 'warning');
+      await Animal.findByIdAndUpdate(animalId, { $set: { status: 'warning' } });
       emitStatusChange(userId, animalId, 'warning');
     }
 
     const alertPayload = {
-      id: alertId,
+      id: alert._id,
       animalId,
       type,
       severity,
       message,
-      latitude,
-      longitude,
-      createdAt: new Date().toISOString()
+      location: alert.location,
+      createdAt: alert.createdAt
     };
 
     emitAlert(userId, animalId, alertPayload);
-    logger.warn(`🩺 Health alert — animal ${animalId} (${type}): ${message}`);
-    return { alertId, ...alertPayload };
+    winston.warn(`🩺 Health alert — animal ${animalId} (${type}): ${message}`);
+    return alert;
   } catch (err) {
-    logger.error('Failed to create health alert:', err.message);
+    winston.error('Failed to create health alert:', err.message);
     throw err;
   }
 }
@@ -108,82 +127,68 @@ async function createHealthAlert({ animalId, userId, type, severity, message, la
  * Mark an animal as safe and resolve any active breach alerts.
  */
 async function markAnimalSafe(animalId, userId) {
-  await Animal.updateStatus(animalId, 'safe');
-  emitStatusChange(userId, animalId, 'safe');
+  await Animal.findByIdAndUpdate(animalId, { $set: { status: 'healthy' } });
+  emitStatusChange(userId, animalId, 'healthy');
 }
 
 /**
- * Enhanced Geofence & Zone Monitoring
- * Checks all user zones for transitions and breaches.
+ * Enhanced Zone Monitoring
+ * Checks all user zones for transitions and breaches via Mongoose.
  */
 async function processZoneMonitoring(animal, currentPos) {
-  const { id: animalId, user_id: userId, current_zone_id: lastZoneId } = animal;
+  const { _id: animalId, userId, currentZoneId: lastZoneId } = animal;
   const { latitude, longitude } = currentPos;
-  const point = { latitude, longitude };
 
   try {
     // 1. Fetch all zones for this user
-    const zones = await Geofence.findByUser(userId);
+    const zones = await Zone.find({ userId, isActive: true }).sort({ priorityLevel: -1 });
     let matchedZone = null;
 
     // 2. Find which zone the animal is currently in
     for (const zone of zones) {
-      if (zone.type === 'polygon' && zone.polygon_coords) {
-        const coords = typeof zone.polygon_coords === 'string' ? JSON.parse(zone.polygon_coords) : zone.polygon_coords;
-        if (isPointInPolygon(point, coords)) {
-          matchedZone = zone;
-          break; // Stop at the first highest-priority zone found (due to sorting in findByUser)
-        }
+      const { breached } = checkBreach(latitude, longitude, zone);
+      if (!breached) { // !breached means INSIDE
+        matchedZone = zone;
+        break; 
       }
     }
 
-    const matchedId = matchedZone ? matchedZone.id : null;
+    const matchedId = matchedZone ? matchedZone._id : null;
 
     // 3. Handle Transitions (Entry/Exit)
-    if (matchedId !== lastZoneId) {
+    if (String(matchedId) !== String(lastZoneId)) {
       if (lastZoneId) {
-        await Geofence.logEvent(lastZoneId, animalId, 'exit');
-        logger.info(`🚶 Animal ${animalId} exited zone ${lastZoneId}`);
+        winston.info(`🚶 Animal ${animalId} exited zone ${lastZoneId}`);
       }
       if (matchedId) {
-        await Geofence.logEvent(matchedId, animalId, 'enter');
-        logger.info(`🚩 Animal ${animalId} entered zone ${matchedId} (${matchedZone.name})`);
+        winston.info(`🚩 Animal ${animalId} entered zone ${matchedId} (${matchedZone.name})`);
       }
-      await Animal.updateCurrentZone(animalId, matchedId);
+      await Animal.findByIdAndUpdate(animalId, { $set: { currentZoneId: matchedId } });
     }
 
-    // 4. Breach Detection for "Animal-Specific" Active Geofence
-    // Or if the animal is NOT in any grazing zone and it's supposed to be.
-    // If there's an active primary zone, the animal SHOULD be in it or another grazing zone.
-    
-    // For now, if animal has a specific geofence (from Geofence.findByAnimal)
-    const activeFence = await Geofence.findByAnimal(animalId, userId);
-    if (activeFence) {
-      let isInside = false;
-      if (activeFence.type === 'polygon' && activeFence.polygon_coords) {
-        const coords = typeof activeFence.polygon_coords === 'string' ? JSON.parse(activeFence.polygon_coords) : activeFence.polygon_coords;
-        isInside = isPointInPolygon(point, coords);
-      } else if (activeFence.type === 'circle' && activeFence.center_lat) {
-        // (Circle logic check would go here)
-      }
-
-      if (!isInside) {
-        // Trigger alert with linked geofenceId and Name
-        await createGeofenceAlert({
-          animalId, userId, latitude, longitude,
-          distanceM: null, radiusM: activeFence.radius_m,
-          geofenceId: activeFence.id,
-          geofenceName: activeFence.name
-        });
-      } else if (animal.status === 'danger') {
-        // Auto-safe if back in zone
-        await markAnimalSafe(animalId, userId);
+    // 4. Breach Detection for assigned primary zone
+    // If there is a currentZoneId assigned to animal, check it specifically
+    if (animal.currentZoneId) {
+      const primaryZone = await Zone.findById(animal.currentZoneId);
+      if (primaryZone) {
+        const { breached, distanceM } = checkBreach(latitude, longitude, primaryZone);
+        if (breached) {
+          await createGeofenceAlert({
+            animalId, userId, 
+            latitude, longitude,
+            distanceM, radiusM: primaryZone.radiusM,
+            zoneId: primaryZone._id,
+            zoneName: primaryZone.name
+          });
+        } else if (animal.status === 'out_of_zone' || animal.status === 'warning') {
+          await markAnimalSafe(animalId, userId);
+        }
       }
     }
 
     return matchedZone;
   } catch (err) {
-    logger.error(`Error in processZoneMonitoring for animal ${animalId}:`, err.message);
+    winston.error(`Error in processZoneMonitoring for animal ${animalId}:`, err.message);
   }
 }
 

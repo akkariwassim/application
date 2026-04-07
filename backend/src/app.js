@@ -11,7 +11,7 @@ require('dotenv').config();
 
 const logger         = require('./utils/logger');
 const { initSocket } = require('./config/socket');
-const { testConnection } = require('./config/database');
+const connectDB     = require('./config/mongoose');
 
 // Routes
 const authRoutes      = require('./routes/auth');
@@ -82,7 +82,7 @@ initSocket(server);
 const PORT = parseInt(process.env.PORT) || 3000;
 
 async function start() {
-  await testConnection();
+  await connectDB();
   server.listen(PORT, () => {
     logger.info(`🚀 Server running on http://localhost:${PORT}`);
     logger.info(`   Environment: ${process.env.NODE_ENV || 'development'}`);

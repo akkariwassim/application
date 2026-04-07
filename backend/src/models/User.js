@@ -1,83 +1,60 @@
 'use strict';
 
-const { pool } = require('../config/database');
+const mongoose = require('mongoose');
+const bcrypt = require('bcrypt');
 
-const User = {
-  /**
-   * Find a user by email.
-   */
-  async findByEmail(email) {
-    const [rows] = await pool.query(
-      'SELECT * FROM users WHERE email = ? AND is_active = 1 LIMIT 1',
-      [email]
-    );
-    return rows[0] || null;
+const userSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: [true, 'Name is required'],
+    trim: true,
   },
-
-  /**
-   * Find a user by id.
-   */
-  async findById(id) {
-    const [rows] = await pool.query(
-      'SELECT id, name, email, role, phone, created_at FROM users WHERE id = ? AND is_active = 1 LIMIT 1',
-      [id]
-    );
-    return rows[0] || null;
+  email: {
+    type: String,
+    required: [true, 'Email is required'],
+    unique: true,
+    lowercase: true,
+    match: [/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/, 'Please provide a valid email'],
   },
-
-  /**
-   * Create a new user.
-   */
-  async create({ name, email, passwordHash, role = 'farmer', phone = null }) {
-    const [result] = await pool.query(
-      'INSERT INTO users (name, email, password_hash, role, phone) VALUES (?, ?, ?, ?, ?)',
-      [name, email, passwordHash, role, phone]
-    );
-    return result.insertId;
+  password: {
+    type: String,
+    required: [true, 'Password is required'],
+    minlength: 6,
+    select: false, // Don't return password by default
   },
-
-  /**
-   * Update user profile.
-   */
-  async update(id, { name, phone }) {
-    await pool.query(
-      'UPDATE users SET name = ?, phone = ? WHERE id = ?',
-      [name, phone, id]
-    );
+  role: {
+    type: String,
+    enum: ['farmer', 'admin'],
+    default: 'farmer',
   },
-
-  /**
-   * Store a refresh token.
-   */
-  async saveRefreshToken(userId, tokenHash, expiresAt) {
-    await pool.query(
-      'INSERT INTO refresh_tokens (user_id, token_hash, expires_at) VALUES (?, ?, ?)',
-      [userId, tokenHash, expiresAt]
-    );
+  phone: {
+    type: String,
+    trim: true,
   },
-
-  /**
-   * Find a valid (non-revoked, non-expired) refresh token.
-   */
-  async findRefreshToken(tokenHash) {
-    const [rows] = await pool.query(
-      `SELECT * FROM refresh_tokens
-       WHERE token_hash = ? AND revoked = 0 AND expires_at > NOW()
-       LIMIT 1`,
-      [tokenHash]
-    );
-    return rows[0] || null;
+  isActive: {
+    type: Boolean,
+    default: true,
   },
+  refreshTokens: [{
+    token: String,
+    expiresAt: Date,
+  }]
+}, {
+  timestamps: true, // Adds createdAt and updatedAt
+});
 
-  /**
-   * Revoke a refresh token.
-   */
-  async revokeRefreshToken(tokenHash) {
-    await pool.query(
-      'UPDATE refresh_tokens SET revoked = 1 WHERE token_hash = ?',
-      [tokenHash]
-    );
-  }
+// Hash password before saving
+userSchema.pre('save', async function(next) {
+  if (!this.isModified('password')) return next();
+  this.password = await bcrypt.hash(this.password, 12);
+  next();
+});
+
+// Method to check password
+userSchema.methods.comparePassword = async function(candidatePassword) {
+  return await bcrypt.compare(candidatePassword, this.password);
 };
+
+const User = mongoose.model('User', userSchema);
 
 module.exports = User;
