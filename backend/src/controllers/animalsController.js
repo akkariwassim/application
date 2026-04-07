@@ -1,7 +1,7 @@
 'use strict';
 
-const Animal   = require('../models/Animal');
-const Geofence = require('../models/Geofence');
+const Animal = require('../models/Animal');
+const Zone   = require('../models/Zone');
 const { emitPositionUpdate } = require('../config/socket');
 
 /**
@@ -9,7 +9,7 @@ const { emitPositionUpdate } = require('../config/socket');
  */
 async function listAnimals(req, res, next) {
   try {
-    const animals = await Animal.findByUser(req.user.id);
+    const animals = await Animal.find({ userId: req.user.id }).populate('currentZoneId');
     res.json(animals);
   } catch (err) {
     next(err);
@@ -21,11 +21,10 @@ async function listAnimals(req, res, next) {
  */
 async function getAnimal(req, res, next) {
   try {
-    const animal = await Animal.findById(req.params.id, req.user.id);
+    const animal = await Animal.findOne({ _id: req.params.id, userId: req.user.id }).populate('currentZoneId');
     if (!animal) return res.status(404).json({ error: 'Animal not found' });
 
-    const geofence = await Geofence.findByAnimal(req.params.id);
-    res.json({ ...animal, geofence });
+    res.json(animal);
   } catch (err) {
     next(err);
   }
@@ -36,12 +35,8 @@ async function getAnimal(req, res, next) {
  */
 async function createAnimal(req, res, next) {
   try {
-    const { name, type, breed, weightKg, birthDate, rfidTag, deviceId, colorHex, notes } = req.body;
-    const id = await Animal.create({
-      userId: req.user.id, name, type, breed, weightKg, birthDate,
-      rfidTag, deviceId, colorHex, notes
-    });
-    const animal = await Animal.findById(id, req.user.id);
+    const animalData = { ...req.body, userId: req.user.id };
+    const animal = await Animal.create(animalData);
     res.status(201).json(animal);
   } catch (err) {
     next(err);
@@ -53,9 +48,12 @@ async function createAnimal(req, res, next) {
  */
 async function updateAnimal(req, res, next) {
   try {
-    const ok = await Animal.update(req.params.id, req.user.id, req.body);
-    if (!ok) return res.status(404).json({ error: 'Animal not found' });
-    const animal = await Animal.findById(req.params.id, req.user.id);
+    const animal = await Animal.findOneAndUpdate(
+      { _id: req.params.id, userId: req.user.id },
+      { $set: req.body },
+      { new: true, runValidators: true }
+    );
+    if (!animal) return res.status(404).json({ error: 'Animal not found' });
     res.json(animal);
   } catch (err) {
     next(err);
@@ -67,8 +65,8 @@ async function updateAnimal(req, res, next) {
  */
 async function deleteAnimal(req, res, next) {
   try {
-    const ok = await Animal.delete(req.params.id, req.user.id);
-    if (!ok) return res.status(404).json({ error: 'Animal not found' });
+    const result = await Animal.deleteOne({ _id: req.params.id, userId: req.user.id });
+    if (result.deletedCount === 0) return res.status(404).json({ error: 'Animal not found' });
     res.json({ message: 'Animal deleted' });
   } catch (err) {
     next(err);
@@ -76,39 +74,25 @@ async function deleteAnimal(req, res, next) {
 }
 
 /**
- * POST /api/animals/:id/geofence
+ * POST /api/animals/:id/zone
+ * Sets or updates the primary zone for an animal
  */
-async function setGeofence(req, res, next) {
+async function setZone(req, res, next) {
   try {
-    const animal = await Animal.findById(req.params.id, req.user.id);
+    const { zoneId } = req.body;
+    const animal = await Animal.findOneAndUpdate(
+      { _id: req.params.id, userId: req.user.id },
+      { $set: { currentZoneId: zoneId } },
+      { new: true }
+    ).populate('currentZoneId');
+
     if (!animal) return res.status(404).json({ error: 'Animal not found' });
-
-    const { type, centerLat, centerLon, radiusM, polygonCoords } = req.body;
-    const gfId = await Geofence.upsert(req.params.id, { type, centerLat, centerLon, radiusM, polygonCoords });
-    const geofence = await Geofence.findByAnimal(req.params.id);
-    res.status(201).json(geofence);
-  } catch (err) {
-    next(err);
-  }
-}
-
-/**
- * GET /api/animals/:id/geofence
- */
-async function getGeofence(req, res, next) {
-  try {
-    const animal = await Animal.findById(req.params.id, req.user.id);
-    if (!animal) return res.status(404).json({ error: 'Animal not found' });
-
-    const geofence = await Geofence.findByAnimal(req.params.id);
-    if (!geofence) return res.status(404).json({ error: 'No geofence defined' });
-    res.json(geofence);
+    res.json(animal);
   } catch (err) {
     next(err);
   }
 }
 
 module.exports = {
-  listAnimals, getAnimal, createAnimal, updateAnimal, deleteAnimal,
-  setGeofence, getGeofence
+  listAnimals, getAnimal, createAnimal, updateAnimal, deleteAnimal, setZone
 };

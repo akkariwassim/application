@@ -3,6 +3,7 @@
 /**
  * Geofence Service
  * Provides distance calculations and breach detection logic.
+ * Updated to support GeoJSON format from MongoDB.
  */
 
 const EARTH_RADIUS_M = 6_371_000; // metres
@@ -16,12 +17,6 @@ function toRad(deg) {
 
 /**
  * Calculate the Haversine distance (in metres) between two GPS coordinates.
- *
- * @param {number} lat1
- * @param {number} lon1
- * @param {number} lat2
- * @param {number} lon2
- * @returns {number} Distance in metres
  */
 function haversineDistance(lat1, lon1, lat2, lon2) {
   const dLat = toRad(lat2 - lat1);
@@ -33,36 +28,15 @@ function haversineDistance(lat1, lon1, lat2, lon2) {
 }
 
 /**
- * Check if a point is inside a circle geofence.
- *
- * @param {number} lat       - Current latitude
- * @param {number} lon       - Current longitude
- * @param {number} centerLat - Geofence centre latitude
- * @param {number} centerLon - Geofence centre longitude
- * @param {number} radiusM   - Geofence radius in metres
- * @returns {{ inside: boolean, distanceM: number }}
- */
-function checkCircleGeofence(lat, lon, centerLat, centerLon, radiusM) {
-  const distanceM = haversineDistance(lat, lon, centerLat, centerLon);
-  return {
-    inside: distanceM <= radiusM,
-    distanceM: Math.round(distanceM)
-  };
-}
-
-/**
  * Ray-casting algorithm to check if a point is inside a polygon.
- *
- * @param {number} lat
- * @param {number} lon
- * @param {Array<{lat: number, lon: number}>} polygon
- * @returns {boolean}
+ * GeoJSON format: polygon is [[[lon, lat], [lon, lat], ...]] (first ring)
  */
-function pointInPolygon(lat, lon, polygon) {
+function pointInPolygon(lat, lon, coordinates) {
+  const polygon = coordinates[0]; // First ring
   let inside = false;
   for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
-    const xi = polygon[i].lon, yi = polygon[i].lat;
-    const xj = polygon[j].lon, yj = polygon[j].lat;
+    const xi = polygon[i][0], yi = polygon[i][1]; // [lon, lat]
+    const xj = polygon[j][0], yj = polygon[j][1];
     const intersect =
       yi > lat !== yj > lat && lon < ((xj - xi) * (lat - yi)) / (yj - yi) + xi;
     if (intersect) inside = !inside;
@@ -71,33 +45,31 @@ function pointInPolygon(lat, lon, polygon) {
 }
 
 /**
- * High-level breach check given a geofence DB record.
- *
- * @param {number} lat
- * @param {number} lon
- * @param {Object} geofence - Row from geofences table
- * @returns {{ breached: boolean, distanceM: number|null }}
+ * High-level breach check given a geofence Mongoose document.
  */
-function checkBreach(lat, lon, geofence) {
-  if (!geofence) return { breached: false, distanceM: null };
+function checkBreach(lat, lon, zone) {
+  if (!zone || !zone.isActive) return { breached: false, distanceM: null };
 
-  if (geofence.type === 'circle') {
-    const { inside, distanceM } = checkCircleGeofence(
-      lat, lon,
-      parseFloat(geofence.center_lat),
-      parseFloat(geofence.center_lon),
-      parseFloat(geofence.radius_m)
-    );
-    return { breached: !inside, distanceM };
+  // Circle check (using center and radiusM)
+  if (zone.radiusM && zone.center) {
+    const [centerLon, centerLat] = zone.center.coordinates;
+    const distanceM = haversineDistance(lat, lon, centerLat, centerLon);
+    return {
+      breached: distanceM > zone.radiusM,
+      distanceM: Math.round(distanceM)
+    };
   }
 
-  if (geofence.type === 'polygon' && geofence.polygon_coords) {
-    const polygon =
-      typeof geofence.polygon_coords === 'string'
-        ? JSON.parse(geofence.polygon_coords)
-        : geofence.polygon_coords;
-    const inside = pointInPolygon(lat, lon, polygon);
-    return { breached: !inside, distanceM: null };
+  // Polygon check (using GeoJSON geometry)
+  if (zone.geometry && zone.geometry.type === 'Polygon') {
+    const inside = pointInPolygon(lat, lon, zone.geometry.coordinates);
+    
+    // If it's an exclusion zone, breach is when INSIDE. 
+    // If it's a grazing zone, breach is when OUTSIDE.
+    const isExclusion = zone.type === 'exclusion' || zone.type === 'hazard';
+    const breached = isExclusion ? inside : !inside;
+
+    return { breached, distanceM: null };
   }
 
   return { breached: false, distanceM: null };
@@ -105,7 +77,6 @@ function checkBreach(lat, lon, geofence) {
 
 module.exports = {
   haversineDistance,
-  checkCircleGeofence,
   pointInPolygon,
   checkBreach
 };
