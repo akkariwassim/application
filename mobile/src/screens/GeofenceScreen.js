@@ -7,7 +7,7 @@ import MapView, { Polygon, Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import { Ionicons } from '@expo/vector-icons';
 import useGeofenceStore from '../store/geofenceStore';
 import useAnimalStore   from '../store/animalStore';
-import { calculateCentroid } from '../utils/geoUtils';
+import { calculateCentroid, calculatePolygonArea } from '../utils/geoUtils';
 
 const COLORS = {
   primary: '#4F46E5', background: '#0A0F1E', surface: '#131929',
@@ -15,10 +15,11 @@ const COLORS = {
   danger: '#EF4444', success: '#22C55E', border: 'rgba(255,255,255,0.08)',
 };
 
-export default function GeofenceScreen() {
-  const { geofences, fetchGeofences, createGeofence, deleteGeofence, isLoading } = useGeofenceStore();
+export default function GeofenceScreen({ route }) {
+  const { geofences, fetchGeofences, createGeofence, updateGeofence, deleteGeofence, isLoading } = useGeofenceStore();
   const { animals } = useAnimalStore();
   
+  const [editingId, setEditingId] = useState(null);
   const [isDrawing, setIsDrawing] = useState(false);
   const [newPolygon, setNewPolygon] = useState([]);
   const [mapRef, setMapRef] = useState(null);
@@ -27,10 +28,29 @@ export default function GeofenceScreen() {
   const [showSaveModal, setShowSaveModal] = useState(false);
   const [zoneName, setZoneName] = useState('');
   const [isPrimary, setIsPrimary] = useState(false);
+  const [zoneType, setZoneType] = useState('grazing');
+  const [priority, setPriority] = useState(1);
+  const [fillColor, setFillColor] = useState('#4F46E5');
+  const [area, setArea] = useState(0);
 
   useEffect(() => {
     fetchGeofences();
-  }, []);
+    
+    // Check for initialZone from navigation (Edit Mode)
+    const initialZone = route.params?.initialZone;
+    if (initialZone) {
+      setEditingId(initialZone.id);
+      setIsDrawing(true);
+      const coords = typeof initialZone.polygon_coords === 'string' ? JSON.parse(initialZone.polygon_coords) : initialZone.polygon_coords;
+      setNewPolygon(coords || []);
+      setZoneName(initialZone.name || '');
+      setIsPrimary(initialZone.is_primary === 1);
+      setZoneType(initialZone.zone_type || 'grazing');
+      setPriority(initialZone.priority_level || 1);
+      setFillColor(initialZone.fill_color || '#4F46E5');
+      setArea(initialZone.area_sqm || 0);
+    }
+  }, [route.params?.initialZone]);
 
   const handleMapPress = (e) => {
     if (!isDrawing) return;
@@ -46,20 +66,35 @@ export default function GeofenceScreen() {
 
     try {
       const centroid = calculateCentroid(newPolygon);
-      await createGeofence({
+      const polyArea = calculatePolygonArea(newPolygon);
+      
+      const payload = {
         type: 'polygon',
         name: zoneName,
         polygonCoords: newPolygon,
         centerLat: centroid.latitude,
         centerLon: centroid.longitude,
         isPrimary: isPrimary,
-      });
+        zoneType: zoneType,
+        priorityLevel: priority,
+        areaSqm: polyArea,
+        fillColor: fillColor,
+        isActive: 1
+      };
+
+      if (editingId) {
+        await updateGeofence(editingId, payload);
+      } else {
+        await createGeofence(payload);
+      }
+      
       setIsDrawing(false);
       setNewPolygon([]);
       setShowSaveModal(false);
+      setEditingId(null);
       setZoneName('');
       setIsPrimary(false);
-      Alert.alert('Success', `Zone "${zoneName}" saved successfully.`);
+      Alert.alert('Success', `Zone "${zoneName}" ${editingId ? 'updated' : 'saved'} successfully.`);
     } catch (err) {
       Alert.alert('Error', 'Failed to save zone.');
     }
@@ -70,12 +105,32 @@ export default function GeofenceScreen() {
       Alert.alert('Invalid Zone', 'A polygon must have at least 3 points.');
       return;
     }
+    const polyArea = calculatePolygonArea(newPolygon);
+    setArea(polyArea);
     setShowSaveModal(true);
+  };
+
+  const updateVertex = (index, coordinate) => {
+    const updated = [...newPolygon];
+    updated[index] = coordinate;
+    setNewPolygon(updated);
+    setArea(calculatePolygonArea(updated)); // Live area update
+  };
+
+  const removeVertex = (index) => {
+    if (newPolygon.length <= 3) {
+      Alert.alert('Notice', 'A polygon needs at least 3 points.');
+      return;
+    }
+    const updated = newPolygon.filter((_, i) => i !== index);
+    setNewPolygon(updated);
+    setArea(calculatePolygonArea(updated)); // Live area update
   };
 
   const handleCancel = () => {
     setIsDrawing(false);
     setNewPolygon([]);
+    setEditingId(null);
   };
 
   const deleteZone = (id) => {
@@ -157,6 +212,9 @@ export default function GeofenceScreen() {
                   key={i} 
                   coordinate={p} 
                   anchor={{x: 0.5, y: 0.5}}
+                  draggable
+                  onDragEnd={(e) => updateVertex(i, e.nativeEvent.coordinate)}
+                  onLongPress={() => removeVertex(i)}
                 >
                   <View style={styles.vertexMarker} />
                 </Marker>
@@ -211,8 +269,26 @@ export default function GeofenceScreen() {
                 onChangeText={setZoneName}
                 placeholder="e.g. North Pasture"
                 placeholderTextColor={COLORS.subtext}
-                autoFocus
               />
+
+              <View style={styles.row}>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.label}>Type</Text>
+                  <View style={styles.pickerContainer}>
+                    <TouchableOpacity onPress={() => setZoneType('grazing')} style={[styles.typeBtn, zoneType === 'grazing' && styles.activeType]}>
+                      <Text style={styles.typeBtnText}>Grazing</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => setZoneType('water')} style={[styles.typeBtn, zoneType === 'water' && styles.activeType]}>
+                      <Text style={styles.typeBtnText}>Water</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => setZoneType('rest')} style={[styles.typeBtn, zoneType === 'rest' && styles.activeType]}>
+                      <Text style={styles.typeBtnText}>Rest</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </View>
+
+              <Text style={styles.label}>Area: {(area / 10000).toFixed(2)} Ha ({area.toFixed(0)} m²)</Text>
 
               <TouchableOpacity 
                 style={styles.toggleRow} 
@@ -293,6 +369,11 @@ const styles = StyleSheet.create({
   modalTitle:   { color: COLORS.text, fontSize: 22, fontWeight: '800', marginBottom: 24 },
   label:        { color: COLORS.subtext, fontSize: 12, fontWeight: '600', marginBottom: 8, marginLeft: 4 },
   input:        { height: 56, backgroundColor: COLORS.card, borderRadius: 16, paddingHorizontal: 16, color: COLORS.text, fontSize: 16, borderWidth: 1, borderColor: COLORS.border, marginBottom: 20 },
+  row:          { flexDirection: 'row', gap: 12, marginBottom: 20 },
+  pickerContainer: { flexDirection: 'row', gap: 8, marginTop: 4 },
+  typeBtn:      { flex: 1, height: 40, borderRadius: 10, backgroundColor: COLORS.card, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: COLORS.border },
+  activeType:   { backgroundColor: COLORS.primary, borderColor: COLORS.primary },
+  typeBtnText:  { color: COLORS.text, fontSize: 13, fontWeight: '600' },
   toggleRow:    { flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 30 },
   toggleText:   { color: COLORS.text, fontSize: 15, fontWeight: '600' },
   modalActions: { flexDirection: 'row', gap: 12 },

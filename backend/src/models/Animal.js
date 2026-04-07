@@ -10,12 +10,14 @@ const Animal = {
     const [rows] = await pool.query(
       `SELECT a.*,
               p.latitude, p.longitude, p.speed_mps, p.recorded_at AS last_seen,
-              g.center_lat, g.center_lon, g.radius_m, g.type AS geofence_type
+              g.center_lat, g.center_lon, g.radius_m, g.type AS geofence_type,
+              z.name as current_zone_name
        FROM animals a
        LEFT JOIN positions p ON p.id = (
          SELECT id FROM positions WHERE animal_id = a.id ORDER BY recorded_at DESC LIMIT 1
        )
        LEFT JOIN geofences g ON g.animal_id = a.id AND g.is_active = 1
+       LEFT JOIN geofences z ON a.current_zone_id = z.id
        WHERE a.user_id = ?
        ORDER BY a.name`,
       [userId]
@@ -102,6 +104,13 @@ const Animal = {
       [id, userId]
     );
     return result.affectedRows > 0;
+  },
+
+  /**
+   * Update animal's current zone.
+   */
+  async updateCurrentZone(id, zoneId) {
+    await pool.query('UPDATE animals SET current_zone_id = ? WHERE id = ?', [zoneId, id]);
   }
 };
 

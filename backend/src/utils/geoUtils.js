@@ -1,33 +1,12 @@
-/**
- * Geographic utility functions for the Smart Virtual Fence.
- */
-
-/**
- * Calculates the centroid (mean center) of a set of coordinates.
- * @param {Array} coordinates - Array of { latitude, longitude } objects.
- * @returns {Object|null} { latitude, longitude } or null if empty.
- */
-export function calculateCentroid(coordinates) {
-  if (!coordinates || coordinates.length === 0) return null;
-
-  let totalLat = 0;
-  let totalLon = 0;
-
-  coordinates.forEach((coord) => {
-    totalLat += coord.latitude;
-    totalLon += coord.longitude;
-  });
-
-  return {
-    latitude: totalLat / coordinates.length,
-    longitude: totalLon / coordinates.length,
-  };
-}
+'use strict';
 
 /**
  * Checks if a coordinate is inside a polygon.
+ * @param {Array} polygon - Array of [lat, lon] or {latitude, longitude}
+ * @param {Object} point - { latitude, longitude }
+ * @returns {Boolean}
  */
-export function isPointInPolygon(point, polygon) {
+function isPointInPolygon(point, polygon) {
   if (!polygon || polygon.length < 3) return false;
 
   const x = point.latitude;
@@ -35,10 +14,10 @@ export function isPointInPolygon(point, polygon) {
   let inside = false;
 
   for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
-    const xi = polygon[i].latitude;
-    const yi = polygon[i].longitude;
-    const xj = polygon[j].latitude;
-    const yj = polygon[j].longitude;
+    const xi = polygon[i].latitude !== undefined ? polygon[i].latitude : polygon[i][0];
+    const yi = polygon[i].longitude !== undefined ? polygon[i].longitude : polygon[i][1];
+    const xj = polygon[j].latitude !== undefined ? polygon[j].latitude : polygon[j][0];
+    const yj = polygon[j].longitude !== undefined ? polygon[j].longitude : polygon[j][1];
 
     const intersect = ((yi > y) !== (yj > y)) &&
         (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
@@ -49,9 +28,10 @@ export function isPointInPolygon(point, polygon) {
 }
 
 /**
- * Calculates the area of a polygon in square meters.
+ * Calculates the area of a polygon in square meters (Geodesic).
+ * @param {Array} coords - Array of { latitude, longitude }
  */
-export function calculatePolygonArea(coords) {
+function calculatePolygonArea(coords) {
   if (!coords || coords.length < 3) return 0;
   
   const RADIUS = 6378137; // Earth radius in meters
@@ -74,7 +54,7 @@ export function calculatePolygonArea(coords) {
  * Calculates the perimeter of a polygon in meters.
  * @param {Array} coords - Array of { latitude, longitude }
  */
-export function calculatePerimeter(coords) {
+function calculatePerimeter(coords) {
   if (!coords || coords.length < 2) return 0;
   
   const R = 6378137;
@@ -101,4 +81,8 @@ export function calculatePerimeter(coords) {
   return perimeter;
 }
 
-
+module.exports = {
+  isPointInPolygon,
+  calculatePolygonArea,
+  calculatePerimeter
+};
