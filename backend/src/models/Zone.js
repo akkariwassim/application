@@ -3,7 +3,7 @@
 const mongoose = require('mongoose');
 
 const zoneSchema = new mongoose.Schema({
-  userId: {
+  user_id: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
     required: true,
@@ -14,10 +14,13 @@ const zoneSchema = new mongoose.Schema({
     trim: true,
   },
   description: String,
-  type: {
+  zone_type: {
     type: String,
     enum: ['grazing', 'exclusion', 'shelter', 'hazard'],
     default: 'grazing',
+  },
+  polygon_coords: {
+    type: mongoose.Schema.Types.Mixed,
   },
   geometry: {
     type: {
@@ -31,6 +34,14 @@ const zoneSchema = new mongoose.Schema({
       required: true,
     }
   },
+  center_lat: {
+    type: Number,
+    default: 0,
+  },
+  center_lon: {
+    type: Number,
+    default: 0,
+  },
   center: {
     type: {
       type: String,
@@ -43,26 +54,52 @@ const zoneSchema = new mongoose.Schema({
       required: true,
     }
   },
-  radiusM: Number, // Optional, for circular geofences
-  isActive: {
+  radiusM: Number,
+  is_active: {
     type: Boolean,
     default: true,
   },
-  priorityLevel: {
+  is_primary: {
+    type: Number, // Mobile expects 1 or 0
+    default: 0,
+  },
+  priority_level: {
     type: Number,
     default: 1,
   },
-  fillColor: {
+  active_alerts: {
+    type: Number,
+    default: 0,
+  },
+  fill_color: {
     type: String,
     default: '#4F46E5',
     match: [/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/, 'Please provide a valid hex color'],
   },
-  areaSqm: Number,
+  area_sqm: Number,
 }, {
-  timestamps: true,
+  timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' },
+  toJSON: { 
+    virtuals: true,
+    transform: (doc, ret) => {
+      ret.id = ret._id.toString();
+      delete ret._id;
+      delete ret.__v;
+      return ret;
+    }
+  },
+  toObject: { virtuals: true }
 });
 
-// Geo-spatial index for geometry queries
+zoneSchema.pre('save', async function() {
+  if (this.isModified('center_lat') || this.isModified('center_lon')) {
+    this.center = {
+      type: 'Point',
+      coordinates: [this.center_lon, this.center_lat]
+    };
+  }
+});
+
 zoneSchema.index({ geometry: '2dsphere' });
 zoneSchema.index({ center: '2dsphere' });
 

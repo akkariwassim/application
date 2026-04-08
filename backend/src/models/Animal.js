@@ -3,7 +3,7 @@
 const mongoose = require('mongoose');
 
 const animalSchema = new mongoose.Schema({
-  userId: {
+  user_id: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
     required: true,
@@ -15,63 +15,91 @@ const animalSchema = new mongoose.Schema({
   },
   type: {
     type: String,
-    required: [true, 'Animal type is required (e.g., cow, sheep)'],
-    trim: true,
+    required: [true, 'Animal type is required'],
+    enum: ['bovine', 'ovine', 'caprine', 'equine', 'other'],
+    default: 'other',
   },
   breed: String,
-  weightKg: Number,
-  birthDate: Date,
-  rfidTag: {
-    type: String,
-    unique: true,
-    sparse: true, // Allow nulls while maintaining uniqueness
-  },
-  deviceId: {
+  weight_kg: Number,
+  birth_date: Date,
+  rfid_tag: {
     type: String,
     unique: true,
     sparse: true,
   },
-  colorHex: {
+  device_id: {
+    type: String,
+    unique: true,
+    sparse: true,
+  },
+  color_hex: {
     type: String,
     default: '#4CAF50',
   },
-  notes: String,
   status: {
     type: String,
-    enum: ['healthy', 'sick', 'out_of_zone', 'inactive', 'warning'],
-    default: 'healthy',
+    enum: ['safe', 'warning', 'danger', 'offline'],
+    default: 'offline',
   },
-  currentLocation: {
+  latitude: {
+    type: Number,
+    default: 0,
+  },
+  longitude: {
+    type: Number,
+    default: 0,
+  },
+  current_location: {
     type: {
       type: String,
       enum: ['Point'],
       default: 'Point',
     },
     coordinates: {
-      type: [Number], // [longitude, latitude]
+      type: [Number],
       default: [0, 0],
     }
   },
-  currentZoneId: {
+  current_zone_id: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Zone',
   },
   settings: {
-    minTemp: { type: Number, default: 37.5 },
-    maxTemp: { type: Number, default: 40.0 },
-    minActivity: { type: Number, default: 20 },
-    maxActivity: { type: Number, default: 80 },
+    min_temp: { type: Number, default: 37.5 },
+    max_temp: { type: Number, default: 40.0 },
+    min_activity: { type: Number, default: 20 },
+    max_activity: { type: Number, default: 80 },
   },
-  lastSeen: {
+  temperature: Number,
+  activity: Number,
+  last_seen: {
     type: Date,
     default: Date.now,
   }
 }, {
-  timestamps: true,
+  timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' },
+  toJSON: { 
+    virtuals: true,
+    transform: (doc, ret) => {
+      ret.id = ret._id.toString();
+      delete ret._id;
+      delete ret.__v;
+      return ret;
+    }
+  },
+  toObject: { virtuals: true }
 });
 
-// Geo-spatial index for location queries
-animalSchema.index({ currentLocation: '2dsphere' });
+animalSchema.pre('save', async function() {
+  if (this.isModified('latitude') || this.isModified('longitude')) {
+    this.current_location = {
+      type: 'Point',
+      coordinates: [this.longitude, this.latitude]
+    };
+  }
+});
+
+animalSchema.index({ current_location: '2dsphere' });
 
 const Animal = mongoose.model('Animal', animalSchema);
 

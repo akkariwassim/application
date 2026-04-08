@@ -19,14 +19,14 @@ router.use(authenticate);
 
 // GET /api/positions/:animalId
 router.get('/:animalId', [
-  param('animalId').isInt({ min: 1 }),
+  param('animalId').isMongoId().withMessage('Invalid animal ID'),
   query('limit').optional().isInt({ min: 1, max: 1000 }),
   validate
 ], ctrl.getHistory);
 
 // GET /api/positions/:animalId/latest
 router.get('/:animalId/latest', [
-  param('animalId').isInt({ min: 1 }),
+  param('animalId').isMongoId().withMessage('Invalid animal ID'),
   validate
 ], ctrl.getLatest);
 

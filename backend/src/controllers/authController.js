@@ -1,92 +1,145 @@
 'use strict';
 
-const jwt     = require('jsonwebtoken');
-const crypto  = require('crypto');
 const User    = require('../models/User');
-const winston = require('winston');
+const jwt     = require('jsonwebtoken');
+const logger  = require('../utils/logger');
 
-function generateAccessToken(user) {
-  return jwt.sign(
-    { id: user._id, email: user.email, role: user.role },
-    process.env.JWT_SECRET,
+// Helper to generate tokens
+const generateTokens = (userId) => {
+  const accessToken = jwt.sign(
+    { id: userId }, 
+    process.env.JWT_SECRET, 
     { expiresIn: process.env.JWT_EXPIRES_IN || '15m' }
   );
-}
 
-function generateRefreshToken() {
-  return crypto.randomBytes(64).toString('hex');
-}
+  const refreshToken = jwt.sign(
+    { id: userId }, 
+    process.env.JWT_REFRESH_SECRET, 
+    { expiresIn: process.env.JWT_REFRESH_EXPIRES_IN || '7d' }
+  );
 
-function hashToken(token) {
-  return crypto.createHash('sha256').update(token).digest('hex');
-}
+  return { accessToken, refreshToken };
+};
 
 /**
- * POST /api/auth/register
+ * Register a new user
  */
 async function register(req, res, next) {
   try {
-    const { name, email, password, phone } = req.body;
-
-    // Check uniqueness
+    const { name, email, password, phone, role } = req.body;
+    logger.debug(`Registration attempt: ${email}`, { name, phone, role });
+    
+    // Check if user already exists
     const existing = await User.findOne({ email });
     if (existing) {
-      return res.status(409).json({ error: 'Email already registered' });
+      logger.warn(`Registration failed: Email already taken - ${email}`);
+      return res.status(400).json({ 
+        error: 'EMAIL_TAKEN', 
+        message: 'Cet e-mail est déjà utilisé par un autre compte.' 
+      });
     }
-
-    // Passwords are hashed in the model pre-save hook
-    const user = await User.create({ name, email, password, phone });
-
-    const accessToken  = generateAccessToken(user);
-    const refreshToken = generateRefreshToken();
-    const expiresAt    = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
     
-    user.refreshTokens.push({ token: hashToken(refreshToken), expiresAt });
+    const user = await User.create({
+      name,
+      email,
+      password,
+      phone: phone || '',
+      role: role || 'farmer',
+      is_active: true
+    });
+    
+    const { accessToken, refreshToken } = generateTokens(user._id);
+
+    // Store refresh token in user document
+    user.refresh_tokens.push({
+      token: refreshToken,
+      expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 days
+    });
     await user.save();
 
-    winston.info(`New user registered: ${email}`);
+    logger.info(`✅ New user registered and logged in: ${email}`);
     
-    // Convert to plain object and remove password
-    const userObj = user.toObject();
-    delete userObj.password;
-    delete userObj.refreshTokens;
-
-    res.status(201).json({ user: userObj, accessToken, refreshToken });
+    res.status(201).json({ 
+      user, 
+      accessToken, 
+      refreshToken 
+    });
   } catch (err) {
+    logger.error(`Error in registration: ${err.message}`);
     next(err);
   }
 }
 
 /**
- * POST /api/auth/login
+ * Login user
  */
 async function login(req, res, next) {
   try {
     const { email, password } = req.body;
-
+    logger.debug(`Login attempt: ${email}`);
+    
     const user = await User.findOne({ email }).select('+password');
     if (!user) {
-      return res.status(401).json({ error: 'Invalid credentials' });
+      logger.warn(`Login failed: User not found - ${email}`);
+      return res.status(401).json({ 
+        error: 'INVALID_CREDENTIALS', 
+        message: 'Aucun compte trouvé avec cet e-mail.' 
+      });
     }
 
     const isMatch = await user.comparePassword(password);
     if (!isMatch) {
-      return res.status(401).json({ error: 'Invalid credentials' });
+      logger.warn(`Login failed: Incorrect password - ${email}`);
+      return res.status(401).json({ 
+        error: 'INVALID_CREDENTIALS', 
+        message: 'E-mail ou mot de passe incorrect.' 
+      });
     }
-
-    const accessToken  = generateAccessToken(user);
-    const refreshToken = generateRefreshToken();
-    const expiresAt    = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
     
-    user.refreshTokens.push({ token: hashToken(refreshToken), expiresAt });
+    if (!user.is_active) {
+      logger.warn(`Login failed: Account disabled - ${email}`);
+      return res.status(403).json({ 
+        error: 'ACCOUNT_DISABLED', 
+        message: 'Votre compte est désactivé. Veuillez contacter l\'administrateur.' 
+      });
+    }
+    
+    const { accessToken, refreshToken } = generateTokens(user._id);
+
+    // Rotation: add new refresh token
+    user.refresh_tokens.push({
+      token: refreshToken,
+      expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+    });
+
+    // Cleanup: remove expired or too many tokens (simple cleanup)
+    if (user.refresh_tokens.length > 5) {
+      user.refresh_tokens = user.refresh_tokens.slice(-5);
+    }
+    
     await user.save();
 
-    const userObj = user.toObject();
-    delete userObj.password;
-    delete userObj.refreshTokens;
+    logger.info(`✅ User logged in successfully: ${email}`);
+    
+    res.json({ 
+      user, 
+      accessToken, 
+      refreshToken 
+    });
+  } catch (err) {
+    logger.error(`Error in login: ${err.message}`);
+    next(err);
+  }
+}
 
-    winston.info(`User logged in: ${email}`);
-    res.json({ user: userObj, accessToken, refreshToken });
+/**
+ * GET current user /api/auth/me
+ */
+async function getMe(req, res, next) {
+  try {
+    const user = await User.findById(req.user.id);
+    if (!user) return res.status(404).json({ error: 'User not found' });
+    res.json(user);
   } catch (err) {
     next(err);
   }
@@ -97,32 +150,35 @@ async function login(req, res, next) {
  */
 async function refreshToken(req, res, next) {
   try {
-    const { refreshToken: token } = req.body;
-    if (!token) return res.status(400).json({ error: 'Refresh token required' });
-
-    const hash = hashToken(token);
-    const user = await User.findOne({ 
-      'refreshTokens.token': hash,
-      'refreshTokens.expiresAt': { $gt: new Date() }
-    });
-
-    if (!user) {
-      return res.status(401).json({ error: 'Invalid or expired refresh token' });
+    const { refreshToken: incomingToken } = req.body;
+    if (!incomingToken) {
+      return res.status(400).json({ error: 'TOKEN_REQUIRED', message: 'Token de rafraîchissement manquant.' });
     }
 
-    // Remove old token
-    user.refreshTokens = user.refreshTokens.filter(t => t.token !== hash);
+    const decoded = jwt.verify(incomingToken, process.env.JWT_REFRESH_SECRET);
+    const user = await User.findById(decoded.id);
 
-    const newAccessToken  = generateAccessToken(user);
-    const newRefreshToken = generateRefreshToken();
-    const expiresAt       = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+    if (!user || !user.refresh_tokens.find(t => t.token === incomingToken)) {
+      logger.warn(`Refresh failed: Token invalid or user not found - ${decoded.id}`);
+      return res.status(401).json({ error: 'INVALID_TOKEN', message: 'Session expirée ou invalide.' });
+    }
 
-    user.refreshTokens.push({ token: hashToken(newRefreshToken), expiresAt });
+    // Generate new pair
+    const tokens = generateTokens(user._id);
+
+    // Update tokens array (rotate)
+    user.refresh_tokens = user.refresh_tokens.filter(t => t.token !== incomingToken);
+    user.refresh_tokens.push({
+      token: tokens.refreshToken,
+      expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+    });
     await user.save();
 
-    res.json({ accessToken: newAccessToken, refreshToken: newRefreshToken });
+    logger.debug(`Session refreshed for user: ${user.email}`);
+    res.json(tokens);
   } catch (err) {
-    next(err);
+    logger.error(`Error in refreshToken: ${err.message}`);
+    res.status(401).json({ error: 'INVALID_TOKEN', message: 'Session expirée.' });
   }
 }
 
@@ -131,31 +187,25 @@ async function refreshToken(req, res, next) {
  */
 async function logout(req, res, next) {
   try {
-    const { refreshToken: token } = req.body;
-    if (token) {
-      const hash = hashToken(token);
+    const { refreshToken } = req.body;
+    if (refreshToken) {
       await User.updateOne(
-        { 'refreshTokens.token': hash },
-        { $pull: { refreshTokens: { token: hash } } }
+        { 'refresh_tokens.token': refreshToken },
+        { $pull: { refresh_tokens: { token: refreshToken } } }
       );
     }
+    logger.info('User logged out');
     res.json({ message: 'Logged out successfully' });
   } catch (err) {
+    logger.error(`Error in logout: ${err.message}`);
     next(err);
   }
 }
 
-/**
- * GET /api/auth/me
- */
-async function me(req, res, next) {
-  try {
-    const user = await User.findById(req.user.id);
-    if (!user) return res.status(404).json({ error: 'User not found' });
-    res.json(user);
-  } catch (err) {
-    next(err);
-  }
-}
-
-module.exports = { register, login, refreshToken, logout, me };
+module.exports = {
+  register,
+  login,
+  getMe,
+  refreshToken,
+  logout
+};

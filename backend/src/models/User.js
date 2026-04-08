@@ -31,23 +31,32 @@ const userSchema = new mongoose.Schema({
     type: String,
     trim: true,
   },
-  isActive: {
+  is_active: {
     type: Boolean,
     default: true,
   },
-  refreshTokens: [{
+  refresh_tokens: [{
     token: String,
     expiresAt: Date,
   }]
 }, {
-  timestamps: true, // Adds createdAt and updatedAt
+  timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' },
+  toJSON: { 
+    virtuals: true,
+    transform: (doc, ret) => {
+      ret.id = ret._id.toString();
+      delete ret._id;
+      delete ret.__v;
+      return ret;
+    }
+  },
+  toObject: { virtuals: true }
 });
 
 // Hash password before saving
-userSchema.pre('save', async function(next) {
-  if (!this.isModified('password')) return next();
+userSchema.pre('save', async function() {
+  if (!this.isModified('password')) return;
   this.password = await bcrypt.hash(this.password, 12);
-  next();
 });
 
 // Method to check password
