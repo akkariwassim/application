@@ -19,6 +19,7 @@ const animalsRoutes   = require('./routes/animals');
 const positionsRoutes = require('./routes/positions');
 const alertsRoutes    = require('./routes/alerts');
 const geofencesRoutes = require('./routes/geofences');
+const userRoutes      = require('./routes/user');
 
 // Middleware
 const errorHandler   = require('./middleware/errorHandler');
@@ -66,10 +67,12 @@ app.use('/api/animals',   animalsRoutes);
 app.use('/api/positions', positionsRoutes);
 app.use('/api/alerts',    alertsRoutes);
 app.use('/api/geofences', geofencesRoutes);
+app.use('/api/user',      userRoutes);
 
 // ── 404 handler ────────────────────────────────────────────────
-app.use((_req, res) => {
-  res.status(404).json({ error: 'Route not found' });
+app.use((req, res) => {
+  logger.warn(`404 - ${req.method} ${req.url}`);
+  res.status(404).json({ error: 'Route not found (DEBUG V1)' });
 });
 
 // ── Global error handler ───────────────────────────────────────

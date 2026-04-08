@@ -37,6 +37,6 @@ router.post('/refresh', [
 router.post('/logout', ctrl.logout);
 
 // GET /api/auth/me  (protected)
-router.get('/me', authenticate, ctrl.me);
+router.get('/me', authenticate, ctrl.getMe);
 
 module.exports = router;

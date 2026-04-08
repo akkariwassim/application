@@ -4,7 +4,7 @@ const Alert   = require('../models/Alert');
 const Animal  = require('../models/Animal');
 const Zone    = require('../models/Zone');
 const { emitAlert, emitStatusChange } = require('../config/socket');
-const winston = require('winston');
+const logger = require('../utils/logger');
 const { checkBreach } = require('./geofenceService');
 
 /**
@@ -62,10 +62,10 @@ async function createGeofenceAlert({ animalId, userId, latitude, longitude, dist
     emitAlert(userId, animalId, alertPayload);
     emitStatusChange(userId, animalId, 'out_of_zone');
 
-    winston.warn(`🚨 Geofence breach — animal ${animalId}: ${message}`);
+    logger.warn(`🚨 Geofence breach — animal ${animalId}: ${message}`);
     return alert;
   } catch (err) {
-    winston.error('Failed to create geofence alert:', err.message);
+    logger.error('Failed to create geofence alert:', err.message);
     throw err;
   }
 }
@@ -115,10 +115,10 @@ async function createHealthAlert({ animalId, userId, type, severity, message, la
     };
 
     emitAlert(userId, animalId, alertPayload);
-    winston.warn(`🩺 Health alert — animal ${animalId} (${type}): ${message}`);
+    logger.warn(`🩺 Health alert — animal ${animalId} (${type}): ${message}`);
     return alert;
   } catch (err) {
-    winston.error('Failed to create health alert:', err.message);
+    logger.error('Failed to create health alert:', err.message);
     throw err;
   }
 }
@@ -158,10 +158,10 @@ async function processZoneMonitoring(animal, currentPos) {
     // 3. Handle Transitions (Entry/Exit)
     if (String(matchedId) !== String(lastZoneId)) {
       if (lastZoneId) {
-        winston.info(`🚶 Animal ${animalId} exited zone ${lastZoneId}`);
+        logger.info(`🚶 Animal ${animalId} exited zone ${lastZoneId}`);
       }
       if (matchedId) {
-        winston.info(`🚩 Animal ${animalId} entered zone ${matchedId} (${matchedZone.name})`);
+        logger.info(`🚩 Animal ${animalId} entered zone ${matchedId} (${matchedZone.name})`);
       }
       await Animal.findByIdAndUpdate(animalId, { $set: { currentZoneId: matchedId } });
     }
@@ -188,7 +188,7 @@ async function processZoneMonitoring(animal, currentPos) {
 
     return matchedZone;
   } catch (err) {
-    winston.error(`Error in processZoneMonitoring for animal ${animalId}:`, err.message);
+    logger.error(`Error in processZoneMonitoring for animal ${animalId}:`, err.message);
   }
 }
 

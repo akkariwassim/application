@@ -9,10 +9,10 @@ const { authenticate } = require('../middleware/auth');
 // All animals routes require authentication
 router.use(authenticate);
 
-const idParam = param('id').isInt({ min: 1 }).withMessage('ID must be a positive integer');
+const idParam = param('id').isMongoId().withMessage('Invalid ID format');
 
 // GET /api/animals
-router.get('/', ctrl.listAnimals);
+router.get('/', ctrl.getAnimals);
 
 // POST /api/animals
 router.post('/', [
@@ -47,9 +47,9 @@ router.post('/:id/geofence', [
   body('radiusM').if(body('type').equals('circle')).isFloat({ min: 1 }).withMessage('radius must be > 0'),
   body('polygonCoords').if(body('type').equals('polygon')).isArray({ min: 3 }),
   validate
-], ctrl.setGeofence);
+], ctrl.setZone);
 
 // GET /api/animals/:id/geofence
-router.get('/:id/geofence', [idParam, validate], ctrl.getGeofence);
+router.get('/:id/geofence', [idParam, validate], ctrl.getZone);
 
 module.exports = router;

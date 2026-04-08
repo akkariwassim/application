@@ -3,55 +3,44 @@
 const mongoose = require('mongoose');
 
 const sensorDataSchema = new mongoose.Schema({
-  animalId: {
+  animal_id: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Animal',
     required: true,
   },
+  user_id: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true,
+  },
+  latitude: Number,
+  longitude: Number,
+  temperature: Number,
+  activity: {
+    type: Number,
+    min: 0,
+    max: 100,
+  },
   timestamp: {
     type: Date,
     default: Date.now,
-    index: true,
   },
-  location: {
-    type: {
-      type: String,
-      enum: ['Point'],
-      required: true,
-    },
-    coordinates: {
-      type: [Number], // [longitude, latitude]
-      required: true,
+  battery_level: Number,
+}, {
+  timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' },
+  toJSON: { 
+    virtuals: true,
+    transform: (doc, ret) => {
+      ret.id = ret._id.toString();
+      delete ret._id;
+      delete ret.__v;
+      return ret;
     }
   },
-  metrics: {
-    temperature: {
-      type: Number,
-      required: true,
-    },
-    activity: {
-      type: Number,
-      required: true,
-    },
-    battery: Number,
-    speedMps: Number,
-  },
-  metadata: {
-    deviceId: String,
-    signalStrength: Number,
-  }
-}, {
-  // Use time-series optimization if using MongoDB 5.0+ 
-  // (Note: To enable natively, would require createCollection with timeseries option)
-  // For now, standard collection with compound index is robust
-  timestamps: false,
+  toObject: { virtuals: true }
 });
 
-// Compound index for efficient historical queries per animal
-sensorDataSchema.index({ animalId: 1, timestamp: -1 });
-
-// Geo-spatial index for trajectory analysis
-sensorDataSchema.index({ location: '2dsphere' });
+sensorDataSchema.index({ animal_id: 1, timestamp: -1 });
 
 const SensorData = mongoose.model('SensorData', sensorDataSchema);
 

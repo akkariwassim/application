@@ -5,22 +5,17 @@ const Alert = require('../models/Alert');
 /**
  * GET /api/alerts
  */
-async function listAlerts(req, res, next) {
+async function getAlerts(req, res, next) {
   try {
-    const { animalId, severity, status, limit = 50, offset = 0 } = req.query;
+    const { status, severity, animalId, type } = req.query;
     
-    const query = { userId: req.user.id };
-    if (animalId) query.animalId = animalId;
-    if (severity) query.severity = severity;
+    const query = { user_id: req.user.id };
     if (status) query.status = status;
-
-    const alerts = await Alert.find(query)
-      .sort({ createdAt: -1 })
-      .skip(parseInt(offset))
-      .limit(parseInt(limit))
-      .populate('animalId', 'name type')
-      .populate('zoneId', 'name');
-
+    if (severity) query.severity = severity;
+    if (animalId) query.animal_id = animalId;
+    if (type) query.type = type;
+    
+    const alerts = await Alert.find(query).sort({ created_at: -1 });
     res.json(alerts);
   } catch (err) {
     next(err);
@@ -32,10 +27,8 @@ async function listAlerts(req, res, next) {
  */
 async function getAlert(req, res, next) {
   try {
-    const alert = await Alert.findOne({ _id: req.params.id, userId: req.user.id })
-      .populate('animalId')
-      .populate('zoneId');
-      
+    const { id } = req.params;
+    const alert = await Alert.findOne({ _id: id, user_id: req.user.id });
     if (!alert) return res.status(404).json({ error: 'Alert not found' });
     res.json(alert);
   } catch (err) {
@@ -48,19 +41,14 @@ async function getAlert(req, res, next) {
  */
 async function acknowledgeAlert(req, res, next) {
   try {
+    const { id } = req.params;
     const alert = await Alert.findOneAndUpdate(
-      { _id: req.params.id, userId: req.user.id, status: 'active' },
-      { 
-        $set: { 
-          status: 'acknowledged',
-          acknowledgedBy: req.user.id,
-          acknowledgedAt: new Date()
-        } 
-      },
+      { _id: id, user_id: req.user.id },
+      { $set: { status: 'acknowledged', acknowledged_at: new Date() } },
       { new: true }
     );
-
-    if (!alert) return res.status(404).json({ error: 'Alert not found or already acknowledged' });
+    
+    if (!alert) return res.status(404).json({ error: 'Alert not found' });
     res.json(alert);
   } catch (err) {
     next(err);
@@ -72,18 +60,14 @@ async function acknowledgeAlert(req, res, next) {
  */
 async function resolveAlert(req, res, next) {
   try {
+    const { id } = req.params;
     const alert = await Alert.findOneAndUpdate(
-      { _id: req.params.id, userId: req.user.id, status: { $ne: 'resolved' } },
-      { 
-        $set: { 
-          status: 'resolved',
-          resolvedAt: new Date()
-        } 
-      },
+      { _id: id, user_id: req.user.id },
+      { $set: { status: 'resolved', resolved_at: new Date() } },
       { new: true }
     );
-
-    if (!alert) return res.status(404).json({ error: 'Alert not found or already resolved' });
+    
+    if (!alert) return res.status(404).json({ error: 'Alert not found' });
     res.json(alert);
   } catch (err) {
     next(err);
@@ -95,12 +79,19 @@ async function resolveAlert(req, res, next) {
  */
 async function deleteAlert(req, res, next) {
   try {
-    const result = await Alert.deleteOne({ _id: req.params.id, userId: req.user.id });
+    const { id } = req.params;
+    const result = await Alert.deleteOne({ _id: id, user_id: req.user.id });
     if (result.deletedCount === 0) return res.status(404).json({ error: 'Alert not found' });
-    res.json({ message: 'Alert deleted' });
+    res.json({ message: 'Alert deleted successfully' });
   } catch (err) {
     next(err);
   }
 }
 
-module.exports = { listAlerts, getAlert, acknowledgeAlert, resolveAlert, deleteAlert };
+module.exports = {
+  getAlerts,
+  getAlert,
+  acknowledgeAlert,
+  resolveAlert,
+  deleteAlert
+};

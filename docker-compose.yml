@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  # ── MySQL Database ───────────────────────────────────────────
+  # ── MySQL Database (Legacy) ──────────────────────────────────
   db:
     image: mysql:8.0
     container_name: smart_fence_db
@@ -13,10 +13,18 @@ services:
       - "3306:3306"
     volumes:
       - db_data:/var/lib/mysql
-      - ./database/schema.sql:/docker-entrypoint-initdb.d/01_schema.sql
-      - ./database/sample_data.sql:/docker-entrypoint-initdb.d/02_sample_data.sql
+
+  # ── MongoDB Database (New) ────────────────────────────────────
+  mongodb:
+    image: mongo:6.0
+    container_name: smart_fence_mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-prootpass"]
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -51,4 +59,5 @@ services:
 
 volumes:
   db_data:
+  mongodb_data:
   backend_logs:

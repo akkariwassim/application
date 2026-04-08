@@ -3,68 +3,56 @@
 const mongoose = require('mongoose');
 
 const alertSchema = new mongoose.Schema({
-  userId: {
+  user_id: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
     required: true,
   },
-  animalId: {
+  animal_id: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Animal',
     required: true,
   },
-  zoneId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Zone',
-  },
   type: {
     type: String,
-    enum: [
-      'geofence_exit',
-      'geofence_enter',
-      'high_temp',
-      'low_temp',
-      'high_activity',
-      'low_activity',
-      'battery_low',
-      'inactivity'
-    ],
     required: true,
+    enum: ['fence_breach', 'health_critical', 'low_activity', 'device_offline', 'low_battery'],
   },
   severity: {
     type: String,
     enum: ['low', 'medium', 'high', 'critical'],
     default: 'medium',
   },
-  message: String,
+  message: {
+    type: String,
+    required: true,
+  },
   status: {
     type: String,
     enum: ['active', 'acknowledged', 'resolved'],
     default: 'active',
   },
-  location: {
-    type: {
-      type: String,
-      enum: ['Point'],
-      default: 'Point',
-    },
-    coordinates: {
-      type: [Number], // [lon, lat]
+  acknowledged_at: Date,
+  resolved_at: Date,
+  latitude: Number,
+  longitude: Number,
+  metadata: {
+    type: mongoose.Schema.Types.Mixed,
+    default: {},
+  }
+}, {
+  timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' },
+  toJSON: { 
+    virtuals: true,
+    transform: (doc, ret) => {
+      ret.id = ret._id.toString();
+      delete ret._id;
+      delete ret.__v;
+      return ret;
     }
   },
-  acknowledgedBy: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-  },
-  acknowledgedAt: Date,
-  resolvedAt: Date,
-}, {
-  timestamps: true,
+  toObject: { virtuals: true }
 });
-
-// Geo-spatial index for alerts by location
-alertSchema.index({ location: '2dsphere' });
-alertSchema.index({ animalId: 1, createdAt: -1 });
 
 const Alert = mongoose.model('Alert', alertSchema);
 

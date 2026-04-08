@@ -2,23 +2,31 @@ import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
 import Constants from 'expo-constants';
 
-const API_URL = Constants.expoConfig?.extra?.API_URL || 'http://192.168.100.156:5000';
+const API_URL = Constants.expoConfig?.extra?.API_URL || 'http://192.168.1.236:5000';
 
 const api = axios.create({
-  baseURL: `${API_URL}/api`,
+  baseURL: API_URL,
   timeout: 15000,
   headers: {
     'Content-Type': 'application/json',
   },
 });
 
-// ── Request interceptor: attach JWT ──────────────────────────
+// ── Request interceptor: attach JWT & normalize paths ────────
 api.interceptors.request.use(
   async (config) => {
+    // 1. Attach JWT token
     const token = await SecureStore.getItemAsync('accessToken');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+
+    // 2. Ensure /api prefix
+    if (config.url && !config.url.startsWith('/api')) {
+      const separator = config.url.startsWith('/') ? '' : '/';
+      config.url = `/api${separator}${config.url}`;
+    }
+
     return config;
   },
   (error) => Promise.reject(error)
