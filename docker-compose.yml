@@ -1,4 +1,4 @@
-version: '3.8'
+# Docker Compose configuration for Smart Virtual Fence System
 
 services:
   # ── MySQL Database (Legacy) ──────────────────────────────────
@@ -13,6 +13,11 @@ services:
       - "3306:3306"
     volumes:
       - db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-prootpass"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   # ── MongoDB Database (New) ────────────────────────────────────
   mongodb:
@@ -39,9 +44,12 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      mongodb:
+        condition: service_healthy
     environment:
       NODE_ENV: production
       PORT: 3000
+      MONGODB_URI: mongodb://mongodb:27017/smart_fence
       DB_HOST: db
       DB_PORT: 3306
       DB_NAME: smart_fence

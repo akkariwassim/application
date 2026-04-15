@@ -382,3 +382,20 @@
 2026-04-08 02:20:56 [info]: Socket disconnected: 72IQQhojWlIIxVYyAAAB — client namespace disconnect
 2026-04-08 02:20:59 [info]: Socket connected: acadVd0cmKfyvpBBAAAD (user 69d53a98f629b2d56de2c135)
 2026-04-08 02:21:09 [info]: Profile updated for user: akkariwassim11@gmail.com
+2026-04-08 14:43:22 [info]: MongoDB Connected: ac-lokdmj8-shard-00-00.7zypd8b.mongodb.net
+2026-04-08 14:43:22 [info]: 🚀 Server running on http://localhost:5000
+2026-04-08 14:43:22 [info]:    Environment: development
+2026-04-08 14:50:44 [info]: ✅ User logged in successfully: akkariwassim11@gmail.com
+2026-04-08 14:50:45 [info]: Socket connected: b91yZ-51Ss5gWb1aAAAB (user 69d53a98f629b2d56de2c135)
+2026-04-08 14:53:19 [info]: Socket disconnected: b91yZ-51Ss5gWb1aAAAB — transport close
+2026-04-09 15:39:45 [info]: MongoDB Connected: ac-lokdmj8-shard-00-01.7zypd8b.mongodb.net
+2026-04-09 15:39:45 [info]: 🚀 Server running on http://localhost:5000
+2026-04-09 15:39:45 [info]:    Environment: development
+2026-04-09 15:40:34 [warn]: MongoDB disconnected
+2026-04-09 15:41:51 [warn]: MongoDB disconnected
+2026-04-09 15:51:37 [info]: MongoDB Connected: ac-lokdmj8-shard-00-02.7zypd8b.mongodb.net
+2026-04-09 15:51:37 [info]: 🚀 Server running on http://localhost:5000
+2026-04-09 15:51:37 [info]:    Environment: development
+2026-04-09 16:16:55 [warn]: MongoDB disconnected
+2026-04-09 16:20:32 [warn]: MongoDB disconnected
+2026-04-09 16:25:41 [warn]: MongoDB disconnected

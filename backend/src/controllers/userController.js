@@ -162,7 +162,13 @@ async function updateProfile(req, res, next) {
       user.refresh_tokens = []; // Revoke other sessions on password change
     }
 
-    // 3. Save (triggers pre-save hooks for hashing)
+    // 3. Update Farm Info
+    const { farm_latitude, farm_longitude, farm_name } = req.body;
+    if (farm_latitude !== undefined) user.farm_latitude = farm_latitude;
+    if (farm_longitude !== undefined) user.farm_longitude = farm_longitude;
+    if (farm_name !== undefined) user.farm_name = farm_name;
+
+    // 4. Save (triggers pre-save hooks for hashing)
     await user.save();
 
     // Remove password from response
@@ -192,5 +198,6 @@ module.exports = {
   changePassword,
   updatePhone,
   updateProfile,
+  updateFarm,
   ping
 };

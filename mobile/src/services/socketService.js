@@ -2,7 +2,7 @@ import { io } from 'socket.io-client';
 import * as SecureStore from 'expo-secure-store';
 import Constants from 'expo-constants';
 
-const API_URL = Constants.expoConfig?.extra?.API_URL || 'http://10.0.2.2:3000';
+const API_URL = Constants.expoConfig?.extra?.API_URL || 'http://192.168.100.152:3000';
 
 let socket = null;
 
