@@ -38,4 +38,10 @@ router.put('/update-phone', userController.updatePhone);
  */
 router.put('/update-profile', userController.updateProfile);
 
+/**
+ * @route   PUT /api/user/update-farm
+ * @desc    Update farm location coordinates
+ */
+router.put('/update-farm', userController.updateFarm);
+
 module.exports = router;

@@ -13,14 +13,17 @@ const alertSchema = new mongoose.Schema({
     ref: 'Animal',
     required: true,
   },
+  geofence_id: {
+    type: Number,
+  },
   type: {
     type: String,
     required: true,
-    enum: ['fence_breach', 'health_critical', 'low_activity', 'device_offline', 'low_battery'],
+    enum: ['fence_breach', 'health_critical', 'low_activity', 'device_offline', 'low_battery', 'exit', 'entry'],
   },
   severity: {
     type: String,
-    enum: ['low', 'medium', 'high', 'critical'],
+    enum: ['low', 'medium', 'high', 'critical', 'danger', 'warning'],
     default: 'medium',
   },
   message: {
@@ -34,8 +37,17 @@ const alertSchema = new mongoose.Schema({
   },
   acknowledged_at: Date,
   resolved_at: Date,
-  latitude: Number,
-  longitude: Number,
+  location: {
+    type: {
+      type: String,
+      enum: ['Point'],
+      default: 'Point',
+    },
+    coordinates: {
+      type: [Number],
+      default: [0, 0],
+    }
+  },
   metadata: {
     type: mongoose.Schema.Types.Mixed,
     default: {},

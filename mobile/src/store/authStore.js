@@ -123,6 +123,20 @@ const useAuthStore = create((set, get) => ({
     }
   },
 
+  // ── Update Farm Location ─────────────────────────────────
+  updateFarmLocation: async (latitude, longitude, name) => {
+    set({ error: null });
+    try {
+      const { data } = await api.put('/api/user/update-farm', { latitude, longitude, name });
+      if (data.user) set({ user: data.user });
+      return true;
+    } catch (err) {
+      const message = err.response?.data?.message || err.response?.data?.error || 'Mise à jour de la ferme échouée';
+      set({ error: message });
+      return false;
+    }
+  },
+
   clearError: () => set({ error: null }),
 }));
 

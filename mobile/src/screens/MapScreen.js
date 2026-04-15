@@ -3,12 +3,14 @@ import {
   View, Text, StyleSheet, TouchableOpacity, Image, Dimensions, 
   ActivityIndicator, Modal, FlatList, ScrollView, Animated
 } from 'react-native';
-import MapView, { Marker, Polygon, PROVIDER_GOOGLE, Callout } from 'react-native-maps';
+import MapView, { Marker, Polygon, Polyline, PROVIDER_GOOGLE, Callout } from 'react-native-maps';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as Location from 'expo-location';
+import { getDistance, getPreciseDistance } from 'geolib';
 import useAnimalStore from '../store/animalStore';
 import useGeofenceStore from '../store/geofenceStore';
+import useAuthStore from '../store/authStore';
 import { isPointInPolygon } from '../utils/geoUtils';
 
 const { width, height } = Dimensions.get('window');
@@ -37,47 +39,91 @@ export default function MapScreen() {
   const mapRef = useRef(null);
   const { animals, fetchAnimals, isLoading } = useAnimalStore();
   const { geofences, fetchGeofences } = useGeofenceStore();
+  const { user, updateFarmLocation } = useAuthStore();
   const [selectedAnimal, setSelectedAnimal] = useState(null);
   const [showZonesList, setShowZonesList] = useState(false);
   const [userLocation, setUserLocation] = useState(null);
   const [locationPermission, setLocationPermission] = useState(null);
+  const locationSubscription = useRef(null);
 
   useEffect(() => {
     fetchAnimals();
     fetchGeofences();
     
-    // Auto-center on user upon load
-    centerOnUser();
+    startUserTracking();
 
-    const interval = setInterval(fetchAnimals, 5000);
-    return () => clearInterval(interval);
+    // No more interval fetch needed thanks to WebSocket
+    // const interval = setInterval(fetchAnimals, 5000);
+    // return () => clearInterval(interval);
+
+    return () => {
+      if (locationSubscription.current) {
+        locationSubscription.current.remove();
+      }
+    };
   }, []);
 
-  const centerOnUser = async () => {
+  const startUserTracking = async () => {
     try {
       let { status } = await Location.requestForegroundPermissionsAsync();
       setLocationPermission(status === 'granted');
       
-      if (status !== 'granted') {
-        Alert.alert(
-          'Permission Refusée',
-          'L\'accès à la localisation est nécessaire pour vous situer sur la carte. Veuillez l\'activer dans vos paramètres.'
-        );
-        return;
-      }
+      if (status !== 'granted') return;
 
-      let location = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
-      const coord = { latitude: location.coords.latitude, longitude: location.coords.longitude };
-      
-      setUserLocation(coord);
+      locationSubscription.current = await Location.watchPositionAsync(
+        {
+          accuracy: Location.Accuracy.High,
+          timeInterval: 5000,
+          distanceInterval: 5,
+        },
+        (location) => {
+          const coord = { latitude: location.coords.latitude, longitude: location.coords.longitude };
+          setUserLocation(coord);
+        }
+      );
+    } catch (err) {
+      console.error('Error starting user tracking:', err);
+    }
+  };
+
+  const centerOnUser = async () => {
+    if (!userLocation) {
+      // Get one-time if not tracking yet
+      let location = await Location.getCurrentPositionAsync({});
+      setUserLocation({ latitude: location.coords.latitude, longitude: location.coords.longitude });
+    }
+    
+    if (userLocation) {
       mapRef.current?.animateToRegion({
-        ...coord,
+        ...userLocation,
         latitudeDelta: 0.005,
         longitudeDelta: 0.005,
       }, 1000);
-    } catch (err) {
-      Alert.alert('Erreur GPS', 'Impossible de récupérer votre position. Vérifiez que votre GPS est bien activé.');
     }
+  };
+
+  const handleMapLongPress = async (e) => {
+    const { latitude, longitude } = e.nativeEvent.coordinate;
+    
+    // Ask for farm name or just use default
+    const success = await updateFarmLocation(latitude, longitude, user.farm_name || 'Ma Ferme');
+    if (success) {
+      // Show small toast or feedback if needed
+    }
+  };
+
+  const calculateDistances = (animal) => {
+    if (!userLocation || !animal) return null;
+    
+    const animalCoord = { latitude: parseFloat(animal.latitude), longitude: parseFloat(animal.longitude) };
+    const distUserAnimal = getDistance(userLocation, animalCoord);
+    
+    let distFarmAnimal = null;
+    if (user.farm_latitude && user.farm_longitude) {
+      distFarmAnimal = getDistance({ latitude: user.farm_latitude, longitude: user.farm_longitude }, animalCoord);
+    }
+
+    return { userAnimal: distUserAnimal, farmAnimal: distFarmAnimal };
   };
 
   const fitAllZones = () => {
@@ -131,6 +177,7 @@ export default function MapScreen() {
         style={StyleSheet.absoluteFillObject}
         provider={PROVIDER_GOOGLE}
         mapType="hybrid"
+        onLongPress={handleMapLongPress}
         initialRegion={{
           latitude: 35.038,
           longitude: 9.484,
@@ -185,10 +232,25 @@ export default function MapScreen() {
           <Marker
             coordinate={userLocation}
             title="Ma Position"
+            flat={true}
             zIndex={100}
           >
             <View style={styles.userMarker}>
-              <Ionicons name="person-circle" size={24} color="#4F46E5" />
+              <View style={styles.userMarkerPulse} />
+              <Ionicons name="person" size={18} color="#4F46E5" />
+            </View>
+          </Marker>
+        )}
+
+        {/* Farm Marker */}
+        {user?.farm_latitude && user?.farm_longitude && (
+          <Marker
+            coordinate={{ latitude: user.farm_latitude, longitude: user.farm_longitude }}
+            title={user.farm_name || "Ma Ferme"}
+            pinColor={COLORS.success}
+          >
+            <View style={styles.farmMarker}>
+              <Ionicons name="home" size={20} color={COLORS.success} />
             </View>
           </Marker>
         )}
@@ -208,6 +270,31 @@ export default function MapScreen() {
             </View>
           </Marker>
         ))}
+
+        {/* Polylines to selected animal */}
+        {selectedAnimal && !selectedAnimal.isZone && userLocation && (
+          <Polyline
+            coordinates={[
+              userLocation,
+              { latitude: parseFloat(selectedAnimal.latitude), longitude: parseFloat(selectedAnimal.longitude) }
+            ]}
+            strokeColor={COLORS.primary}
+            strokeWidth={2}
+            lineDashPattern={[5, 5]}
+          />
+        )}
+
+        {selectedAnimal && !selectedAnimal.isZone && user?.farm_latitude && (
+          <Polyline
+            coordinates={[
+              { latitude: user.farm_latitude, longitude: user.farm_longitude },
+              { latitude: parseFloat(selectedAnimal.latitude), longitude: parseFloat(selectedAnimal.longitude) }
+            ]}
+            strokeColor={COLORS.success}
+            strokeWidth={1}
+            lineDashPattern={[2, 4]}
+          />
+        )}
       </MapView>
 
       {/* Top Controls */}
@@ -288,6 +375,21 @@ export default function MapScreen() {
               {selectedAnimal.speed_mps != null && (
                 <Text style={styles.sheetMeta}>🏃 {(parseFloat(selectedAnimal.speed_mps) * 3.6).toFixed(1)} km/h</Text>
               )}
+              
+              <View style={styles.distanceRow}>
+                {calculateDistances(selectedAnimal)?.userAnimal !== null && (
+                  <View style={styles.distanceBadge}>
+                    <Ionicons name="person" size={12} color={COLORS.primary} />
+                    <Text style={styles.distanceText}>{(calculateDistances(selectedAnimal).userAnimal / 1000).toFixed(2)} km</Text>
+                  </View>
+                )}
+                {calculateDistances(selectedAnimal)?.farmAnimal !== null && (
+                  <View style={styles.distanceBadge}>
+                    <Ionicons name="home" size={12} color={COLORS.success} />
+                    <Text style={styles.distanceText}>{(calculateDistances(selectedAnimal).farmAnimal / 1000).toFixed(2)} km</Text>
+                  </View>
+                )}
+              </View>
             </>
           )}
         </View>
@@ -331,5 +433,9 @@ const styles = StyleSheet.create({
   zoneMarkerWrapper: { alignItems: 'center', justifyContent: 'center' },
   zoneLabelContainer: { backgroundColor: 'rgba(19,25,41,0.85)', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4, marginTop: 2, borderWidth: 1, borderColor: 'rgba(255,255,255,0.15)', shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.5, shadowRadius: 1, elevation: 2 },
   zoneLabelText: { color: '#FFFFFF', fontSize: 10, fontWeight: '800', textAlign: 'center', textTransform: 'uppercase', letterSpacing: 0.5 },
-  userMarker: { backgroundColor: '#FFF', borderRadius: 15, padding: 2, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.3, shadowRadius: 3, elevation: 5 },
+  userMarker: { backgroundColor: '#FFF', borderRadius: 15, padding: 4, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.3, shadowRadius: 3, elevation: 5, alignItems: 'center', justifyContent: 'center' },
+  userMarkerPulse: { position: 'absolute', width: 28, height: 28, borderRadius: 14, backgroundColor: 'rgba(79, 70, 229, 0.2)', borderWidth: 1, borderColor: 'rgba(79, 70, 229, 0.4)' },
+  distanceRow: { flexDirection: 'row', gap: 8, marginTop: 12 },
+  distanceBadge: { flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: 'rgba(255,255,255,0.05)', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 8, borderWidth: 1, borderColor: COLORS.border },
+  distanceText: { color: COLORS.text, fontSize: 11, fontWeight: '600' },
 });
