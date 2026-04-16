@@ -19,11 +19,15 @@ const alertSchema = new mongoose.Schema({
   type: {
     type: String,
     required: true,
-    enum: ['fence_breach', 'health_critical', 'low_activity', 'device_offline', 'low_battery', 'exit', 'entry'],
+    enum: [
+      'geofence_breach', 'high_temperature', 'abnormal_heart_rate', 
+      'low_battery', 'no_movement', 'device_offline', 
+      'low_gps_signal', 'sensor_failure', 'exit', 'entry'
+    ],
   },
   severity: {
     type: String,
-    enum: ['low', 'medium', 'high', 'critical', 'danger', 'warning'],
+    enum: ['low', 'medium', 'high', 'critical'],
     default: 'medium',
   },
   message: {

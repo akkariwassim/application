@@ -20,6 +20,7 @@ const positionsRoutes = require('./routes/positions');
 const alertsRoutes    = require('./routes/alerts');
 const geofencesRoutes = require('./routes/geofences');
 const userRoutes      = require('./routes/user');
+const devicesRoutes    = require('./routes/devices');
 
 // Middleware
 const errorHandler   = require('./middleware/errorHandler');
@@ -27,11 +28,21 @@ const errorHandler   = require('./middleware/errorHandler');
 const app  = express();
 const server = http.createServer(app);
 
+// ── Global Error Traps (IOT Reliability) ──────────
+process.on('uncaughtException', (err) => {
+  console.error('[CRITICAL] Uncaught Exception:', err.message);
+  console.error(err.stack);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('[CRITICAL] Unhandled Rejection at:', promise, 'reason:', reason);
+});
+
 // ── Security ───────────────────────────────────────────────────
 app.use(helmet());
 app.use(cors({
   origin: process.env.CLIENT_URL === '*' ? true : (process.env.CLIENT_URL || '*'),
-  methods: ['GET', 'POST'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
   credentials: true
 }));
 
@@ -77,6 +88,7 @@ app.use('/api/positions', positionsRoutes);
 app.use('/api/alerts',    alertsRoutes);
 app.use('/api/geofences', geofencesRoutes);
 app.use('/api/user',      userRoutes);
+app.use('/api/devices',   devicesRoutes);
 
 // ── 404 handler ────────────────────────────────────────────────
 app.use((req, res) => {

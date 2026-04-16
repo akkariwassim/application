@@ -7,17 +7,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import useAnimalStore from '../store/animalStore';
 
-const COLORS = {
-  primary:    '#4F46E5',
-  background: '#0A0F1E',
-  surface:    '#131929',
-  card:       '#1E2A45',
-  text:       '#F0F4FF',
-  subtext:    '#94A3B8',
-  danger:     '#EF4444',
-  success:    '#22C55E',
-  border:     'rgba(255,255,255,0.08)',
-};
+import theme, { COLORS, SPACING, BORDER_RADIUS, SHADOWS, TYPOGRAPHY } from '../config/theme';
 
 export default function AnimalSettingsScreen({ route, navigation }) {
   const insets = useSafeAreaInsets();
@@ -25,22 +15,27 @@ export default function AnimalSettingsScreen({ route, navigation }) {
   const { updateAnimal, isLoading } = useAnimalStore();
 
   const [form, setForm] = useState({
-    minTemp:     String(animal.min_temp || 37.5),
-    maxTemp:     String(animal.max_temp || 40.0),
-    minActivity: String(animal.min_activity || 20),
-    maxActivity: String(animal.max_activity || 80),
+    minTemp:     String(animal.settings?.min_temp || 37.5),
+    maxTemp:     String(animal.settings?.max_temp || 40.0),
+    minActivity: String(animal.settings?.min_activity || 20),
+    maxActivity: String(animal.settings?.max_activity || 80),
+    minHeartRate: String(animal.settings?.min_heart_rate || 40),
+    maxHeartRate: String(animal.settings?.max_heart_rate || 110),
   });
 
   const handleSave = async () => {
     try {
       await updateAnimal(animal.id, {
-        ...animal,
-        minTemp:     parseFloat(form.minTemp),
-        maxTemp:     parseFloat(form.maxTemp),
-        minActivity: parseInt(form.minActivity),
-        maxActivity: parseInt(form.maxActivity),
+        settings: {
+          min_temp:     parseFloat(form.minTemp),
+          max_temp:     parseFloat(form.maxTemp),
+          min_activity: parseInt(form.minActivity),
+          max_activity: parseInt(form.maxActivity),
+          min_heart_rate: parseInt(form.minHeartRate),
+          max_heart_rate: parseInt(form.maxHeartRate),
+        }
       });
-      Alert.alert('Success', 'Thresholds updated successfully.');
+      Alert.alert('Succès', 'Seuils mis à jour avec succès.');
       navigation.goBack();
     } catch (err) {
       Alert.alert('Error', err.message || 'Failed to update thresholds.');
@@ -90,28 +85,55 @@ export default function AnimalSettingsScreen({ route, navigation }) {
         </View>
 
         {/* Activity Thresholds */}
-        <Text style={styles.sectionTitle}>Activity Level (%)</Text>
+        <Text style={styles.sectionTitle}>Niveau d'Activité (%)</Text>
         <View style={styles.row}>
           <View style={styles.inputBox}>
-            <Text style={styles.label}>Min Activity</Text>
+            <Text style={styles.label}>Activité Min</Text>
             <TextInput
               style={styles.input}
               value={form.minActivity}
               onChangeText={(t) => setForm({ ...form, minActivity: t })}
               keyboardType="number-pad"
               placeholder="20"
-              placeholderTextColor={COLORS.subtext}
+              placeholderTextColor={COLORS.textDim}
             />
           </View>
           <View style={[styles.inputBox, styles.rightBox]}>
-            <Text style={styles.label}>Max Activity</Text>
+            <Text style={styles.label}>Activité Max</Text>
             <TextInput
               style={styles.input}
               value={form.maxActivity}
               onChangeText={(t) => setForm({ ...form, maxActivity: t })}
               keyboardType="number-pad"
               placeholder="80"
-              placeholderTextColor={COLORS.subtext}
+              placeholderTextColor={COLORS.textDim}
+            />
+          </View>
+        </View>
+
+        {/* Heart Rate Thresholds */}
+        <Text style={styles.sectionTitle}>Rythme Cardiaque (BPM)</Text>
+        <View style={styles.row}>
+          <View style={styles.inputBox}>
+            <Text style={styles.label}>BPM Min</Text>
+            <TextInput
+              style={styles.input}
+              value={form.minHeartRate}
+              onChangeText={(t) => setForm({ ...form, minHeartRate: t })}
+              keyboardType="number-pad"
+              placeholder="40"
+              placeholderTextColor={COLORS.textDim}
+            />
+          </View>
+          <View style={[styles.inputBox, styles.rightBox]}>
+            <Text style={styles.label}>BPM Max</Text>
+            <TextInput
+              style={styles.input}
+              value={form.maxHeartRate}
+              onChangeText={(t) => setForm({ ...form, maxHeartRate: t })}
+              keyboardType="number-pad"
+              placeholder="110"
+              placeholderTextColor={COLORS.textDim}
             />
           </View>
         </View>

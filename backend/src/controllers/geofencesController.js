@@ -9,6 +9,7 @@ const logger = require('../utils/logger');
 async function getGeofences(req, res, next) {
   try {
     const zones = await Zone.find({ user_id: req.user.id });
+    logger.info(`[Geofences] Found ${zones.length} zones for user ${req.user.id}`);
     res.json(zones);
   } catch (err) {
     next(err);

@@ -73,8 +73,22 @@ api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
+    if (!originalRequest) return Promise.reject(error);
 
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    // ── 1. Retry Logic for Network/Transient Errors ───────────
+    const isRetryable = !error.response || (error.response.status >= 500 && error.response.status <= 599);
+    originalRequest._retryCount = originalRequest._retryCount || 0;
+
+    if (isRetryable && originalRequest._retryCount < 3) {
+      originalRequest._retryCount++;
+      const delay = originalRequest._retryCount * 1000; // Exponential backoff
+      console.log(`[API] Retrying ${originalRequest.url} (Attempt ${originalRequest._retryCount}) in ${delay}ms...`);
+      await new Promise(resolve => setTimeout(resolve, delay));
+      return api(originalRequest);
+    }
+
+    // ── 2. JWT Auto-Refresh (401) ─────────────────────────────
+    if (error.response?.status === 401 && !originalRequest._isRefreshing) {
       if (isRefreshing) {
         return new Promise((resolve, reject) => {
           failedQueue.push({ resolve, reject });
@@ -86,7 +100,7 @@ api.interceptors.response.use(
           .catch((err) => Promise.reject(err));
       }
 
-      originalRequest._retry = true;
+      originalRequest._isRefreshing = true;
       isRefreshing = true;
 
       try {
@@ -109,25 +123,20 @@ api.interceptors.response.use(
         processQueue(refreshError, null);
         await SecureStore.deleteItemAsync('accessToken');
         await SecureStore.deleteItemAsync('refreshToken');
-        // Navigation to login is handled in the store
         return Promise.reject(refreshError);
       } finally {
         isRefreshing = false;
       }
     }
 
+    // ── 3. Diagnostic Logging ─────────────────────────────────
     if (error.response) {
-      // ── Mute expected 404 on session check (initial load) ─────
       const isMe404 = error.config.url.includes('/auth/me') && error.response.status === 404;
-
       if (!isMe404) {
         console.error(`[API Error] ${error.config.method?.toUpperCase()} ${error.config.url} - Status: ${error.response.status}`);
-        console.error('Data:', JSON.stringify(error.response.data, null, 2));
       }
     } else if (error.request) {
-      console.error(`[Network Error] ${error.config.method?.toUpperCase()} ${error.config.url} - No response received`);
-    } else {
-      console.error(`[Error] ${error.message}`);
+      console.error(`[Network Error] ${error.config.method?.toUpperCase()} ${error.config.url} - No response`);
     }
 
     return Promise.reject(error);

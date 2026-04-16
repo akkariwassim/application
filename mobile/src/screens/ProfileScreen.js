@@ -4,15 +4,13 @@ import {
   ScrollView, Alert, Switch, Modal, TextInput,
   ActivityIndicator, KeyboardAvoidingView, Platform,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import useAuthStore from '../store/authStore';
 
-const COLORS = {
-  primary:'#4F46E5', background:'#0A0F1E', surface:'#131929',
-  card:'#1E2A45', text:'#F0F4FF', subtext:'#94A3B8',
-  danger:'#EF4444', border:'rgba(255,255,255,0.08)', safe:'#22C55E',
-};
+import theme, { COLORS, SPACING, BORDER_RADIUS, SHADOWS, TYPOGRAPHY } from '../config/theme';
+import useAnimalStore from '../store/animalStore';
+import useGeofenceStore from '../store/geofenceStore';
 
 function MenuItem({ icon, label, value, onPress, danger, toggle, toggleValue, onToggle }) {
   return (
@@ -35,20 +33,41 @@ function MenuItem({ icon, label, value, onPress, danger, toggle, toggleValue, on
 export default function ProfileScreen() {
   const insets = useSafeAreaInsets();
   const { user, logout, updateUserProfile, error, clearError } = useAuthStore();
+  const { animals } = useAnimalStore();
+  const { geofences } = useGeofenceStore();
+  
   const [notifications, setNotifications] = useState(true);
   
-  // Modals state
-  const [nameModal, setNameModal] = useState(false);
-  const [pwdModal, setPwdModal] = useState(false);
-  const [phoneModal, setPhoneModal] = useState(false);
-  const [emailModal, setEmailModal] = useState(false);
+  // States
+  const [isEditModalVisible, setEditModalVisible] = useState(false);
+  const [activeTab, setActiveTab] = useState('account'); // account, farm, security
   const [loading, setLoading] = useState(false);
 
-  // Form state
-  const [newName, setNewName] = useState(user?.name || '');
-  const [newPhone, setNewPhone] = useState(user?.phone || '');
-  const [newEmail, setNewEmail] = useState(user?.email || '');
+  // Form states
+  const [formData, setFormData] = useState({
+    name: user?.name || '',
+    email: user?.email || '',
+    phone: user?.phone || '',
+    farmName: user?.farm_name || '',
+    farmDescription: user?.farm_description || ''
+  });
+
   const [pwdForm, setPwdForm] = useState({ current: '', new: '', confirm: '' });
+
+  // Compute Statistics
+  const totalAnimals = animals.length;
+  const totalArea = geofences.reduce((acc, gf) => acc + (gf.area_sqm || 0), 0);
+  const areaDisplay = totalArea > 10000 ? `${(totalArea / 10000).toFixed(1)} ha` : `${totalArea.toLocaleString()} m²`;
+
+  const handleUpdateProfile = async () => {
+    setLoading(true);
+    const success = await updateUserProfile(formData);
+    setLoading(false);
+    if (success) {
+      setEditModalVisible(false);
+      Alert.alert('Succès ✅', 'Vos informations ont été mises à jour.');
+    }
+  };
 
   const handleLogout = () => {
     Alert.alert(
@@ -123,236 +142,263 @@ export default function ProfileScreen() {
   };
 
   return (
-    <ScrollView style={[styles.container, { paddingTop: insets.top }]}
-      contentContainerStyle={styles.scroll}>
-      
-      {/* Profile Hero */}
-      <View style={styles.hero}>
-        <TouchableOpacity style={styles.avatar} onPress={() => setNameModal(true)}>
-          <Ionicons name="person" size={40} color={COLORS.primary} />
-          <View style={styles.editBadge}>
-            <Ionicons name="pencil" size={12} color="#fff" />
+    <View style={styles.container}>
+      <ScrollView 
+        style={{ flex: 1 }}
+        contentContainerStyle={[styles.scroll, { paddingTop: insets.top + 20 }]}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* ── Profile Hero & Farm ID ── */}
+        <View style={styles.hero}>
+          <TouchableOpacity style={styles.avatar} onPress={() => setEditModalVisible(true)}>
+            <View style={styles.avatarInternal}>
+              <Text style={styles.avatarInitial}>{user?.name?.charAt(0) || 'U'}</Text>
+            </View>
+            <View style={styles.editBadge}>
+              <Ionicons name="camera" size={10} color="#fff" />
+            </View>
+          </TouchableOpacity>
+          <Text style={styles.userName}>{user?.name || 'Administrateur'}</Text>
+          <View style={styles.farmPill}>
+            <Ionicons name="business" size={12} color={COLORS.primary} />
+            <Text style={styles.farmPillText}>{user?.farm_name || 'Ma Ferme IOT'}</Text>
           </View>
+        </View>
+
+        {/* ── Farm Dashboard Overview ── */}
+        <View style={styles.dashboardCard}>
+          <View style={styles.dashHeader}>
+            <Text style={styles.dashTitle}>État de l'Exploitation</Text>
+            <View style={styles.onlineBadge}>
+              <View style={styles.onlineDot} />
+              <Text style={styles.onlineText}>SYSTÈME LIVE</Text>
+            </View>
+          </View>
+          
+          <View style={styles.statsRow}>
+            <View style={styles.statBox}>
+              <View style={[styles.statIcon, { backgroundColor: COLORS.primary + '22' }]}>
+                <MaterialCommunityIcons name="cow" size={24} color={COLORS.primary} />
+              </View>
+              <Text style={styles.statValue}>{totalAnimals}</Text>
+              <Text style={styles.statLabel}>Animaux</Text>
+            </View>
+            <View style={styles.dividerV} />
+            <View style={styles.statBox}>
+              <View style={[styles.statIcon, { backgroundColor: COLORS.success + '22' }]}>
+                <Ionicons name="map" size={24} color={COLORS.success} />
+              </View>
+              <Text style={styles.statValue}>{areaDisplay}</Text>
+              <Text style={styles.statLabel}>Surface</Text>
+            </View>
+            <View style={styles.dividerV} />
+            <View style={styles.statBox}>
+              <View style={[styles.statIcon, { backgroundColor: COLORS.warning + '22' }]}>
+                <MaterialCommunityIcons name="shield-check" size={24} color={COLORS.warning} />
+              </View>
+              <Text style={styles.statValue}>{geofences.length}</Text>
+              <Text style={styles.statLabel}>Zones</Text>
+            </View>
+          </View>
+        </View>
+
+        {/* ── Settings Sections ── */}
+        <Text style={styles.sectionHeader}>Gestion du Compte</Text>
+        <View style={styles.section}>
+          <MenuItem 
+            icon="person-outline" 
+            label="Informations Personnelles" 
+            value={user?.name} 
+            onPress={() => {
+              setFormData({ 
+                name: user?.name || '', 
+                email: user?.email || '', 
+                phone: user?.phone || '',
+                farmName: user?.farm_name || '',
+                farmDescription: user?.farm_description || ''
+              });
+              setActiveTab('account');
+              setEditModalVisible(true);
+            }} 
+          />
+          <MenuItem 
+            icon="business-outline" 
+            label="Exploitation & Ferme" 
+            value={user?.farm_name} 
+            onPress={() => {
+              setActiveTab('farm');
+              setEditModalVisible(true);
+            }} 
+          />
+          <MenuItem icon="lock-closed-outline" label="Sécurité & Mot de passe" onPress={() => { setActiveTab('security'); setEditModalVisible(true); }} />
+        </View>
+
+        <Text style={styles.sectionHeader}>Préférences App</Text>
+        <View style={styles.section}>
+          <MenuItem
+            icon="notifications-outline"
+            label="Notifications Smart"
+            toggle toggleValue={notifications}
+            onToggle={(v) => setNotifications(v)}
+          />
+          <MenuItem icon="color-palette-outline" label="Mode Sombre (OLED)" toggle toggleValue={true} onToggle={() => {}} />
+        </View>
+
+        <TouchableOpacity style={styles.logoutBtn} onPress={handleLogout}>
+          <Ionicons name="log-out-outline" size={20} color={COLORS.danger} />
+          <Text style={styles.logoutText}>Déconnexion</Text>
         </TouchableOpacity>
-        <Text style={styles.userName}>{user?.name || 'Utilisateur'}</Text>
-        <Text style={styles.userEmail}>{user?.email}</Text>
-        <View style={[styles.roleBadge, { backgroundColor: user?.role === 'admin' ? COLORS.danger + '22' : COLORS.primary + '22' }]}>
-          <Text style={[styles.roleText, { color: user?.role === 'admin' ? COLORS.danger : COLORS.primary }]}>
-            {user?.role?.toUpperCase() || 'FERMIER'}
-          </Text>
-        </View>
-      </View>
 
-      {/* Account Section */}
-      <Text style={styles.sectionTitle}>Compte</Text>
-      <View style={styles.section}>
-        <MenuItem 
-          icon="person-outline" 
-          label="Nom complet" 
-          value={user?.name} 
-          onPress={() => {
-            setNewName(user?.name || '');
-            setNameModal(true);
-          }} 
-        />
-        <MenuItem 
-          icon="mail-outline"   
-          label="Email"   
-          value={user?.email} 
-          onPress={() => {
-            setNewEmail(user?.email || '');
-            setEmailModal(true);
-          }} 
-        />
-        <MenuItem 
-          icon="call-outline"   
-          label="Téléphone" 
-          value={user?.phone || 'Ajouter votre numéro'} 
-          onPress={() => {
-            setNewPhone(user?.phone || '');
-            setPhoneModal(true);
-          }} 
-        />
-        <MenuItem icon="key-outline"    label="Changer le mot de passe" onPress={() => setPwdModal(true)} />
-      </View>
+        <Text style={styles.appVersion}>Smart Fence Enterprise v2.5.0</Text>
+      </ScrollView>
 
-      {/* Notifications */}
-      <Text style={styles.sectionTitle}>Notifications</Text>
-      <View style={styles.section}>
-        <MenuItem
-          icon="notifications-outline"
-          label="Notifications Push"
-          toggle toggleValue={notifications}
-          onToggle={(v) => setNotifications(v)}
-        />
-        <MenuItem icon="warning-outline"   label="Alertes de clôture" toggle toggleValue={true} onToggle={() => {}} />
-      </View>
-
-      {/* Sign Out */}
-      <View style={[styles.section, { marginTop: 24 }]}>
-        <MenuItem icon="log-out-outline" label="Se déconnecter" onPress={handleLogout} danger />
-      </View>
-
-      <Text style={styles.footer}>Smart Fence System © 2024</Text>
-
-      {/* MODAL: Update Name */}
-      <Modal visible={nameModal} animationType="fade" transparent>
-        <View style={styles.modalOverlay}>
-          <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.modalCard}>
-            <Text style={styles.modalTitle}>Modifier le nom</Text>
-            <TextInput
-              style={styles.modalInput}
-              value={newName}
-              onChangeText={setNewName}
-              placeholder="Votre nom"
-              placeholderTextColor={COLORS.subtext}
-              autoFocus
-            />
-            {error && <Text style={styles.modalError}>{error}</Text>}
-            <View style={styles.modalBtns}>
-              <TouchableOpacity style={styles.cancelBtn} onPress={() => { setNameModal(false); clearError(); }}>
-                <Text style={styles.cancelBtnText}>Annuler</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.saveBtn} onPress={onUpdateName} disabled={loading}>
-                {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.saveBtnText}>Enregistrer</Text>}
+      {/* ── Unified Management Modal ── */}
+      <Modal visible={isEditModalVisible} animationType="slide" transparent>
+        <View style={styles.modalBackdrop}>
+          <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.managementCard}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Gestion Farm Cloud</Text>
+              <TouchableOpacity onPress={() => { setEditModalVisible(false); clearError(); }}>
+                <Ionicons name="close-circle" size={28} color={COLORS.textDim} />
               </TouchableOpacity>
             </View>
+
+            {/* Tab Selector */}
+            <View style={styles.tabRow}>
+              {['account', 'farm', 'security'].map(tab => (
+                <TouchableOpacity 
+                  key={tab} 
+                  onPress={() => setActiveTab(tab)}
+                  style={[styles.tab, activeTab === tab && styles.tabActive]}
+                >
+                  <Text style={[styles.tabText, activeTab === tab && styles.tabTextActive]}>
+                    {tab === 'account' ? 'Profil' : tab === 'farm' ? 'Ferme' : 'Sécurité'}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            <ScrollView showsVerticalScrollIndicator={false}>
+              {activeTab === 'account' && (
+                <View style={styles.formGroup}>
+                  <Text style={styles.fieldLabel}>Nom complet</Text>
+                  <TextInput style={styles.fieldInput} value={formData.name} onChangeText={t => setFormData({...formData, name: t})} />
+                  
+                  <Text style={styles.fieldLabel}>Email de contact</Text>
+                  <TextInput style={styles.fieldInput} value={formData.email} keyboardType="email-address" onChangeText={t => setFormData({...formData, email: t})} />
+                  
+                  <Text style={styles.fieldLabel}>Téléphone Mobile</Text>
+                  <TextInput style={styles.fieldInput} value={formData.phone} keyboardType="phone-pad" onChangeText={t => setFormData({...formData, phone: t})} />
+                </View>
+              )}
+
+              {activeTab === 'farm' && (
+                <View style={styles.formGroup}>
+                  <Text style={styles.fieldLabel}>Nom de l'Exploitation</Text>
+                  <TextInput style={styles.fieldInput} value={formData.farmName} placeholder="Ma Ferme" placeholderTextColor={COLORS.textDim} onChangeText={t => setFormData({...formData, farmName: t})} />
+                  
+                  <Text style={styles.fieldLabel}>Description / Notes</Text>
+                  <TextInput 
+                    style={[styles.fieldInput, { height: 80, paddingTop: 12 }]} 
+                    multiline 
+                    value={formData.farmDescription} 
+                    placeholder="Détails de l'exploitation..."
+                    placeholderTextColor={COLORS.textDim}
+                    onChangeText={t => setFormData({...formData, farmDescription: t})} 
+                  />
+                </View>
+              )}
+
+              {activeTab === 'security' && (
+                <View style={styles.formGroup}>
+                  <Text style={styles.fieldLabel}>Ancien mot de passe</Text>
+                  <TextInput style={styles.fieldInput} secureTextEntry value={pwdForm.current} onChangeText={t => setPwdForm({...pwdForm, current: t})} />
+                  
+                  <Text style={styles.fieldLabel}>Nouveau mot de passe</Text>
+                  <TextInput style={styles.fieldInput} secureTextEntry value={pwdForm.new} onChangeText={t => setPwdForm({...pwdForm, new: t})} />
+                  
+                  <Text style={styles.fieldLabel}>Confirmer</Text>
+                  <TextInput style={styles.fieldInput} secureTextEntry value={pwdForm.confirm} onChangeText={t => setPwdForm({...pwdForm, confirm: t})} />
+                </View>
+              )}
+
+              {error && <Text style={styles.modalError}>{error}</Text>}
+            </ScrollView>
+
+            <TouchableOpacity 
+              style={[styles.primaryAction, { backgroundColor: activeTab === 'security' ? COLORS.primary : COLORS.success }]} 
+              onPress={activeTab === 'security' ? onChangePassword : handleUpdateProfile}
+              disabled={loading}
+            >
+              {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.primaryActionText}>Appliquer les modifications</Text>}
+            </TouchableOpacity>
           </KeyboardAvoidingView>
         </View>
       </Modal>
-
-      {/* MODAL: Update Phone */}
-      <Modal visible={phoneModal} animationType="fade" transparent>
-        <View style={styles.modalOverlay}>
-          <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.modalCard}>
-            <Text style={styles.modalTitle}>Modifier le téléphone</Text>
-            <TextInput
-              style={styles.modalInput}
-              value={newPhone}
-              onChangeText={setNewPhone}
-              placeholder="Ex: 0612345678"
-              placeholderTextColor={COLORS.subtext}
-              keyboardType="phone-pad"
-              autoFocus
-            />
-            {error && <Text style={styles.modalError}>{error}</Text>}
-            <View style={styles.modalBtns}>
-              <TouchableOpacity style={styles.cancelBtn} onPress={() => { setPhoneModal(false); clearError(); }}>
-                <Text style={styles.cancelBtnText}>Annuler</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.saveBtn} onPress={onUpdatePhone} disabled={loading}>
-                {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.saveBtnText}>Enregistrer</Text>}
-              </TouchableOpacity>
-            </View>
-          </KeyboardAvoidingView>
-        </View>
-      </Modal>
-
-      {/* MODAL: Update Email */}
-      <Modal visible={emailModal} animationType="fade" transparent>
-        <View style={styles.modalOverlay}>
-          <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.modalCard}>
-            <Text style={styles.modalTitle}>Modifier l'email</Text>
-            <TextInput
-              style={styles.modalInput}
-              value={newEmail}
-              onChangeText={setNewEmail}
-              placeholder="votre@email.com"
-              placeholderTextColor={COLORS.subtext}
-              keyboardType="email-address"
-              autoCapitalize="none"
-              autoFocus
-            />
-            {error && <Text style={styles.modalError}>{error}</Text>}
-            <View style={styles.modalBtns}>
-              <TouchableOpacity style={styles.cancelBtn} onPress={() => { setEmailModal(false); clearError(); }}>
-                <Text style={styles.cancelBtnText}>Annuler</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.saveBtn} onPress={onUpdateEmail} disabled={loading}>
-                {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.saveBtnText}>Enregistrer</Text>}
-              </TouchableOpacity>
-            </View>
-          </KeyboardAvoidingView>
-        </View>
-      </Modal>
-
-      {/* MODAL: Change Password */}
-      <Modal visible={pwdModal} animationType="fade" transparent>
-        <View style={styles.modalOverlay}>
-          <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.modalCard}>
-            <Text style={styles.modalTitle}>Changer le mot de passe</Text>
-            
-            <Text style={styles.inputLabel}>Ancien mot de passe</Text>
-            <TextInput
-              style={styles.modalInput}
-              secureTextEntry
-              value={pwdForm.current}
-              onChangeText={(t) => setPwdForm({...pwdForm, current: t})}
-            />
-            
-            <Text style={styles.inputLabel}>Nouveau mot de passe</Text>
-            <TextInput
-              style={styles.modalInput}
-              secureTextEntry
-              value={pwdForm.new}
-              onChangeText={(t) => setPwdForm({...pwdForm, new: t})}
-            />
-
-            <Text style={styles.inputLabel}>Confirmer le nouveau</Text>
-            <TextInput
-              style={styles.modalInput}
-              secureTextEntry
-              value={pwdForm.confirm}
-              onChangeText={(t) => setPwdForm({...pwdForm, confirm: t})}
-            />
-
-            {error && <Text style={styles.modalError}>{error}</Text>}
-            
-            <View style={styles.modalBtns}>
-              <TouchableOpacity style={styles.cancelBtn} onPress={() => { setPwdModal(false); clearError(); }}>
-                <Text style={styles.cancelBtnText}>Annuler</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.saveBtn} onPress={onChangePassword} disabled={loading}>
-                {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.saveBtnText}>Changer</Text>}
-              </TouchableOpacity>
-            </View>
-          </KeyboardAvoidingView>
-        </View>
-      </Modal>
-    </ScrollView>
+    </View>
   );
+}
 }
 
 const styles = StyleSheet.create({
   container:   { flex:1, backgroundColor:COLORS.background },
-  scroll:      { paddingBottom:40 },
-  hero:        { alignItems:'center', padding:28 },
-  avatar:      { width:88, height:88, borderRadius:44, backgroundColor:COLORS.primary+'22', alignItems:'center', justifyContent:'center', marginBottom:12, position:'relative' },
-  editBadge:   { position:'absolute', bottom:0, right:0, backgroundColor:COLORS.primary, width:24, height:24, borderRadius:12, alignItems:'center', justifyContent:'center', borderWidth:2, borderColor:COLORS.background },
-  userName:    { color:COLORS.text, fontSize:22, fontWeight:'800' },
-  userEmail:   { color:COLORS.subtext, fontSize:14, marginTop:4 },
-  roleBadge:   { marginTop:10, paddingHorizontal:14, paddingVertical:5, borderRadius:12 },
-  roleText:    { fontSize:12, fontWeight:'700', letterSpacing:1 },
-  sectionTitle:{ color:COLORS.subtext, fontSize:12, fontWeight:'700', textTransform:'uppercase', letterSpacing:1, marginHorizontal:20, marginBottom:8, marginTop:20 },
-  section:     { backgroundColor:COLORS.card, marginHorizontal:16, borderRadius:16, borderWidth:1, borderColor:COLORS.border, overflow:'hidden' },
-  menuItem:    { flexDirection:'row', alignItems:'center', padding:16, borderBottomWidth:1, borderColor:COLORS.border },
-  menuIconBox: { width:36, height:36, borderRadius:10, alignItems:'center', justifyContent:'center', marginRight:12 },
-  menuLabel:   { flex:1, color:COLORS.text, fontSize:15 },
-  menuRight:   { flexDirection:'row', alignItems:'center', gap:8, maxWidth:'50%' },
-  menuValue:   { color:COLORS.subtext, fontSize:13 },
-  footer:      { textAlign:'center', color:COLORS.subtext, fontSize:12, marginTop:40 },
+  scroll:      { paddingBottom:60, paddingHorizontal: 16 },
+  
+  // Hero Section
+  hero:        { alignItems:'center', paddingBottom: 24, paddingTop: 10 },
+  avatar:      { width:100, height:100, borderRadius:50, backgroundColor:COLORS.card, padding: 4, ...SHADOWS.soft },
+  avatarInternal: { flex: 1, borderRadius: 50, backgroundColor: COLORS.surface, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: COLORS.border },
+  avatarInitial: { color: COLORS.primary, fontSize: 36, fontWeight: '800' },
+  editBadge:   { position:'absolute', bottom:4, right:4, backgroundColor:COLORS.primary, width:28, height:28, borderRadius:14, alignItems:'center', justifyContent:'center', borderWidth:3, borderColor:COLORS.background },
+  userName:    { color:COLORS.text, fontSize:24, fontWeight:'900', marginTop: 16 },
+  farmPill:    { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: COLORS.primary + '15', paddingHorizontal: 16, paddingVertical: 6, borderRadius: 20, marginTop: 10 },
+  farmPillText: { color: COLORS.primary, fontSize: 13, fontWeight: '700' },
 
-  // Modal styles
-  modalOverlay:{ flex:1, backgroundColor:'rgba(0,0,0,0.7)', justifyContent:'center', padding:20 },
-  modalCard:   { backgroundColor:COLORS.card, borderRadius:24, padding:24, borderWidth:1, borderColor:COLORS.border },
-  modalTitle:  { color:COLORS.text, fontSize:18, fontWeight:'700', marginBottom:20 },
-  inputLabel:  { color:COLORS.subtext, fontSize:12, marginBottom:6, marginTop:12 },
-  modalInput:  { backgroundColor:COLORS.surface, borderRadius:12, height:48, color:COLORS.text, paddingHorizontal:16, borderWidth:1, borderColor:COLORS.border },
-  modalError:  { color:COLORS.danger, fontSize:13, marginTop:12 },
-  modalBtns:   { flexDirection:'row', justifyContent:'flex-end', marginTop:24, gap:12 },
-  cancelBtn:   { paddingVertical:10, paddingHorizontal:16 },
-  cancelBtnText:{ color:COLORS.subtext, fontSize:15, fontWeight:'600' },
-  saveBtn:     { backgroundColor:COLORS.primary, borderRadius:12, paddingVertical:10, paddingHorizontal:20, minWidth:100, alignItems:'center' },
-  saveBtnText: { color:'#fff', fontSize:15, fontWeight:'700' },
+  // Dashboard Card
+  dashboardCard: { backgroundColor: COLORS.card, borderRadius: 24, padding: 20, borderWidth: 1, borderColor: COLORS.border, ...SHADOWS.soft, marginBottom: 20 },
+  dashHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 },
+  dashTitle: { color: COLORS.white, fontSize: 15, fontWeight: '800' },
+  onlineBadge: { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: 'rgba(34, 197, 94, 0.1)', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 10 },
+  onlineDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: COLORS.success },
+  onlineText: { color: COLORS.success, fontSize: 9, fontWeight: '900' },
+  
+  statsRow: { flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center' },
+  statBox: { alignItems: 'center', flex: 1 },
+  statIcon: { width: 44, height: 44, borderRadius: 14, alignItems: 'center', justifyContent: 'center', marginBottom: 10 },
+  statValue: { color: COLORS.white, fontSize: 18, fontWeight: '800' },
+  statLabel: { color: COLORS.textDim, fontSize: 11, fontWeight: '600', marginTop: 2 },
+  dividerV: { width: 1, height: 40, backgroundColor: COLORS.border },
+
+  sectionHeader: { color: COLORS.textMuted, fontSize: 13, fontWeight: '800', marginLeft: 10, marginBottom: 12, marginTop: 20, textTransform: 'uppercase', letterSpacing: 1 },
+  section: { backgroundColor: COLORS.card, borderRadius: 20, borderWidth: 1, borderColor: COLORS.border, overflow: 'hidden' },
+  menuItem: { flexDirection: 'row', alignItems: 'center', padding: 18, borderBottomWidth: 1, borderColor: COLORS.border },
+  menuIconBox: { width: 38, height: 38, borderRadius: 12, alignItems: 'center', justifyContent: 'center', marginRight: 14 },
+  menuLabel: { flex: 1, color: COLORS.text, fontSize: 15, fontWeight: '600' },
+  menuRight: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  menuValue: { color: COLORS.textDim, fontSize: 13 },
+
+  logoutBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10, marginTop: 32, paddingVertical: 18, borderRadius: 20, backgroundColor: COLORS.danger + '10', borderWidth: 1, borderColor: COLORS.danger + '20' },
+  logoutText: { color: COLORS.danger, fontSize: 16, fontWeight: '800' },
+  appVersion: { textAlign: 'center', color: COLORS.textDim, fontSize: 11, marginTop: 30, fontWeight: '600' },
+
+  // Management Modal
+  modalBackdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.85)', justifyContent: 'flex-end' },
+  managementCard: { backgroundColor: COLORS.surface, borderTopLeftRadius: 32, borderTopRightRadius: 32, padding: 24, paddingBottom: 40, maxHeight: '90%' },
+  modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 },
+  modalTitle: { color: COLORS.white, fontSize: 22, fontWeight: '800' },
+  
+  tabRow: { flexDirection: 'row', gap: 10, marginBottom: 24 },
+  tab: { flex: 1, height: 42, borderRadius: 12, backgroundColor: COLORS.card, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: COLORS.border },
+  tabActive: { backgroundColor: COLORS.primary, borderColor: COLORS.primary },
+  tabText: { color: COLORS.textDim, fontSize: 13, fontWeight: '700' },
+  tabTextActive: { color: COLORS.white },
+
+  formGroup: { gap: 16 },
+  fieldLabel: { color: COLORS.textMuted, fontSize: 12, fontWeight: '700', textTransform: 'uppercase', marginLeft: 4 },
+  fieldInput: { backgroundColor: COLORS.card, borderRadius: 14, height: 54, paddingHorizontal: 18, color: COLORS.white, fontSize: 16, borderWidth: 1, borderColor: COLORS.border },
+  
+  primaryAction: { height: 58, borderRadius: 16, alignItems: 'center', justifyContent: 'center', marginTop: 32, ...SHADOWS.hard },
+  primaryActionText: { color: COLORS.white, fontSize: 16, fontWeight: '800' },
+  modalError: { color: COLORS.danger, fontSize: 13, textAlign: 'center', marginTop: 12 },
 });
 

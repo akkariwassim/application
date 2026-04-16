@@ -50,6 +50,10 @@ const userSchema = new mongoose.Schema({
   farm_name: {
     type: String,
     default: 'Ma Ferme'
+  },
+  farm_description: {
+    type: String,
+    default: ''
   }
 }, {
   timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' },

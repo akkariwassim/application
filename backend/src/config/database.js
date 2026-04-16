@@ -18,15 +18,16 @@ const pool = mysql.createPool({
 
 /**
  * Test the database connection at startup.
+ * Modified to be non-fatal to support MongoDB-only operation for live features.
  */
 async function testConnection() {
   try {
     const conn = await pool.getConnection();
-    logger.info('✅ MySQL connected successfully');
+    logger.info('✅ MySQL connected successfully (Legacy Mode)');
     conn.release();
   } catch (err) {
-    logger.error('❌ MySQL connection failed:', err.message);
-    throw err;
+    logger.warn(`⚠️ MySQL connection failed: ${err.message}`);
+    logger.info('   Backend will continue in MongoDB-only mode for live tracking.');
   }
 }
 

@@ -75,10 +75,12 @@ function getIO() {
 }
 
 /**
- * Emit a position update to subscribers of an animal.
+ * Emit a position update to subscribers of an animal and the owner.
  */
-function emitPositionUpdate(animalId, data) {
+function emitPositionUpdate(userId, animalId, data) {
   if (!io) return;
+  // Send to user room (Farmer) and animal room (if any)
+  io.to(`user:${userId}`).emit('position-update', { animalId, ...data });
   io.to(`animal:${animalId}`).emit('position-update', { animalId, ...data });
 }
 

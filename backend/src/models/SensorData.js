@@ -16,6 +16,9 @@ const sensorDataSchema = new mongoose.Schema({
   latitude: Number,
   longitude: Number,
   temperature: Number,
+  heart_rate: Number,
+  gps_signal: Number,
+  battery_level: Number,
   activity: {
     type: Number,
     min: 0,
@@ -25,7 +28,6 @@ const sensorDataSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
-  battery_level: Number,
 }, {
   timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' },
   toJSON: { 

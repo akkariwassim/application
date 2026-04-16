@@ -50,7 +50,7 @@
     ],
     "scheme": "smartfence",
     "extra": {
-      "API_URL": "http://10.113.3.82:3000",
+      "API_URL": "http://192.168.0.111:3000",
       "eas": {
         "projectId": "your-eas-project-id"
       }

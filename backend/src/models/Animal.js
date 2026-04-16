@@ -16,7 +16,7 @@ const animalSchema = new mongoose.Schema({
   type: {
     type: String,
     required: [true, 'Animal type is required'],
-    enum: ['bovine', 'ovine', 'caprine', 'equine', 'other'],
+    enum: ['cow', 'sheep', 'goat', 'camel', 'horse', 'other'],
     default: 'other',
   },
   breed: String,
@@ -69,9 +69,23 @@ const animalSchema = new mongoose.Schema({
     max_temp: { type: Number, default: 40.0 },
     min_activity: { type: Number, default: 20 },
     max_activity: { type: Number, default: 80 },
+    min_heart_rate: { type: Number, default: 40 },
+    max_heart_rate: { type: Number, default: 110 },
   },
   temperature: Number,
+  heart_rate: { type: Number, default: 60 },
+  battery_level: { type: Number, default: 100 },
+  gps_signal: { type: Number, default: 100 },
   activity: Number,
+  actuators: {
+    buzzer: { type: Boolean, default: false },
+    led:    { type: Boolean, default: false },
+    relay:  { type: Boolean, default: false },
+  },
+  last_sync: {
+    type: Date,
+    default: Date.now,
+  },
   last_seen: {
     type: Date,
     default: Date.now,
