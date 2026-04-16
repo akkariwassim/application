@@ -187,6 +187,36 @@ async function updateProfile(req, res, next) {
 }
 
 /**
+ * Update farm location and name
+ * PUT /api/user/update-farm
+ */
+async function updateFarm(req, res, next) {
+  try {
+    const { latitude, longitude, name } = req.body;
+    
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({ error: 'USER_NOT_FOUND', message: 'Utilisateur introuvable.' });
+    }
+
+    if (latitude !== undefined) user.farm_latitude = latitude;
+    if (longitude !== undefined) user.farm_longitude = longitude;
+    if (name !== undefined) user.farm_name = name;
+
+    await user.save();
+
+    const userObj = user.toObject();
+    delete userObj.password;
+
+    logger.info(`Farm updated for user: ${user.email}`);
+    res.json({ message: 'Ferme mise à jour avec succès.', user: userObj });
+  } catch (err) {
+    logger.error(`Error in updateFarm: ${err.message}`);
+    next(err);
+  }
+}
+
+/**
  * Diagnostic ping
  */
 async function ping(req, res) {

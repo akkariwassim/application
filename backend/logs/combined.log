@@ -499,3 +499,30 @@
 2026-04-09 16:20:32 [warn]: MongoDB disconnected
 2026-04-09 16:25:41 [warn]: MongoDB disconnected
 >>>>>>> 440470a6bb27bacf6886edd154bcb792cdea0e3a
+2026-04-16 16:37:20 [info]: MongoDB Connected: ac-lokdmj8-shard-00-00.7zypd8b.mongodb.net
+2026-04-16 16:37:20 [info]: 🚀 Server running on http://localhost:3000
+2026-04-16 16:37:20 [info]:    Environment: development
+2026-04-16 16:37:20 [info]: Incoming Request: GET /api/animals
+2026-04-16 16:37:21 [info]: Incoming Request: GET /api/animals
+2026-04-16 16:37:22 [info]: Incoming Request: GET /api/animals
+2026-04-16 16:37:22 [info]: Incoming Request: GET /api/animals
+2026-04-16 16:37:22 [info]: Incoming Request: GET /api/animals
+2026-04-16 16:37:24 [info]: Incoming Request: GET /api/animals
+2026-04-16 16:37:24 [info]: Incoming Request: GET /api/animals
+2026-04-16 16:37:24 [info]: Incoming Request: GET /api/animals
+2026-04-16 16:37:26 [info]: Socket connected: tDOIY74Zxj5Aom8rAAAD (user 69e0f6ec4be9f34aaa8e2d6a)
+2026-04-16 16:37:29 [info]: Incoming Request: GET /api/animals
+2026-04-16 16:37:34 [info]: Incoming Request: GET /api/animals
+2026-04-16 16:37:34 [info]: Incoming Request: POST /api/auth/refresh
+2026-04-16 16:37:35 [info]: Incoming Request: GET /api/animals
+2026-04-16 16:37:44 [info]: Incoming Request: GET /api/animals
+2026-04-16 16:37:53 [info]: Incoming Request: GET /api/animals
+2026-04-16 16:37:53 [info]: Incoming Request: GET /api/animals
+2026-04-16 16:37:53 [info]: Incoming Request: GET /api/animals
+2026-04-16 16:37:53 [info]: Incoming Request: GET /api/animals
+2026-04-16 16:37:54 [info]: Incoming Request: GET /api/animals
+2026-04-16 16:37:54 [info]: Incoming Request: GET /api/animals
+2026-04-16 16:38:00 [info]: MongoDB Connected: ac-lokdmj8-shard-00-00.7zypd8b.mongodb.net
+2026-04-16 16:38:00 [info]: 🚀 Server running on http://localhost:3000
+2026-04-16 16:38:00 [info]:    Environment: development
+2026-04-16 16:38:01 [info]: Incoming Request: GET /api/animals
