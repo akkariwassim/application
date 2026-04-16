@@ -21,15 +21,21 @@ const COLORS = {
 };
 
 const TYPE_ICONS = {
-  geofence_breach: { icon: 'map', color: COLORS.danger },
-  temperature:     { icon: 'thermometer', color: COLORS.warning },
-  activity:        { icon: 'pulse', color: COLORS.primary },
+  geofence_breach:    { icon: 'map', color: COLORS.danger, label: 'ZONE' },
+  high_temperature:   { icon: 'thermometer', color: COLORS.warning, label: 'CHALEUR' },
+  abnormal_heart_rate: { icon: 'heart', color: COLORS.danger, label: 'CARDIAQUE' },
+  low_battery:        { icon: 'battery-dead', color: COLORS.warning, label: 'BATTERIE' },
+  device_offline:     { icon: 'cloud-offline', color: COLORS.subtext, label: 'OFFLINE' },
+  no_movement:        { icon: 'pause-circle', color: COLORS.primary, label: 'IMMOBILE' },
 };
 
 const GUIDANCE = {
-  geofence_breach: "Animal has left the designated safe zone. Locate and bring it back immediately.",
-  temperature:     "Abnormal body temperature detected. Check for signs of illness or heat stress.",
-  activity:        "Unusual activity levels detected. Animal might be in distress or injured.",
+  geofence_breach:    "L'animal a quitté la zone de sécurité. Localisez-le et ramenez-le immédiatement.",
+  high_temperature:   "Température corporelle anormale. Vérifiez les signes de maladie ou de stress thermique.",
+  abnormal_heart_rate: "Rythme cardiaque irrégulier. L'animal peut être en détresse ou blessé.",
+  low_battery:        "La batterie du collier est critique. Veuillez la charger pour éviter de perdre le signal.",
+  device_offline:     "Le dispositif ne répond plus. Vérifiez la connectivité ou l'état physique du collier.",
+  no_movement:        "Aucun mouvement détecté depuis longtemps. Vérifiez si l'animal est coincé ou endormi.",
 };
 
 export default function AlertDetailScreen({ route, navigation }) {
@@ -79,23 +85,26 @@ export default function AlertDetailScreen({ route, navigation }) {
         </View>
 
         {/* Map View */}
-        {alert.latitude && alert.longitude && (
+        {alert.location?.coordinates && (
           <View style={styles.mapContainer}>
-            <Text style={styles.sectionTitle}>Location at Alert Time</Text>
+            <Text style={styles.sectionTitle}>Position au moment de l'alerte</Text>
             <View style={styles.mapWrapper}>
               <MapView
                 style={styles.map}
                 provider={PROVIDER_GOOGLE}
                 mapType="hybrid"
                 initialRegion={{
-                  latitude: parseFloat(alert.latitude),
-                  longitude: parseFloat(alert.longitude),
+                  latitude: alert.location.coordinates[1],
+                  longitude: alert.location.coordinates[0],
                   latitudeDelta: 0.005,
                   longitudeDelta: 0.005,
                 }}
               >
                 <Marker
-                  coordinate={{ latitude: parseFloat(alert.latitude), longitude: parseFloat(alert.longitude) }}
+                  coordinate={{ 
+                    latitude: alert.location.coordinates[1], 
+                    longitude: alert.location.coordinates[0] 
+                  }}
                 >
                   <View style={[styles.marker, { borderColor: typeInfo.color }]}>
                     <Ionicons name="paw" size={18} color={typeInfo.color} />
@@ -110,9 +119,9 @@ export default function AlertDetailScreen({ route, navigation }) {
         <View style={styles.card}>
           <View style={styles.guidanceHeader}>
             <Ionicons name="bulb-outline" size={20} color={COLORS.warning} />
-            <Text style={styles.guidanceTitle}>Farmer Guidance</Text>
+            <Text style={styles.guidanceTitle}>Conseils Agriculteur</Text>
           </View>
-          <Text style={styles.guidanceText}>{GUIDANCE[alert.type] || "Check the animal immediately for any signs of distress."}</Text>
+          <Text style={styles.guidanceText}>{GUIDANCE[alert.type] || "Vérifiez l'animal immédiatement pour tout signe de détresse."}</Text>
         </View>
 
         {/* Action Buttons */}

@@ -1,81 +1,8 @@
 'use strict';
 
-const Animal = require('../models/Animal');
-const Zone   = require('../models/Zone');
-
-/**
- * Generate a random point guaranteed to be inside a polygon.
- * Uses bounding-box rejection sampling.
- */
-function randomPointInPolygon(coords) {
-  if (!coords || coords.length < 3) return null;
-
-  // Compute bounding box
-  let minLat = Infinity, maxLat = -Infinity, minLon = Infinity, maxLon = -Infinity;
-  for (const c of coords) {
-    if (c.latitude < minLat) minLat = c.latitude;
-    if (c.latitude > maxLat) maxLat = c.latitude;
-    if (c.longitude < minLon) minLon = c.longitude;
-    if (c.longitude > maxLon) maxLon = c.longitude;
-  }
-
-  // Rejection sampling: pick random points in the bounding box until one is inside
-  for (let attempt = 0; attempt < 200; attempt++) {
-    const lat = minLat + Math.random() * (maxLat - minLat);
-    const lon = minLon + Math.random() * (maxLon - minLon);
-
-    if (isPointInsidePolygon(lat, lon, coords)) {
-      return { latitude: lat, longitude: lon };
-    }
-  }
-
-  // Fallback: centroid
-  const centLat = coords.reduce((s, c) => s + c.latitude, 0) / coords.length;
-  const centLon = coords.reduce((s, c) => s + c.longitude, 0) / coords.length;
-  return { latitude: centLat, longitude: centLon };
-}
-
-/**
- * Ray-casting point-in-polygon test
- */
-function isPointInsidePolygon(lat, lon, polygon) {
-  let inside = false;
-  for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
-    const xi = polygon[i].latitude, yi = polygon[i].longitude;
-    const xj = polygon[j].latitude, yj = polygon[j].longitude;
-    const intersect = ((yi > lon) !== (yj > lon)) && (lat < (xj - xi) * (lon - yi) / (yj - yi) + xi);
-    if (intersect) inside = !inside;
-  }
-  return inside;
-}
-
-const isAtZero = (lat, lon) => {
-  const l = parseFloat(lat);
-  const n = parseFloat(lon);
-  return isNaN(l) || isNaN(n) || (Math.abs(l) < 0.001 && Math.abs(n) < 0.001);
-};
-
-/**
- * Given a zone, returns a random coordinate inside it
- */
-async function getRandomPointInZone(zoneId) {
-  const zone = await Zone.findById(zoneId);
-  if (!zone) return null;
-
-  if (zone.polygon_coords) {
-    const coords = typeof zone.polygon_coords === 'string' ? JSON.parse(zone.polygon_coords) : zone.polygon_coords;
-    if (coords.length >= 3) {
-      return randomPointInPolygon(coords);
-    }
-  }
-
-  // Fallback to center
-  if (zone.center_lat && zone.center_lon) {
-    return { latitude: zone.center_lat, longitude: zone.center_lon };
-  }
-
-  return null;
-}
+const Animal       = require('../models/Animal');
+const Zone         = require('../models/Zone');
+const socketConfig = require('../config/socket');
 
 /**
  * GET /api/animals
@@ -108,49 +35,70 @@ async function getAnimal(req, res, next) {
  */
 async function createAnimal(req, res, next) {
   try {
-    const { name, type, breed, latitude, longitude, 
-            weightKg, birthDate, rfidTag, deviceId, 
-            colorHex, notes, currentZoneId, current_zone_id } = req.body;
+    const { name, type, breed, weightKg, birthDate, rfidTag, deviceId, colorHex, currentZoneId } = req.body;
 
-    const zoneId = currentZoneId || current_zone_id || null;
-
-    let finalLat = parseFloat(latitude);
-    let finalLon = parseFloat(longitude);
-    if (isNaN(finalLat)) finalLat = 0;
-    if (isNaN(finalLon)) finalLon = 0;
-
-    // If assigned to a zone but coordinates missing/zero → random point inside zone
-    if (zoneId && isAtZero(finalLat, finalLon)) {
-      const point = await getRandomPointInZone(zoneId);
-      if (point) {
-        finalLat = point.latitude;
-        finalLon = point.longitude;
+    // 1. Strict Duplicate Check (Professional Conflict Handling)
+    if (deviceId && deviceId.trim()) {
+      const existing = await Animal.findOne({ device_id: deviceId.trim() });
+      if (existing) {
+        return res.status(409).json({ 
+          error: 'DUPLICATE_DEVICE', 
+          field: 'device_id',
+          message: `Le collier ${deviceId} est déjà assigné à ${existing.name}.` 
+        });
       }
     }
 
-    const animal = await Animal.create({
+    if (rfidTag && rfidTag.trim()) {
+      const existing = await Animal.findOne({ rfid_tag: rfidTag.trim() });
+      if (existing) {
+        return res.status(409).json({ 
+          error: 'DUPLICATE_DEVICE', 
+          field: 'rfid_tag',
+          message: `Le tag RFID ${rfidTag} est déjà utilisé.` 
+        });
+      }
+    }
+
+    // 2. Data Construction (Omit empty strings to satisfy sparse index)
+    const animalData = {
       user_id: req.user.id,
       name,
       type,
       breed,
       weight_kg: weightKg,
       birth_date: birthDate,
-      // Convert empty strings to null to avoid duplicate-key conflicts on sparse index
-      rfid_tag:  rfidTag  && rfidTag.trim()  ? rfidTag.trim()  : null,
-      device_id: deviceId && deviceId.trim() ? deviceId.trim() : null,
+      current_zone_id: currentZoneId || null,
       color_hex: colorHex || '#4CAF50',
-      notes,
-      latitude:  finalLat,
-      longitude: finalLon,
-      current_zone_id: zoneId,
       status: 'safe',
-      last_seen: new Date()
-    });
+      last_seen: new Date(),
+      last_sync: new Date()
+    };
+
+    if (rfidTag && rfidTag.trim())  animalData.rfid_tag  = rfidTag.trim();
+    if (deviceId && deviceId.trim()) animalData.device_id = deviceId.trim();
+
+    const animal = await Animal.create(animalData);
+
+    // 3. Mark Device as Assigned in Inventory
+    if (deviceId && deviceId.trim()) {
+      const Device = require('../models/Device'); // Lazy load to avoid circular if any
+      await Device.findOneAndUpdate(
+        { device_id: deviceId.trim() },
+        { $set: { status: 'assigned' } },
+        { upsert: true } // Create if it didn't exist in inventory
+      );
+    }
     
     res.status(201).json(animal);
   } catch (err) {
     if (err.code === 11000) {
-      return res.status(400).json({ error: 'DUPLICATE_DEVICE', message: 'Ce device_id ou rfid_tag est déjà utilisé par un autre animal.' });
+      const field = Object.keys(err.keyPattern)[0];
+      return res.status(409).json({ 
+        error: 'DUPLICATE_DEVICE', 
+        field, 
+        message: 'Cette ressource matérielle est déjà assignée.' 
+      });
     }
     next(err);
   }
@@ -164,33 +112,13 @@ async function updateAnimal(req, res, next) {
     const { id } = req.params;
     const updates = { ...req.body };
     
-    // Remap camelCase from frontend if needed
+    // Remap camelCase
     if (updates.weightKg) { updates.weight_kg = updates.weightKg; delete updates.weightKg; }
     if (updates.birthDate) { updates.birth_date = updates.birthDate; delete updates.birthDate; }
     if (updates.rfidTag) { updates.rfid_tag = updates.rfidTag; delete updates.rfidTag; }
     if (updates.deviceId) { updates.device_id = updates.deviceId; delete updates.deviceId; }
     if (updates.colorHex) { updates.color_hex = updates.colorHex; delete updates.colorHex; }
-    
-    if (updates.currentZoneId) { 
-      updates.current_zone_id = updates.currentZoneId; 
-      delete updates.currentZoneId; 
-    }
-
-    const existing = await Animal.findOne({ _id: id, user_id: req.user.id });
-    if (!existing) return res.status(404).json({ error: 'Animal not found' });
-
-    const currentLat = updates.latitude !== undefined ? updates.latitude : existing.latitude;
-    const currentLon = updates.longitude !== undefined ? updates.longitude : existing.longitude;
-    const zoneId = updates.current_zone_id || existing.current_zone_id;
-
-    // Auto-place inside zone if animal is at 0,0
-    if (zoneId && isAtZero(currentLat, currentLon)) {
-      const point = await getRandomPointInZone(zoneId);
-      if (point) {
-        updates.latitude = point.latitude;
-        updates.longitude = point.longitude;
-      }
-    }
+    if (updates.currentZoneId) { updates.current_zone_id = updates.currentZoneId; delete updates.currentZoneId; }
 
     const animal = await Animal.findOneAndUpdate(
       { _id: id, user_id: req.user.id },
@@ -199,6 +127,17 @@ async function updateAnimal(req, res, next) {
     );
     
     if (!animal) return res.status(404).json({ error: 'Animal not found' });
+
+    // Sync device status if device_id changed
+    if (updates.device_id) {
+      const Device = require('../models/Device');
+      await Device.findOneAndUpdate(
+        { device_id: updates.device_id },
+        { $set: { status: 'assigned' } },
+        { upsert: true }
+      );
+    }
+
     res.json(animal);
   } catch (err) {
     next(err);
@@ -221,14 +160,12 @@ async function deleteAnimal(req, res, next) {
 
 /**
  * GET /api/animals/:id/zone
- * Compatibility alias for mobile app
  */
 async function getZone(req, res, next) {
   try {
     const { id } = req.params;
     const animal = await Animal.findOne({ _id: id, user_id: req.user.id });
     if (!animal || !animal.current_zone_id) return res.json(null);
-    
     const zone = await Zone.findById(animal.current_zone_id);
     res.json(zone);
   } catch (err) {
@@ -238,21 +175,56 @@ async function getZone(req, res, next) {
 
 /**
  * POST /api/animals/:id/geofence
- * Compatibility alias for setGeofence in mobile store
  */
 async function setZone(req, res, next) {
   try {
     const { id } = req.params;
     const { geofenceId } = req.body;
-    
     const animal = await Animal.findOneAndUpdate(
       { _id: id, user_id: req.user.id },
       { $set: { current_zone_id: geofenceId } },
       { new: true }
     );
-    
     if (!animal) return res.status(404).json({ error: 'Animal not found' });
     res.json(animal);
+  } catch (err) {
+    next(err);
+  }
+}
+
+/**
+ * POST /api/animals/:id/action
+ * Trigger a real hardware actuator (buzzer, led, relay)
+ */
+async function triggerAction(req, res, next) {
+  try {
+    const { id } = req.params;
+    const { type, state } = req.body; // type: 'buzzer'|'led'|'relay', state: boolean
+
+    if (!['buzzer', 'led', 'relay'].includes(type)) {
+      return res.status(400).json({ error: 'INVALID_ACTION', message: 'Action type must be buzzer, led, or relay' });
+    }
+
+    const animal = await Animal.findOneAndUpdate(
+      { _id: id, user_id: req.user.id },
+      { $set: { [`actuators.${type}`]: !!state } },
+      { new: true }
+    );
+
+    if (!animal) return res.status(404).json({ error: 'Animal not found' });
+
+    // Broadcast update to Farmer app
+    socketConfig.emitPositionUpdate(req.user.id, id, { actuators: animal.actuators });
+
+    // BROADCAST to hardware!
+    const io = socketConfig.getIO();
+    io.to(`animal:${id}`).emit('actuator-command', { 
+      type, 
+      state: !!state,
+      animalId: id 
+    });
+
+    res.json({ message: `Action ${type} sent to hardware`, actuators: animal.actuators });
   } catch (err) {
     next(err);
   }
@@ -265,5 +237,6 @@ module.exports = {
   updateAnimal,
   deleteAnimal,
   getZone,
-  setZone
+  setZone,
+  triggerAction
 };

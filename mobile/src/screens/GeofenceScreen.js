@@ -228,11 +228,19 @@ export default function GeofenceScreen({ route }) {
         >
           {/* Existing Geofences */}
           {geofences.map((gf) => {
-            const coords = gf.polygon_coords ? (typeof gf.polygon_coords === 'string' ? JSON.parse(gf.polygon_coords) : gf.polygon_coords) : [];
-            if (gf.type === 'polygon' && coords.length > 0) {
+            const gfId = String(gf.id || gf._id);
+            const rawCoords = gf.polygon_coords || [];
+            let coords = [];
+            try {
+              coords = typeof rawCoords === 'string' ? JSON.parse(rawCoords) : rawCoords;
+            } catch (e) {
+              console.warn(`[GeofenceScreen] Failed to parse coords for zone ${gfId}`);
+            }
+
+            if (Array.isArray(coords) && coords.length > 0) {
               return (
                 <Polygon
-                  key={gf.id}
+                  key={gfId}
                   coordinates={coords}
                   strokeColor={gf.is_active ? COLORS.primary : COLORS.subtext}
                   fillColor={gf.is_active ? COLORS.primary + '33' : COLORS.subtext + '22'}
@@ -379,7 +387,7 @@ export default function GeofenceScreen({ route }) {
           <FlatList
             data={geofences}
             renderItem={renderGeofenceItem}
-            keyExtractor={(item) => item.id.toString()}
+            keyExtractor={(item) => String(item.id || item._id)}
             ListEmptyComponent={
               <Text style={styles.emptyText}>No zones defined. Tap + to draw one.</Text>
             }

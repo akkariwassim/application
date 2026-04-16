@@ -2,9 +2,9 @@
 
 const Animal          = require('../models/Animal');
 const SensorData      = require('../models/SensorData');
-const Geofence        = require('../models/Geofence');
+const Zone            = require('../models/Zone');
 const Alert           = require('../models/Alert');
-const geofenceService = require('../services/geofenceService');
+const monitorService  = require('../services/monitorService');
 const socketConfig    = require('../config/socket');
 const logger          = require('../utils/logger');
 
@@ -14,89 +14,103 @@ const logger          = require('../utils/logger');
  */
 async function submitPosition(req, res, next) {
   try {
-    const { animalId, latitude, longitude, temperature, activity } = req.body;
+    const { 
+      animalId, latitude, longitude, 
+      temperature, heart_rate, battery_level, gps_signal, activity 
+    } = req.body;
     
-    // 1. Update the Animal with latest metrics
+    // 1. Update the Animal with latest metrics (ONLY provided fields)
+    const updatePayload = { 
+      last_seen: new Date(),
+      last_sync: new Date()
+    };
+    
+    if (latitude !== undefined)  updatePayload.latitude  = latitude;
+    if (longitude !== undefined) updatePayload.longitude = longitude;
+    if (temperature !== undefined) updatePayload.temperature = temperature;
+    if (heart_rate !== undefined)   updatePayload.heart_rate   = heart_rate;
+    if (battery_level !== undefined) updatePayload.battery_level = battery_level;
+    if (gps_signal !== undefined)    updatePayload.gps_signal    = gps_signal;
+    if (activity !== undefined)      updatePayload.activity      = activity;
+
     const animal = await Animal.findOneAndUpdate(
       { _id: animalId, user_id: req.user.id },
-      { 
-        $set: { 
-          latitude, 
-          longitude, 
-          temperature: temperature || 38.5, 
-          activity: activity || 50,
-          last_seen: new Date()
-        } 
-      },
+      { $set: updatePayload },
       { new: true }
     );
     
     if (!animal) return res.status(404).json({ error: 'Animal not found' });
+
+    // 2. Save to SensorData (History)
+    await SensorData.create({
+      animal_id: animalId,
+      user_id: req.user.id,
+      latitude:      animal.latitude,
+      longitude:     animal.longitude,
+      temperature:   animal.temperature,
+      heart_rate:    animal.heart_rate,
+      battery_level: animal.battery_level,
+      gps_signal:    animal.gps_signal,
+      activity:      animal.activity,
+      timestamp:     animal.last_sync
+    });
     
-    // 3. Broadcast update via WebSocket
-    socketConfig.emitPositionUpdate(animalId, { 
-      latitude, 
-      longitude, 
-      temperature: animal.temperature, 
-      activity: animal.activity,
-      timestamp: animal.last_seen
+    // 3. Broadcast real-time update via WebSocket (Always, for live UI)
+    socketConfig.emitPositionUpdate(req.user.id, animalId, { 
+      latitude:      animal.latitude, 
+      longitude:     animal.longitude, 
+      temperature:   animal.temperature, 
+      heart_rate:    animal.heart_rate,
+      battery_level: animal.battery_level,
+      gps_signal:    animal.gps_signal,
+      activity:      animal.activity,
+      timestamp:     animal.last_sync
     });
 
-    // 4. Geofence Check & Alerting
-    try {
-      const activeZone = await Geofence.findByAnimal(animalId, req.user.id);
-      if (activeZone && activeZone.is_active) {
-        let coords = [];
-        if (activeZone.type === 'polygon' && activeZone.polygon_coords) {
-          coords = typeof activeZone.polygon_coords === 'string' 
-            ? JSON.parse(activeZone.polygon_coords) 
-            : activeZone.polygon_coords;
-        }
+    // 4. Persistence Throttling: Save to history only if threshold met
+    const shouldSave = monitorService.shouldPersist(
+      animal.last_sync_history, // We'll add this field or just use a helper
+      { latitude: animal.last_lat_history, longitude: animal.last_lon_history },
+      { latitude, longitude }
+    );
 
-        const checkResult = geofenceService.checkBreach(latitude, longitude, {
-          type: activeZone.type,
-          radiusM: activeZone.radius_m,
-          center: { coordinates: [activeZone.center_lon, activeZone.center_lat] },
-          geometry: activeZone.type === 'polygon' ? { 
-            type: 'Polygon', 
-            coordinates: [coords.map(c => [c.longitude, c.latitude])] 
-          } : null,
-          isActive: true
-        });
-
-        if (checkResult.breached) {
-          logger.warn(`Geofence Breach! Animal ${animalId} left zone ${activeZone.name}`);
-          
-          // Create Alert in DB
-          const alert = await Alert.create({
-            animal_id: animalId,
-            user_id: req.user.id,
-            geofence_id: activeZone.id,
-            type: 'exit',
-            severity: 'danger',
-            message: `⚠️ L'animal ${animal.name} a quitté sa zone : ${activeZone.name}`,
-            location: { type: 'Point', coordinates: [longitude, latitude] }
-          });
-
-          // Update animal status
-          animal.status = 'danger';
-          await animal.save();
-
-          // Push alert via Socket
-          socketConfig.emitAlert(req.user.id, animalId, alert);
-          socketConfig.emitStatusChange(req.user.id, animalId, 'danger');
-        } else if (animal.status !== 'safe') {
-          // Recover if back in zone
-          animal.status = 'safe';
-          await animal.save();
-          socketConfig.emitStatusChange(req.user.id, animalId, 'safe');
-        }
-      }
-    } catch (geoErr) {
-      logger.error(`Geofence calculation error: ${geoErr.message}`);
+    if (shouldSave) {
+      await SensorData.create({
+        animal_id: animalId,
+        user_id: req.user.id,
+        latitude,
+        longitude,
+        temperature: animal.temperature,
+        heart_rate:  animal.heart_rate,
+        activity:    animal.activity,
+        timestamp:   animal.last_sync
+      });
+      
+      // Update tracking state for next throttling check
+      animal.last_sync_history = new Date();
+      animal.last_lat_history  = latitude;
+      animal.last_lon_history  = longitude;
     }
 
-    res.json({ message: 'Position updated successfully', animal });
+    // 5. Intelligent Monitoring (Async - don't block response)
+    // We run this in background to keep API response < 100ms
+    setImmediate(async () => {
+      try {
+        const newStatus = await monitorService.checkGeofence(animal, latitude, longitude);
+        if (newStatus !== animal.status) {
+          animal.status = newStatus;
+        }
+        await monitorService.checkVitals(animal, { 
+          temperature, heart_rate, battery_level, gps_signal 
+        }, { latitude, longitude });
+        
+        await animal.save();
+      } catch (err) {
+        logger.error(`[PositionsController] Background Monitor Error: ${err.message}`);
+      }
+    });
+
+    res.json({ message: 'Position received and processed', status: animal.status });
   } catch (err) {
     next(err);
   }

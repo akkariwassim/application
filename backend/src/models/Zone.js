@@ -67,6 +67,11 @@ const zoneSchema = new mongoose.Schema({
     type: Number,
     default: 1,
   },
+  animal_id: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Animal',
+    default: null,
+  },
   active_alerts: {
     type: Number,
     default: 0,
@@ -99,6 +104,20 @@ zoneSchema.pre('save', async function() {
     };
   }
 });
+
+/**
+ * Static helper to find the active zone for an animal.
+ * Checks for animal-specific zone first, then falls back to user-level primary zone.
+ */
+zoneSchema.statics.findByAnimal = async function(animalId, userId) {
+  // 1. Look for zone specifically assigned to this animal
+  let zone = await this.findOne({ animal_id: animalId, is_active: true });
+  if (zone) return zone;
+
+  // 2. Fall back to user's primary/default zone
+  zone = await this.findOne({ user_id: userId, is_primary: 1, is_active: true });
+  return zone;
+};
 
 zoneSchema.index({ geometry: '2dsphere' });
 zoneSchema.index({ center: '2dsphere' });

@@ -48,7 +48,8 @@ function pointInPolygon(lat, lon, coordinates) {
  * High-level breach check given a geofence Mongoose document.
  */
 function checkBreach(lat, lon, zone) {
-  if (!zone || !zone.isActive) return { breached: false, distanceM: null };
+  // Zone is a Mongoose document (Zone model)
+  if (!zone || !zone.is_active) return { breached: false, distanceM: null };
 
   // Circle check (using center and radiusM)
   if (zone.radiusM && zone.center) {
@@ -66,7 +67,7 @@ function checkBreach(lat, lon, zone) {
     
     // If it's an exclusion zone, breach is when INSIDE. 
     // If it's a grazing zone, breach is when OUTSIDE.
-    const isExclusion = zone.type === 'exclusion' || zone.type === 'hazard';
+    const isExclusion = zone.zone_type === 'exclusion' || zone.zone_type === 'hazard';
     const breached = isExclusion ? inside : !inside;
 
     return { breached, distanceM: null };

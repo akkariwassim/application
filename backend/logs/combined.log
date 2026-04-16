@@ -807,3 +807,1791 @@
 2026-04-16 17:19:46 [info]: Incoming Request: GET /api/animals
 2026-04-16 17:19:46 [info]: Incoming Request: GET /api/geofences
 2026-04-16 17:19:52 [info]: Incoming Request: GET /api/animals
+2026-04-16 18:58:58 [info]: MongoDB Connected: ac-lokdmj8-shard-00-00.7zypd8b.mongodb.net
+2026-04-16 18:58:58 [info]: 🚀 Server running on http://localhost:3000
+2026-04-16 18:58:58 [info]:    Environment: development
+2026-04-16 18:59:48 [warn]: MongoDB disconnected
+2026-04-16 19:00:02 [info]: MongoDB Connected: ac-lokdmj8-shard-00-00.7zypd8b.mongodb.net
+2026-04-16 19:00:02 [info]: 🚀 Server running on http://localhost:3000
+2026-04-16 19:00:02 [info]:    Environment: development
+2026-04-16 19:04:13 [info]: Incoming Request: POST /api/auth/login
+2026-04-16 19:04:14 [info]: ✅ User logged in successfully: akkariwassim11@gmail.com
+2026-04-16 19:04:14 [info]: Incoming Request: GET /api/animals
+2026-04-16 19:04:14 [info]: Incoming Request: GET /api/geofences
+2026-04-16 19:04:14 [info]: Incoming Request: GET /api/animals
+2026-04-16 19:04:14 [info]: Incoming Request: GET /api/geofences
+2026-04-16 19:04:14 [info]: Incoming Request: GET /api/animals
+2026-04-16 19:04:14 [info]: Incoming Request: GET /api/geofences
+2026-04-16 19:04:15 [info]: Socket connected: jrexM4OEI4LO6YHzAAAB (user 69e0f6ec4be9f34aaa8e2d6a)
+2026-04-16 19:04:29 [info]: Incoming Request: GET /api/animals
+2026-04-16 19:05:08 [info]: Incoming Request: GET /api/animals
+2026-04-16 19:05:12 [info]: Incoming Request: GET /api/geofences
+2026-04-16 19:05:14 [info]: Incoming Request: GET /api/geofences
+2026-04-16 19:05:21 [info]: Incoming Request: GET /api/alerts?status=active
+2026-04-16 19:05:22 [info]: Incoming Request: GET /api/animals
+2026-04-16 19:05:27 [info]: Incoming Request: GET /api/animals/69e108298a500d1d8def052e
+2026-04-16 19:05:40 [info]: Incoming Request: GET /api/animals
+2026-04-16 19:05:40 [info]: Incoming Request: GET /api/geofences
+2026-04-16 19:06:01 [info]: Incoming Request: GET /api/animals
+2026-04-16 19:06:13 [info]: Incoming Request: GET /api/geofences
+2026-04-16 19:06:27 [info]: Incoming Request: GET /api/animals
+2026-04-16 19:06:27 [info]: Incoming Request: GET /api/geofences
+2026-04-16 19:07:54 [info]: Socket disconnected: jrexM4OEI4LO6YHzAAAB — transport close
+2026-04-16 19:10:06 [warn]: MongoDB disconnected
+2026-04-16 19:14:28 [info]: MongoDB Connected: ac-lokdmj8-shard-00-00.7zypd8b.mongodb.net
+2026-04-16 19:14:28 [info]: 🚀 Server running on http://localhost:3000
+2026-04-16 19:14:28 [info]:    Environment: development
+2026-04-16 19:17:42 [warn]: MongoDB disconnected
+2026-04-16 19:18:06 [info]: Incoming Request: GET /api/auth/me
+2026-04-16 19:18:07 [info]: Incoming Request: GET /api/animals
+2026-04-16 19:18:07 [info]: Incoming Request: GET /api/geofences
+2026-04-16 19:18:07 [info]: Incoming Request: GET /api/animals
+2026-04-16 19:18:07 [info]: Incoming Request: GET /api/geofences
+2026-04-16 19:18:07 [info]: Socket connected: QA60woGsH40S6nUPAAAB (user 69e0f6ec4be9f34aaa8e2d6a)
+2026-04-16 19:18:07 [info]: Incoming Request: GET /api/animals
+2026-04-16 19:18:07 [info]: Incoming Request: GET /api/geofences
+2026-04-16 19:18:42 [info]: Incoming Request: GET /api/animals
+2026-04-16 19:18:57 [info]: Incoming Request: GET /api/geofences
+2026-04-16 19:18:59 [info]: Incoming Request: GET /api/geofences
+2026-04-16 19:19:06 [info]: Incoming Request: GET /api/alerts?status=active
+2026-04-16 19:19:11 [info]: Incoming Request: GET /api/alerts?status=active&type=temperature
+2026-04-16 19:19:12 [info]: Incoming Request: GET /api/alerts?status=active&type=geofence_breach
+2026-04-16 19:19:13 [info]: Incoming Request: GET /api/alerts?status=active&type=activity
+2026-04-16 19:19:15 [info]: Incoming Request: GET /api/alerts?status=active&type=geofence_breach
+2026-04-16 19:19:15 [info]: Incoming Request: POST /api/auth/refresh
+2026-04-16 19:19:15 [info]: Incoming Request: GET /api/alerts?status=active&type=geofence_breach
+2026-04-16 19:19:16 [info]: Incoming Request: GET /api/animals
+2026-04-16 19:19:18 [info]: Incoming Request: GET /api/geofences
+2026-04-16 19:19:39 [info]: Incoming Request: POST /api/animals
+2026-04-16 19:19:48 [info]: Incoming Request: GET /api/animals/69e1283b971dca5232dddfa1
+2026-04-16 19:20:00 [info]: Incoming Request: GET /api/animals
+2026-04-16 19:20:00 [info]: Incoming Request: GET /api/geofences
+2026-04-16 19:20:05 [info]: Socket disconnected: QA60woGsH40S6nUPAAAB — client namespace disconnect
+2026-04-16 19:20:09 [info]: Incoming Request: GET /api/auth/me
+2026-04-16 19:20:09 [info]: Incoming Request: GET /api/animals
+2026-04-16 19:20:09 [info]: Incoming Request: GET /api/animals
+2026-04-16 19:20:09 [info]: Incoming Request: GET /api/geofences
+2026-04-16 19:20:09 [info]: Incoming Request: GET /api/geofences
+2026-04-16 19:20:09 [info]: Socket connected: VyJVwKcdynx-8LmEAAAD (user 69e0f6ec4be9f34aaa8e2d6a)
+2026-04-16 19:20:09 [info]: Incoming Request: GET /api/animals
+2026-04-16 19:20:09 [info]: Incoming Request: GET /api/geofences
+2026-04-16 19:20:13 [info]: Incoming Request: GET /api/geofences
+2026-04-16 19:20:15 [info]: Incoming Request: GET /api/animals
+2026-04-16 19:20:15 [info]: Incoming Request: GET /api/geofences
+2026-04-16 19:20:17 [info]: Incoming Request: GET /api/animals
+2026-04-16 19:23:05 [info]: Incoming Request: GET /api/alerts?status=active
+2026-04-16 19:23:05 [info]: Incoming Request: GET /api/animals
+2026-04-16 19:23:07 [info]: Incoming Request: GET /api/animals/69e1283b971dca5232dddfa1
+2026-04-16 19:34:22 [info]: Socket disconnected: VyJVwKcdynx-8LmEAAAD — client namespace disconnect
+2026-04-16 19:35:55 [info]: Incoming Request: GET /api/auth/me
+2026-04-16 19:35:55 [info]: Incoming Request: POST /api/auth/refresh
+2026-04-16 19:35:55 [info]: Incoming Request: GET /api/auth/me
+2026-04-16 19:35:56 [info]: Incoming Request: GET /api/animals
+2026-04-16 19:35:56 [info]: Incoming Request: GET /api/geofences
+2026-04-16 19:35:56 [info]: Incoming Request: GET /api/animals
+2026-04-16 19:35:56 [info]: Incoming Request: GET /api/geofences
+2026-04-16 19:35:56 [info]: Socket connected: bBQOq0zh2QczpmaOAAAF (user 69e0f6ec4be9f34aaa8e2d6a)
+2026-04-16 19:35:56 [info]: Incoming Request: GET /api/animals
+2026-04-16 19:35:56 [info]: Incoming Request: GET /api/geofences
+2026-04-16 19:35:59 [info]: Incoming Request: GET /api/geofences
+2026-04-16 19:35:59 [info]: Incoming Request: GET /api/animals
+2026-04-16 19:36:01 [info]: Incoming Request: GET /api/animals/69e1283b971dca5232dddfa1
+2026-04-16 19:36:05 [info]: Incoming Request: GET /api/animals
+2026-04-16 19:36:05 [info]: Incoming Request: GET /api/geofences
+2026-04-16 19:36:09 [info]: Incoming Request: GET /api/alerts?status=active
+2026-04-16 19:36:10 [info]: Incoming Request: GET /api/alerts?status=active
+2026-04-16 19:36:11 [info]: Incoming Request: GET /api/alerts?status=acknowledged
+2026-04-16 19:36:12 [info]: Incoming Request: GET /api/alerts?status=resolved
+2026-04-16 19:36:12 [info]: Incoming Request: GET /api/alerts?status=active
+2026-04-16 19:36:13 [info]: Incoming Request: GET /api/alerts?status=active
+2026-04-16 19:36:15 [info]: Incoming Request: GET /api/animals/69e108298a500d1d8def052e
+2026-04-16 19:36:21 [info]: Incoming Request: GET /api/animals
+2026-04-16 19:36:21 [info]: Incoming Request: GET /api/geofences
+2026-04-16 19:38:19 [info]: Socket disconnected: bBQOq0zh2QczpmaOAAAF — client namespace disconnect
+2026-04-16 19:38:19 [info]: Incoming Request: GET /api/auth/me
+2026-04-16 19:38:19 [info]: Incoming Request: GET /api/animals
+2026-04-16 19:38:19 [info]: Incoming Request: GET /api/geofences
+2026-04-16 19:38:19 [info]: Incoming Request: GET /api/animals
+2026-04-16 19:38:19 [info]: Incoming Request: GET /api/geofences
+2026-04-16 19:38:19 [info]: Socket connected: _MzfN-Tul5ARMPJSAAAH (user 69e0f6ec4be9f34aaa8e2d6a)
+2026-04-16 19:39:01 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:39:01 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:39:01 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:39:01 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:39:01 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:39:01 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:39:06 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:39:06 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:39:06 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:39:06 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:39:06 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:39:06 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:39:11 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:39:11 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:39:11 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:39:11 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:39:11 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:39:11 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:39:16 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:39:16 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:39:16 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:39:16 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:39:16 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:39:16 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:39:21 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:39:21 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:39:21 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:39:21 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:39:21 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:39:21 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:39:26 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:39:26 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:39:26 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:39:26 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:39:26 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:39:26 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:39:31 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:39:31 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:39:31 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:39:31 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:39:31 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:39:31 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:39:35 [info]: Socket disconnected: _MzfN-Tul5ARMPJSAAAH — client namespace disconnect
+2026-04-16 19:39:36 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:39:36 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:39:36 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:39:36 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:39:36 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:39:36 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:39:41 [info]: Incoming Request: GET /api/auth/me
+2026-04-16 19:39:41 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:39:41 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:39:41 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:39:41 [info]: Incoming Request: GET /api/animals
+2026-04-16 19:39:41 [info]: Incoming Request: GET /api/geofences
+2026-04-16 19:39:41 [info]: Incoming Request: GET /api/animals
+2026-04-16 19:39:41 [info]: Incoming Request: GET /api/geofences
+2026-04-16 19:39:41 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:39:41 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:39:41 [info]: Socket connected: BJfO8Mx-Pu1MXtF2AAAJ (user 69e0f6ec4be9f34aaa8e2d6a)
+2026-04-16 19:39:41 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:39:41 [info]: Incoming Request: GET /api/animals
+2026-04-16 19:39:41 [info]: Incoming Request: GET /api/geofences
+2026-04-16 19:39:44 [info]: Incoming Request: GET /api/animals
+2026-04-16 19:39:45 [info]: Incoming Request: GET /api/animals/69e108298a500d1d8def052e
+2026-04-16 19:39:46 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:39:46 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:39:46 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:39:46 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:39:46 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:39:46 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:39:49 [info]: Incoming Request: GET /api/animals/69e1283b971dca5232dddfa1
+2026-04-16 19:39:51 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:39:51 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:39:51 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:39:51 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:39:51 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:39:51 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:39:56 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:39:56 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:39:56 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:39:56 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:39:56 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:39:56 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:40:01 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:40:01 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:40:01 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:40:01 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:40:01 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:40:01 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:40:03 [info]: Incoming Request: GET /api/animals/69e1283b971dca5232dddfa1
+2026-04-16 19:40:06 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:40:06 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:40:06 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:40:06 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:40:06 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:40:06 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:40:11 [info]: Incoming Request: GET /api/geofences
+2026-04-16 19:40:11 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:40:11 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:40:11 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:40:11 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:40:11 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:40:11 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:40:12 [info]: Incoming Request: GET /api/animals
+2026-04-16 19:40:12 [info]: Incoming Request: GET /api/geofences
+2026-04-16 19:40:16 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:40:16 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:40:16 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:40:16 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:40:16 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:40:16 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:40:21 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:40:21 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:40:21 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:40:21 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:40:21 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:40:21 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:40:26 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:40:26 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:40:26 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:40:26 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:40:26 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:40:26 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:40:31 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:40:31 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:40:31 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:40:31 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:40:31 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:40:31 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:40:36 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:40:36 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:40:36 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:40:36 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:40:36 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:40:36 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:40:41 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:40:41 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:40:41 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:40:41 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:40:41 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:40:41 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:40:46 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:40:46 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:40:46 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:40:46 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:40:46 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:40:46 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:40:51 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:40:51 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:40:51 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:40:51 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:40:51 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:40:51 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:40:56 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:40:56 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:40:56 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:40:56 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:40:56 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:40:56 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:41:01 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:41:01 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:41:01 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:41:01 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:41:01 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:41:01 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:41:06 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:41:06 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:41:06 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:41:06 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:41:06 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:41:06 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:41:11 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:41:11 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:41:11 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:41:11 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:41:11 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:41:11 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:41:16 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:41:16 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:41:16 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:41:16 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:41:16 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:41:16 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:41:21 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:41:21 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:41:21 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:41:21 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:41:21 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:41:21 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:41:26 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:41:26 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:41:26 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:41:26 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:41:26 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:41:26 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:41:31 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:41:31 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:41:31 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:41:31 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:41:31 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:41:31 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:41:36 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:41:36 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:41:36 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:41:36 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:41:36 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:41:36 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:41:41 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:41:41 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:41:41 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:41:41 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:41:41 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:41:41 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:41:46 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:41:46 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:41:46 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:41:46 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:41:46 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:41:46 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:41:51 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:41:51 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:41:51 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:41:51 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:41:51 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:41:51 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:41:56 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:41:56 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:41:56 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:41:56 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:41:56 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:41:56 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:42:01 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:42:01 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:42:01 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:42:01 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:42:01 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:42:01 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:42:06 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:42:06 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:42:06 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:42:06 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:42:06 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:42:06 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:42:11 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:42:11 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:42:11 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:42:11 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:42:11 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:42:11 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:42:16 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:42:16 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:42:16 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:42:16 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:42:16 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:42:16 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:42:21 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:42:21 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:42:21 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:42:21 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:42:21 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:42:21 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:42:26 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:42:26 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:42:26 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:42:26 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:42:26 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:42:26 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:42:31 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:42:31 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:42:31 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:42:31 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:42:31 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:42:31 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:42:36 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:42:36 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:42:36 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:42:36 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:42:36 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:42:36 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:42:41 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:42:41 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:42:41 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:42:41 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:42:41 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:42:41 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:42:46 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:42:46 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:42:46 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:42:46 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:42:46 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:42:46 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:42:51 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:42:51 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:42:51 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:42:51 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:42:51 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:42:51 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-16 19:45:17 [info]: MongoDB Connected: ac-lokdmj8-shard-00-00.7zypd8b.mongodb.net
+2026-04-16 19:45:17 [info]: 🚀 Server running on http://localhost:3000
+2026-04-16 19:45:17 [info]:    Environment: development
+2026-04-16 19:45:18 [info]: Socket connected: Y52W3h6dhqKGWfTLAAAB (user 69e0f6ec4be9f34aaa8e2d6a)
+2026-04-16 19:45:21 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:45:22 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:45:22 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:45:26 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:45:27 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:45:27 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:45:31 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:45:32 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:45:32 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:45:33 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:45:33 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:45:33 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:45:36 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:45:36 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:45:37 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:45:38 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:45:38 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:45:38 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:45:41 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:45:42 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:45:42 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:45:43 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:45:43 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:45:43 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:45:46 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:45:47 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:45:47 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:45:48 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:45:48 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:45:48 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:45:51 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:45:52 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:45:52 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:45:53 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:45:53 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:45:53 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:45:56 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:45:57 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:45:58 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:45:58 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:45:58 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:45:58 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:46:01 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:46:02 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:46:02 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:46:03 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:46:03 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:46:03 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:46:06 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:46:07 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:46:07 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:46:08 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:46:08 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:46:08 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:46:11 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:46:12 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:46:12 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:46:13 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:46:13 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:46:13 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:46:16 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:46:17 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:46:17 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:46:18 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:46:18 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:46:18 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:46:21 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:46:22 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:46:22 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:46:23 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:46:23 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:46:23 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:46:26 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:46:27 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:46:27 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:46:28 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:46:28 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:46:28 [info]: Socket disconnected: Y52W3h6dhqKGWfTLAAAB — ping timeout
+2026-04-16 19:46:28 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:46:31 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:46:32 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:46:32 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:46:33 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:46:33 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:46:33 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:46:36 [info]: MongoDB Connected: ac-lokdmj8-shard-00-00.7zypd8b.mongodb.net
+2026-04-16 19:46:36 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:46:37 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:46:37 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:46:38 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:46:38 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:46:38 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:46:41 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:46:42 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:46:42 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:46:43 [info]: MongoDB Connected: ac-lokdmj8-shard-00-00.7zypd8b.mongodb.net
+2026-04-16 19:46:43 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:46:43 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:46:43 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:46:46 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:46:47 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:46:47 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:46:48 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:46:48 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:46:48 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:46:51 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:46:52 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:46:52 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:46:52 [info]: MongoDB Connected: ac-lokdmj8-shard-00-00.7zypd8b.mongodb.net
+2026-04-16 19:46:53 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:46:53 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:46:53 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:46:56 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:46:57 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:46:57 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:46:58 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:46:58 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:46:58 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:47:01 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:47:02 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:47:02 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:47:03 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:47:03 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:47:03 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:47:07 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:47:07 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:47:07 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:47:08 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:47:08 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:47:08 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:47:09 [info]: MongoDB Connected: ac-lokdmj8-shard-00-00.7zypd8b.mongodb.net
+2026-04-16 19:47:12 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:47:12 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:47:12 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:47:13 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:47:13 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:47:13 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:47:17 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:47:17 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:47:17 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:47:18 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:47:18 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:47:18 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:47:22 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:47:22 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:47:22 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:47:23 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:47:23 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:48:47 [info]: MongoDB Connected: ac-lokdmj8-shard-00-00.7zypd8b.mongodb.net
+2026-04-16 19:48:47 [info]: 🚀 Server running on http://localhost:3000
+2026-04-16 19:48:47 [info]:    Environment: development
+2026-04-16 19:48:48 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:48:48 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:48:48 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:48:52 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:48:52 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:48:52 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:48:53 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:48:53 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:48:54 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:48:57 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:48:57 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:48:57 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:48:58 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:48:58 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:48:59 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:49:02 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:49:02 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:49:02 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:49:03 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:49:03 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:49:04 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:49:07 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:49:07 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:49:07 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:49:08 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:49:08 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:49:08 [info]: Incoming Request: POST /api/auth/login
+2026-04-16 19:49:08 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:49:09 [info]: ✅ User logged in successfully: akkariwassim11@gmail.com
+2026-04-16 19:49:09 [info]: Incoming Request: GET /api/animals
+2026-04-16 19:49:09 [info]: Incoming Request: GET /api/geofences
+2026-04-16 19:49:09 [info]: Incoming Request: GET /api/animals
+2026-04-16 19:49:09 [info]: Incoming Request: GET /api/geofences
+2026-04-16 19:49:09 [info]: Socket connected: F1-wZtlwi7rEq8NdAAAB (user 69e0f6ec4be9f34aaa8e2d6a)
+2026-04-16 19:49:09 [info]: Incoming Request: GET /api/animals
+2026-04-16 19:49:09 [info]: Incoming Request: GET /api/geofences
+2026-04-16 19:49:12 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:49:12 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:49:12 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:49:13 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:49:13 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:49:13 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:49:17 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:49:17 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:49:17 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:49:18 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:49:18 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:49:18 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:49:20 [info]: Incoming Request: GET /api/geofences
+2026-04-16 19:49:21 [info]: Incoming Request: GET /api/animals
+2026-04-16 19:49:21 [info]: Incoming Request: GET /api/geofences
+2026-04-16 19:49:22 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:49:22 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:49:22 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:49:23 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:49:23 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:49:23 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:49:27 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:49:27 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:49:27 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:49:28 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:49:28 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:49:29 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:49:29 [info]: Incoming Request: GET /api/alerts?status=active
+2026-04-16 19:49:31 [info]: Incoming Request: GET /api/animals
+2026-04-16 19:49:32 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:49:32 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:49:32 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:49:33 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:49:33 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:49:33 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:49:37 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:49:37 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:49:37 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:49:38 [info]: Incoming Request: GET /api/animals
+2026-04-16 19:49:38 [info]: Incoming Request: GET /api/geofences
+2026-04-16 19:49:38 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:49:38 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:49:38 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:49:42 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:49:42 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:49:43 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:49:43 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:49:43 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:49:44 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:49:47 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:49:47 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:49:48 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:49:48 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:49:48 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:49:49 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:49:52 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:49:52 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:49:52 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:49:53 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:49:53 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:49:53 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:49:57 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:49:57 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:49:57 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:49:58 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:49:58 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:49:59 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:50:02 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:50:02 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:50:02 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:50:03 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:50:03 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:50:03 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:50:07 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:50:07 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:50:07 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:50:08 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:50:08 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:50:08 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:50:12 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:50:12 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:50:13 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:50:13 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:50:13 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:50:14 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:50:17 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:50:17 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:50:17 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:50:18 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:50:18 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:50:19 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:50:22 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:50:22 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:50:22 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:50:23 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:50:23 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:50:24 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:50:27 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:50:27 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:50:27 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:50:28 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:50:28 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:50:29 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:50:32 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:50:32 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:50:32 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:50:33 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:50:33 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:50:34 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:50:37 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:50:37 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:50:37 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:50:38 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:50:38 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:50:39 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:50:42 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:50:42 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:50:42 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:50:43 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:50:44 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:50:44 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:50:47 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:50:47 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:50:47 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:50:52 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:50:53 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:50:53 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:50:57 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:50:57 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:50:58 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:51:02 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:51:02 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:51:02 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:51:07 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:51:07 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:51:07 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:51:12 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:51:12 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:51:12 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:51:17 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:51:17 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:51:17 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:51:22 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:51:22 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:51:23 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:51:27 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:51:27 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:51:28 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:51:32 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:51:32 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:51:33 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:51:37 [info]: Incoming Request: GET /api/animals/69e108298a500d1d8def052e
+2026-04-16 19:51:37 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:51:37 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:51:37 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:51:42 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:51:43 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:51:43 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:51:47 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:51:47 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:51:48 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:51:49 [info]: Incoming Request: GET /api/animals
+2026-04-16 19:51:49 [info]: Incoming Request: GET /api/geofences
+2026-04-16 19:51:52 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:51:52 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:51:53 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:51:57 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:51:57 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:51:58 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:52:02 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:52:02 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:52:03 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:52:07 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:52:07 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:52:07 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:52:12 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:52:12 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:52:13 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:52:17 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:52:17 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:52:18 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:52:22 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:52:22 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:52:23 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:52:24 [info]: Socket disconnected: F1-wZtlwi7rEq8NdAAAB — ping timeout
+2026-04-16 19:52:27 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:52:27 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:52:28 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:52:32 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:52:32 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:52:33 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:52:37 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:52:37 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:52:38 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:52:42 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:52:42 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:52:43 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:52:47 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:52:47 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:52:48 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:52:52 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:52:52 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:52:53 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:52:57 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:52:57 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:52:58 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:53:02 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:53:02 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:53:03 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:53:07 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:53:07 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:53:08 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:53:12 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:53:13 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:53:13 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:53:17 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:53:17 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:53:18 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:53:22 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:53:22 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:53:23 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:53:27 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:53:27 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:53:28 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:53:32 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:53:32 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:53:33 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:53:37 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:53:38 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:53:38 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:53:42 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:53:42 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:53:43 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:53:47 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:53:48 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:53:48 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:53:52 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:53:52 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:53:53 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:53:57 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:53:57 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:53:58 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:54:02 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:54:03 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:54:03 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:54:07 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:54:08 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:54:09 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:54:12 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:54:13 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:54:13 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:54:17 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:54:18 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:54:18 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:54:22 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:54:23 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:54:23 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:54:27 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:54:28 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:54:28 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:54:32 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:54:33 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:54:33 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:54:37 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:54:38 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:54:38 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:54:42 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:54:43 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:54:43 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:54:47 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:54:48 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:54:48 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:54:52 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:54:53 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:54:53 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:54:57 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:54:58 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:54:58 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:55:02 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:55:03 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:55:03 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:55:07 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:55:08 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:55:08 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:55:12 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:55:13 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:55:13 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:55:17 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:55:18 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:55:18 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:55:22 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:55:23 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:55:23 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:55:27 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:55:28 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:55:28 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:55:32 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:55:33 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:55:33 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:55:37 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:55:38 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:55:38 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:55:42 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:55:43 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:55:43 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:55:47 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:55:48 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:55:48 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:55:52 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:55:53 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:55:54 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:55:57 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:55:58 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:55:58 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:56:02 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:56:03 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:56:04 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:56:07 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:56:08 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:56:09 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:56:12 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:56:13 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:56:13 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:56:17 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:56:18 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:56:18 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:56:23 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:56:23 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:56:23 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:56:28 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:56:28 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:56:28 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:56:33 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:56:33 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:56:34 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:56:38 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:56:38 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:56:38 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:56:43 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:56:43 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:56:43 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:56:48 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:56:48 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:56:48 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:56:53 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:56:53 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:56:53 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:56:58 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:56:58 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:56:59 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:57:03 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:57:03 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:57:03 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:57:08 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:57:08 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:57:08 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:57:13 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:57:13 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:57:13 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:57:18 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:57:18 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:57:18 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:57:23 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:57:23 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:57:24 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:57:28 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:57:28 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:57:28 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:57:33 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:57:33 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:57:33 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:57:38 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:57:38 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:57:38 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:57:43 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:57:43 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:57:43 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:57:48 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:57:48 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:57:49 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:57:53 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:57:53 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:57:54 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:57:58 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:57:58 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:57:58 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:58:03 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:58:03 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:58:03 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:58:08 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:58:09 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:58:09 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:58:13 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:58:13 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:58:13 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:58:18 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:58:18 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:58:19 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:58:23 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:58:23 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:58:23 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:58:28 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:58:28 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:58:28 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:58:33 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:58:33 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:58:33 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:58:38 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:58:39 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:58:40 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:58:43 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:58:43 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:58:44 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:58:48 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:58:48 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:58:49 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:58:53 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:58:53 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:58:54 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:58:58 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:58:59 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:58:59 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:59:03 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:59:04 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:59:05 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:59:08 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:59:09 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:59:09 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:59:13 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:59:13 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:59:13 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:59:18 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:59:18 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:59:18 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:59:23 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:59:23 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:59:23 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:59:28 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:59:28 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:59:28 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:59:33 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:59:33 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:59:34 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:59:38 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:59:38 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:59:39 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:59:43 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:59:44 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:59:44 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:59:48 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:59:49 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:59:49 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:59:53 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:59:54 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:59:54 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:59:58 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:59:58 [info]: Incoming Request: POST /api/positions
+2026-04-16 19:59:58 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:00:03 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:00:03 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:00:04 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:00:08 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:00:08 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:00:09 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:00:13 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:00:14 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:00:14 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:00:18 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:00:19 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:00:19 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:00:23 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:00:23 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:00:23 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:00:28 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:00:29 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:00:30 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:00:33 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:00:33 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:00:34 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:00:38 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:00:38 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:00:39 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:00:43 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:00:44 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:00:44 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:00:48 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:00:49 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:00:50 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:00:53 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:00:54 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:00:54 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:00:58 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:00:59 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:01:00 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:01:03 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:01:04 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:01:04 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:01:08 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:01:09 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:01:10 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:01:13 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:01:13 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:01:14 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:01:18 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:01:18 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:01:18 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:01:23 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:01:23 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:01:23 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:01:28 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:01:28 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:01:29 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:01:33 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:01:34 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:01:34 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:01:38 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:01:38 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:01:38 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:01:43 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:01:43 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:01:44 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:01:48 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:01:48 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:01:49 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:01:53 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:01:53 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:01:54 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:01:58 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:01:58 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:01:59 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:02:03 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:02:03 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:02:04 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:02:08 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:02:08 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:02:09 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:02:13 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:02:13 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:02:14 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:02:18 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:02:18 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:02:19 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:02:23 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:02:23 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:02:23 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:02:25 [info]: Socket connected: _m_OttUySa_3P-0BAAAD (user 69e0f6ec4be9f34aaa8e2d6a)
+2026-04-16 20:02:28 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:02:28 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:02:29 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:02:33 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:02:33 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:02:34 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:02:38 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:02:38 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:02:39 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:02:43 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:02:43 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:02:44 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:02:48 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:02:48 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:02:49 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:02:53 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:02:53 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:02:54 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:02:58 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:02:58 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:02:59 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:03:03 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:03:03 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:03:04 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:03:08 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:03:08 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:03:09 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:03:13 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:03:13 [info]: MongoDB Connected: ac-lokdmj8-shard-00-00.7zypd8b.mongodb.net
+2026-04-16 20:03:13 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:03:14 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:03:18 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:03:18 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:03:19 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:03:27 [info]: MongoDB Connected: ac-lokdmj8-shard-00-00.7zypd8b.mongodb.net
+2026-04-16 20:03:27 [info]: 🚀 Server running on http://localhost:3000
+2026-04-16 20:03:27 [info]:    Environment: development
+2026-04-16 20:03:28 [info]: Socket connected: 07x3_Rr7H3JlSRKYAAAB (user 69e0f6ec4be9f34aaa8e2d6a)
+2026-04-16 20:03:28 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:03:29 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:03:29 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:03:33 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:03:34 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:03:34 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:03:38 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:03:39 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:03:39 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:03:43 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:03:44 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:03:44 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:03:48 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:03:49 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:03:49 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:03:50 [info]: MongoDB Connected: ac-lokdmj8-shard-00-00.7zypd8b.mongodb.net
+2026-04-16 20:03:53 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:03:54 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:03:54 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:03:58 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:03:59 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:03:59 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:04:03 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:04:04 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:04:04 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:04:08 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:04:09 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:04:09 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:04:13 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:04:14 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:04:14 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:04:18 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:04:19 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:04:19 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:04:23 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:04:24 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:04:24 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:04:28 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:04:29 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:04:29 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:04:33 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:04:34 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:04:34 [info]: Incoming Request: POST /api/positions
+2026-04-16 20:05:09 [info]: MongoDB Connected: ac-lokdmj8-shard-00-00.7zypd8b.mongodb.net
+2026-04-16 20:06:06 [info]: MongoDB Connected: ac-lokdmj8-shard-00-00.7zypd8b.mongodb.net
+2026-04-16 20:06:06 [info]: 🚀 Server running on http://localhost:3000
+2026-04-16 20:06:06 [info]:    Environment: development
+2026-04-16 20:07:24 [info]: Incoming Request: GET /api/auth/me
+2026-04-16 20:07:24 [info]: Incoming Request: POST /api/auth/refresh
+2026-04-16 20:07:24 [info]: Incoming Request: GET /api/auth/me
+2026-04-16 20:07:24 [info]: Incoming Request: GET /api/animals
+2026-04-16 20:07:24 [info]: Incoming Request: GET /api/geofences
+2026-04-16 20:07:24 [info]: Incoming Request: GET /api/animals
+2026-04-16 20:07:24 [info]: Incoming Request: GET /api/geofences
+2026-04-16 20:07:24 [info]: Incoming Request: GET /api/animals
+2026-04-16 20:07:24 [info]: Incoming Request: GET /api/geofences
+2026-04-16 20:07:25 [info]: Socket connected: 7qsh-k3qfq_HvOg-AAAB (user 69e0f6ec4be9f34aaa8e2d6a)
+2026-04-16 20:08:31 [info]: Incoming Request: GET /api/animals
+2026-04-16 20:08:36 [info]: Incoming Request: GET /api/animals
+2026-04-16 20:08:38 [info]: Incoming Request: GET /api/geofences
+2026-04-16 20:08:39 [info]: Incoming Request: GET /api/animals
+2026-04-16 20:08:39 [info]: Incoming Request: GET /api/geofences
+2026-04-16 20:08:54 [info]: Incoming Request: GET /api/animals/69e108298a500d1d8def052e
+2026-04-16 20:09:05 [info]: Incoming Request: GET /api/alerts?status=active
+2026-04-16 20:09:06 [info]: Incoming Request: GET /api/alerts?status=active
+2026-04-16 20:09:07 [info]: Incoming Request: GET /api/alerts?status=active
+2026-04-16 20:09:09 [info]: Incoming Request: GET /api/alerts?status=acknowledged
+2026-04-16 20:09:09 [info]: Incoming Request: GET /api/alerts?status=resolved
+2026-04-16 20:09:11 [info]: Incoming Request: GET /api/animals
+2026-04-16 20:09:11 [info]: Incoming Request: GET /api/geofences
+2026-04-16 20:11:46 [info]: Socket disconnected: 7qsh-k3qfq_HvOg-AAAB — client namespace disconnect
+2026-04-16 20:12:43 [info]: MongoDB Connected: ac-lokdmj8-shard-00-00.7zypd8b.mongodb.net
+2026-04-16 20:12:43 [info]: 🚀 Server running on http://localhost:3000
+2026-04-16 20:12:43 [info]:    Environment: development
+2026-04-16 20:13:06 [info]: Incoming Request: GET /api/auth/me
+2026-04-16 20:18:49 [info]: Incoming Request: GET /api/auth/me
+2026-04-16 20:18:50 [info]: Incoming Request: GET /api/animals
+2026-04-16 20:18:50 [info]: Incoming Request: GET /api/geofences
+2026-04-16 20:18:50 [info]: Incoming Request: GET /api/animals
+2026-04-16 20:18:50 [info]: Incoming Request: GET /api/geofences
+2026-04-16 20:18:50 [info]: Incoming Request: GET /api/animals
+2026-04-16 20:18:50 [info]: Incoming Request: GET /api/geofences
+2026-04-16 20:18:50 [info]: Socket connected: QDxzZN7ZpBhFnEr3AAAB (user 69e0f6ec4be9f34aaa8e2d6a)
+2026-04-16 20:18:51 [info]: Incoming Request: GET /api/geofences
+2026-04-16 20:18:51 [info]: Incoming Request: GET /api/animals
+2026-04-16 20:18:58 [info]: Incoming Request: GET /api/geofences
+2026-04-16 20:18:59 [info]: Incoming Request: GET /api/alerts?status=active
+2026-04-16 20:19:00 [info]: Incoming Request: GET /api/animals
+2026-04-16 20:19:01 [info]: Incoming Request: GET /api/animals/69e108298a500d1d8def052e
+2026-04-16 20:19:04 [info]: Incoming Request: GET /api/animals
+2026-04-16 20:19:05 [info]: Incoming Request: GET /api/geofences
+2026-04-16 20:21:05 [info]: Incoming Request: GET /api/animals
+2026-04-16 20:21:05 [info]: Incoming Request: GET /api/geofences
+2026-04-16 20:21:35 [info]: Incoming Request: GET /api/animals
+2026-04-16 20:21:35 [info]: Incoming Request: GET /api/geofences
+2026-04-16 20:21:35 [info]: Incoming Request: GET /api/animals
+2026-04-16 20:21:35 [info]: Incoming Request: GET /api/geofences
+2026-04-16 20:21:36 [info]: Incoming Request: GET /api/geofences
+2026-04-16 20:21:36 [info]: Incoming Request: GET /api/animals
+2026-04-16 20:21:36 [info]: Incoming Request: GET /api/geofences
+2026-04-16 20:21:36 [info]: Incoming Request: GET /api/animals
+2026-04-16 20:21:51 [info]: Socket disconnected: QDxzZN7ZpBhFnEr3AAAB — client namespace disconnect
+2026-04-16 20:21:54 [info]: Incoming Request: GET /api/auth/me
+2026-04-16 20:21:55 [info]: Incoming Request: GET /api/animals
+2026-04-16 20:21:55 [info]: Incoming Request: GET /api/animals
+2026-04-16 20:21:55 [info]: Incoming Request: GET /api/geofences
+2026-04-16 20:21:55 [info]: Incoming Request: GET /api/geofences
+2026-04-16 20:21:55 [info]: Socket connected: lUHTfDjyEam4Y88FAAAD (user 69e0f6ec4be9f34aaa8e2d6a)
+2026-04-16 20:21:55 [info]: Incoming Request: GET /api/animals
+2026-04-16 20:21:55 [info]: Incoming Request: GET /api/geofences
+2026-04-16 20:21:55 [info]: Incoming Request: GET /api/animals
+2026-04-16 20:21:55 [info]: Incoming Request: GET /api/geofences
+2026-04-16 20:21:55 [info]: Incoming Request: GET /api/animals
+2026-04-16 20:21:55 [info]: Incoming Request: GET /api/geofences
+2026-04-16 20:21:58 [info]: Incoming Request: GET /api/animals
+2026-04-16 20:22:01 [info]: Incoming Request: GET /api/alerts?status=active
+2026-04-16 20:22:02 [info]: Incoming Request: GET /api/geofences
+2026-04-16 20:22:03 [info]: Incoming Request: GET /api/animals
+2026-04-16 20:22:03 [info]: Incoming Request: GET /api/geofences
+2026-04-16 20:22:14 [info]: Incoming Request: GET /api/animals
+2026-04-16 20:22:14 [info]: Incoming Request: GET /api/geofences
+2026-04-16 20:26:00 [info]: Socket disconnected: lUHTfDjyEam4Y88FAAAD — ping timeout
+2026-04-16 20:27:08 [info]: Incoming Request: GET /api/auth/me
+2026-04-16 20:27:08 [info]: Incoming Request: POST /api/auth/refresh
+2026-04-16 20:27:08 [info]: Incoming Request: GET /api/auth/me
+2026-04-16 20:27:08 [info]: Incoming Request: GET /api/animals
+2026-04-16 20:27:08 [info]: Incoming Request: GET /api/geofences
+2026-04-16 20:27:08 [info]: Incoming Request: GET /api/animals
+2026-04-16 20:27:08 [info]: Incoming Request: GET /api/geofences
+2026-04-16 20:27:08 [info]: Socket connected: bh01zyxXRxOPpDfsAAAH (user 69e0f6ec4be9f34aaa8e2d6a)
+2026-04-16 20:27:08 [info]: Incoming Request: GET /api/animals
+2026-04-16 20:27:08 [info]: Incoming Request: GET /api/geofences
+2026-04-16 20:27:08 [info]: Incoming Request: GET /api/animals
+2026-04-16 20:27:08 [info]: Incoming Request: GET /api/geofences
+2026-04-16 20:27:10 [info]: Incoming Request: GET /api/geofences
+2026-04-16 20:27:13 [info]: Incoming Request: GET /api/animals
+2026-04-16 20:27:13 [info]: Incoming Request: GET /api/geofences
+2026-04-16 20:27:18 [info]: Incoming Request: GET /api/animals
+2026-04-16 20:27:18 [info]: Incoming Request: GET /api/geofences
+2026-04-16 20:30:16 [info]: Incoming Request: GET /api/animals
+2026-04-16 20:30:16 [info]: Incoming Request: GET /api/geofences
+2026-04-16 20:30:27 [info]: Socket disconnected: bh01zyxXRxOPpDfsAAAH — client namespace disconnect
+2026-04-16 20:30:31 [info]: Incoming Request: GET /api/auth/me
+2026-04-16 20:30:32 [info]: Incoming Request: GET /api/animals
+2026-04-16 20:30:32 [info]: Incoming Request: GET /api/geofences
+2026-04-16 20:30:32 [info]: Incoming Request: GET /api/animals
+2026-04-16 20:30:32 [info]: Incoming Request: GET /api/geofences
+2026-04-16 20:30:32 [info]: Socket connected: vKSXen0aUwFOCaNcAAAJ (user 69e0f6ec4be9f34aaa8e2d6a)
+2026-04-16 20:30:32 [info]: Incoming Request: GET /api/animals
+2026-04-16 20:30:32 [info]: Incoming Request: GET /api/geofences
+2026-04-16 20:30:32 [info]: Incoming Request: GET /api/animals
+2026-04-16 20:30:32 [info]: Incoming Request: GET /api/geofences
+2026-04-16 20:30:32 [info]: Incoming Request: GET /api/animals
+2026-04-16 20:30:32 [info]: Incoming Request: GET /api/geofences
+2026-04-16 20:30:32 [info]: Incoming Request: GET /api/animals
+2026-04-16 20:30:32 [info]: Incoming Request: GET /api/geofences
+2026-04-16 20:30:38 [info]: Incoming Request: GET /api/geofences
+2026-04-16 20:30:39 [info]: Incoming Request: GET /api/animals
+2026-04-16 20:30:39 [info]: Incoming Request: GET /api/geofences
+2026-04-16 20:30:39 [info]: Incoming Request: GET /api/animals
+2026-04-16 20:30:39 [info]: Incoming Request: GET /api/geofences
+2026-04-16 20:30:44 [info]: Incoming Request: GET /api/animals
+2026-04-16 20:30:45 [info]: Incoming Request: GET /api/animals/69e108298a500d1d8def052e
+2026-04-16 20:30:59 [info]: Incoming Request: DELETE /api/animals/69e108298a500d1d8def052e
+2026-04-16 20:31:00 [info]: Incoming Request: GET /api/geofences
+2026-04-16 20:31:04 [info]: Incoming Request: GET /api/geofences
+2026-04-16 20:31:14 [info]: Incoming Request: GET /api/animals/69e1283b971dca5232dddfa1
+2026-04-16 20:32:54 [info]: Incoming Request: GET /api/animals/69e1283b971dca5232dddfa1
+2026-04-16 20:33:26 [info]: Incoming Request: GET /api/animals
+2026-04-16 20:33:26 [info]: Incoming Request: GET /api/geofences
+2026-04-16 20:33:43 [info]: Incoming Request: GET /api/animals
+2026-04-16 20:33:43 [info]: Incoming Request: GET /api/geofences
+2026-04-16 20:33:43 [info]: Incoming Request: GET /api/animals
+2026-04-16 20:33:43 [info]: Incoming Request: GET /api/geofences
+2026-04-16 20:36:36 [info]: Socket disconnected: vKSXen0aUwFOCaNcAAAJ — client namespace disconnect
+2026-04-16 20:36:42 [info]: Incoming Request: GET /api/auth/me
+2026-04-16 20:36:42 [info]: Incoming Request: GET /api/animals
+2026-04-16 20:36:42 [info]: Incoming Request: GET /api/geofences
+2026-04-16 20:36:42 [info]: Incoming Request: GET /api/animals
+2026-04-16 20:36:42 [info]: Incoming Request: GET /api/geofences
+2026-04-16 20:36:42 [info]: Socket connected: w0ZCRwJUi_KRCUWVAAAL (user 69e0f6ec4be9f34aaa8e2d6a)
+2026-04-16 20:36:42 [info]: Incoming Request: GET /api/animals
+2026-04-16 20:36:42 [info]: Incoming Request: GET /api/geofences
+2026-04-16 20:36:43 [info]: Incoming Request: GET /api/animals
+2026-04-16 20:36:43 [info]: Incoming Request: GET /api/geofences
+2026-04-16 20:36:43 [info]: Incoming Request: GET /api/animals
+2026-04-16 20:36:43 [info]: Incoming Request: GET /api/animals
+2026-04-16 20:36:43 [info]: Incoming Request: GET /api/geofences
+2026-04-16 20:36:43 [info]: Incoming Request: GET /api/geofences
+2026-04-16 20:36:44 [info]: Incoming Request: GET /api/animals
+2026-04-16 20:36:45 [info]: Incoming Request: GET /api/geofences
+2026-04-16 20:37:07 [info]: Incoming Request: POST /api/animals
+2026-04-16 20:37:45 [info]: Incoming Request: GET /api/geofences
+2026-04-16 20:38:19 [info]: Socket disconnected: w0ZCRwJUi_KRCUWVAAAL — client namespace disconnect
+2026-04-16 20:38:22 [info]: Incoming Request: GET /api/auth/me
+2026-04-16 20:38:23 [info]: Incoming Request: GET /api/animals
+2026-04-16 20:38:23 [info]: Socket connected: kFuGa5BN_PGCGv0rAAAN (user 69e0f6ec4be9f34aaa8e2d6a)
+2026-04-16 20:38:23 [info]: Incoming Request: GET /api/geofences
+2026-04-16 20:38:23 [info]: Incoming Request: GET /api/animals
+2026-04-16 20:38:23 [info]: Incoming Request: GET /api/geofences
+2026-04-16 20:38:23 [info]: Incoming Request: GET /api/animals
+2026-04-16 20:38:23 [info]: Incoming Request: GET /api/geofences
+2026-04-16 20:38:23 [info]: Incoming Request: GET /api/animals
+2026-04-16 20:38:23 [info]: Incoming Request: GET /api/geofences
+2026-04-16 20:38:23 [info]: Incoming Request: GET /api/geofences
+2026-04-16 20:38:23 [info]: Incoming Request: GET /api/animals
+2026-04-16 20:38:23 [info]: Incoming Request: GET /api/geofences
+2026-04-16 20:38:23 [info]: Incoming Request: GET /api/animals
+2026-04-16 20:38:26 [info]: Incoming Request: GET /api/animals
+2026-04-16 20:38:27 [info]: Incoming Request: GET /api/geofences
+2026-04-16 20:38:51 [info]: Incoming Request: POST /api/animals
+2026-04-16 20:39:32 [info]: MongoDB Connected: ac-lokdmj8-shard-00-00.7zypd8b.mongodb.net
+2026-04-16 20:40:23 [info]: MongoDB Connected: ac-lokdmj8-shard-00-00.7zypd8b.mongodb.net
+2026-04-16 20:40:23 [info]: 🚀 Server running on http://localhost:3000
+2026-04-16 20:40:23 [info]:    Environment: development
+2026-04-16 20:40:31 [info]: Socket connected: _j9RA2KFumCBVeVlAAAB (user 69e0f6ec4be9f34aaa8e2d6a)
+2026-04-16 20:40:35 [info]: Socket disconnected: _j9RA2KFumCBVeVlAAAB — client namespace disconnect
+2026-04-16 20:40:41 [info]: Incoming Request: GET /api/auth/me
+2026-04-16 20:40:41 [info]: Incoming Request: GET /api/animals
+2026-04-16 20:40:41 [info]: Socket connected: ZtWg09aR6I-ij4khAAAD (user 69e0f6ec4be9f34aaa8e2d6a)
+2026-04-16 20:40:41 [info]: Incoming Request: GET /api/geofences
+2026-04-16 20:40:41 [info]: Incoming Request: GET /api/animals
+2026-04-16 20:40:41 [info]: Incoming Request: GET /api/geofences
+2026-04-16 20:40:42 [info]: Incoming Request: GET /api/animals
+2026-04-16 20:40:42 [info]: Incoming Request: GET /api/geofences
+2026-04-16 20:40:42 [info]: Incoming Request: GET /api/animals
+2026-04-16 20:40:42 [info]: Incoming Request: GET /api/geofences
+2026-04-16 20:40:42 [info]: Incoming Request: GET /api/animals
+2026-04-16 20:40:42 [info]: Incoming Request: GET /api/geofences
+2026-04-16 20:40:48 [info]: Incoming Request: GET /api/animals
+2026-04-16 20:40:50 [info]: Incoming Request: GET /api/geofences
+2026-04-16 20:41:09 [info]: Incoming Request: POST /api/animals
+2026-04-16 20:41:26 [info]: Incoming Request: GET /api/geofences
+2026-04-16 20:44:11 [info]: MongoDB Connected: ac-lokdmj8-shard-00-00.7zypd8b.mongodb.net
+2026-04-16 20:44:11 [info]: 🚀 Server running on http://localhost:3000
+2026-04-16 20:44:11 [info]:    Environment: development
+2026-04-16 20:47:53 [info]: Incoming Request: POST /api/auth/login
+2026-04-16 20:47:54 [info]: ✅ User logged in successfully: akkariwassim11@gmail.com
+2026-04-16 20:47:54 [info]: Incoming Request: GET /api/animals
+2026-04-16 20:47:54 [info]: Incoming Request: GET /api/geofences
+2026-04-16 20:47:54 [info]: Incoming Request: GET /api/animals
+2026-04-16 20:47:54 [info]: Incoming Request: GET /api/geofences
+2026-04-16 20:47:54 [info]: Socket connected: 7QZFjXLgUMAXSBahAAAB (user 69e0f6ec4be9f34aaa8e2d6a)
+2026-04-16 20:47:54 [info]: Incoming Request: GET /api/geofences
+2026-04-16 20:47:54 [info]: Incoming Request: GET /api/animals
+2026-04-16 20:47:54 [info]: Incoming Request: GET /api/animals
+2026-04-16 20:47:54 [info]: Incoming Request: GET /api/geofences
+2026-04-16 20:47:55 [info]: Incoming Request: GET /api/animals
+2026-04-16 20:47:55 [info]: Incoming Request: GET /api/geofences
+2026-04-16 20:47:55 [info]: Incoming Request: GET /api/animals
+2026-04-16 20:47:55 [info]: Incoming Request: GET /api/geofences
+2026-04-16 20:48:00 [info]: Incoming Request: GET /api/geofences
+2026-04-16 20:48:01 [info]: Incoming Request: GET /api/animals
+2026-04-16 20:48:01 [info]: Incoming Request: GET /api/geofences
+2026-04-16 20:48:01 [info]: Incoming Request: GET /api/animals
+2026-04-16 20:48:01 [info]: Incoming Request: GET /api/geofences
+2026-04-16 20:48:10 [info]: Incoming Request: GET /api/animals
+2026-04-16 20:48:11 [info]: Incoming Request: GET /api/geofences
+2026-04-16 20:48:31 [info]: Incoming Request: POST /api/animals
+2026-04-16 20:51:30 [info]: MongoDB Connected: ac-lokdmj8-shard-00-00.7zypd8b.mongodb.net
+2026-04-16 20:51:30 [info]: 🚀 Server running on http://localhost:3000
+2026-04-16 20:51:30 [info]:    Environment: development
+2026-04-16 20:52:14 [info]: Incoming Request: POST /api/auth/login
+2026-04-16 20:52:15 [info]: ✅ User logged in successfully: akkariwassim11@gmail.com
+2026-04-16 20:52:15 [info]: Incoming Request: GET /api/animals
+2026-04-16 20:52:15 [info]: Incoming Request: GET /api/animals
+2026-04-16 20:52:15 [info]: Incoming Request: GET /api/geofences
+2026-04-16 20:52:15 [info]: Incoming Request: GET /api/geofences
+2026-04-16 20:52:15 [info]: Incoming Request: GET /api/animals
+2026-04-16 20:52:15 [info]: Incoming Request: GET /api/geofences
+2026-04-16 20:52:15 [info]: Socket connected: EafMe9d1BlUqw_qwAAAB (user 69e0f6ec4be9f34aaa8e2d6a)
+2026-04-16 20:52:16 [info]: Incoming Request: GET /api/animals
+2026-04-16 20:52:16 [info]: Incoming Request: GET /api/geofences
+2026-04-16 20:52:16 [info]: Incoming Request: GET /api/animals
+2026-04-16 20:52:16 [info]: Incoming Request: GET /api/geofences
+2026-04-16 20:52:16 [info]: Incoming Request: GET /api/animals
+2026-04-16 20:52:16 [info]: Incoming Request: GET /api/geofences
+2026-04-16 20:52:17 [info]: Incoming Request: GET /api/animals
+2026-04-16 20:52:18 [info]: Incoming Request: GET /api/geofences
+2026-04-16 20:52:44 [info]: Incoming Request: POST /api/animals
+2026-04-16 20:54:51 [info]: Socket disconnected: EafMe9d1BlUqw_qwAAAB — client namespace disconnect
+2026-04-16 20:54:55 [info]: Incoming Request: GET /api/auth/me
+2026-04-16 20:54:55 [info]: Incoming Request: GET /api/animals
+2026-04-16 20:54:55 [info]: Incoming Request: GET /api/animals
+2026-04-16 20:54:55 [info]: Incoming Request: GET /api/geofences
+2026-04-16 20:54:55 [info]: Incoming Request: GET /api/geofences
+2026-04-16 20:54:55 [info]: Socket connected: Yhjjv3jTIGxSDIG8AAAD (user 69e0f6ec4be9f34aaa8e2d6a)
+2026-04-16 20:54:55 [info]: Incoming Request: GET /api/animals
+2026-04-16 20:54:55 [info]: Incoming Request: GET /api/geofences
+2026-04-16 20:54:55 [info]: Incoming Request: GET /api/geofences
+2026-04-16 20:54:55 [info]: Incoming Request: GET /api/animals
+2026-04-16 20:54:55 [info]: Incoming Request: GET /api/animals
+2026-04-16 20:54:55 [info]: Incoming Request: GET /api/geofences
+2026-04-16 20:55:05 [info]: Incoming Request: GET /api/animals
+2026-04-16 20:55:05 [info]: Incoming Request: GET /api/geofences
+2026-04-16 21:00:10 [info]: Incoming Request: GET /api/animals
+2026-04-16 21:00:11 [info]: Incoming Request: GET /api/geofences
+2026-04-16 21:00:36 [info]: Incoming Request: POST /api/animals
+2026-04-16 21:11:40 [info]: MongoDB Connected: ac-lokdmj8-shard-00-00.7zypd8b.mongodb.net
+2026-04-16 21:11:40 [info]: 🚀 Server running on http://localhost:3000
+2026-04-16 21:11:40 [info]:    Environment: development
+2026-04-16 21:12:41 [info]: MongoDB Connected: ac-lokdmj8-shard-00-00.7zypd8b.mongodb.net
+2026-04-16 21:20:03 [info]: Incoming Request: POST /api/auth/login
+2026-04-16 21:20:03 [info]: ✅ User logged in successfully: akkariwassim11@gmail.com
+2026-04-16 21:20:03 [info]: Incoming Request: GET /api/animals
+2026-04-16 21:20:04 [info]: Incoming Request: GET /api/geofences
+2026-04-16 21:20:04 [info]: Socket connected: oUv_SqYkAAT166hCAAAB (user 69e0f6ec4be9f34aaa8e2d6a)
+2026-04-16 21:20:04 [info]: Incoming Request: GET /api/animals
+2026-04-16 21:20:04 [info]: Incoming Request: GET /api/geofences
+2026-04-16 21:20:04 [info]: Incoming Request: GET /api/animals
+2026-04-16 21:20:04 [info]: Incoming Request: GET /api/geofences
+2026-04-16 21:20:04 [info]: Incoming Request: GET /api/animals
+2026-04-16 21:20:04 [info]: Incoming Request: GET /api/geofences
+2026-04-16 21:20:04 [info]: Incoming Request: GET /api/animals
+2026-04-16 21:20:04 [info]: Incoming Request: GET /api/geofences
+2026-04-16 21:20:04 [info]: Incoming Request: GET /api/animals
+2026-04-16 21:20:04 [info]: Incoming Request: GET /api/geofences
+2026-04-16 21:20:07 [info]: Incoming Request: GET /api/animals
+2026-04-16 21:20:09 [info]: Incoming Request: GET /api/devices?status=free
+2026-04-16 21:20:09 [info]: Incoming Request: GET /api/geofences
+2026-04-16 21:20:32 [info]: Incoming Request: POST /api/animals
+2026-04-16 21:20:33 [info]: Incoming Request: GET /api/devices?status=free
+2026-04-16 21:20:35 [info]: Incoming Request: GET /api/animals/69e144915a7d9cefa910dff4
+2026-04-16 21:20:48 [info]: Incoming Request: GET /api/animals
+2026-04-16 21:20:48 [info]: Incoming Request: GET /api/geofences
+2026-04-16 21:23:39 [info]: MongoDB Connected: ac-lokdmj8-shard-00-00.7zypd8b.mongodb.net
+2026-04-16 21:23:39 [info]: 🚀 Server running on http://localhost:3000
+2026-04-16 21:23:39 [info]:    Environment: development
+2026-04-16 21:23:42 [info]: Socket connected: e_8SnU8UVDv1pagGAAAB (user 69e0f6ec4be9f34aaa8e2d6a)
+2026-04-16 21:24:17 [info]: MongoDB Connected: ac-lokdmj8-shard-00-00.7zypd8b.mongodb.net
+2026-04-16 21:24:50 [info]: MongoDB Connected: ac-lokdmj8-shard-00-00.7zypd8b.mongodb.net
+2026-04-16 21:24:50 [info]: 🚀 Server running on http://localhost:3000
+2026-04-16 21:24:50 [info]:    Environment: development
+2026-04-16 21:24:52 [info]: Socket connected: Ik6VehBNYIXpDUqKAAAB (user 69e0f6ec4be9f34aaa8e2d6a)
+2026-04-16 21:24:59 [info]: Socket disconnected: Ik6VehBNYIXpDUqKAAAB — client namespace disconnect
+2026-04-16 21:25:03 [info]: Incoming Request: GET /api/auth/me
+2026-04-16 21:25:03 [info]: Incoming Request: GET /api/animals
+2026-04-16 21:25:03 [info]: Incoming Request: GET /api/animals
+2026-04-16 21:25:03 [info]: Incoming Request: GET /api/geofences
+2026-04-16 21:25:03 [info]: Incoming Request: GET /api/geofences
+2026-04-16 21:25:03 [info]: Socket connected: cdzOJx7mcwKEw0T1AAAD (user 69e0f6ec4be9f34aaa8e2d6a)
+2026-04-16 21:25:03 [info]: Incoming Request: GET /api/animals
+2026-04-16 21:25:03 [info]: Incoming Request: GET /api/geofences
+2026-04-16 21:25:45 [info]: Incoming Request: GET /api/animals
+2026-04-16 21:25:45 [info]: Incoming Request: GET /api/geofences
+2026-04-16 21:25:45 [info]: Incoming Request: GET /api/animals
+2026-04-16 21:25:45 [info]: Incoming Request: GET /api/geofences
+2026-04-16 21:25:45 [info]: Incoming Request: GET /api/animals
+2026-04-16 21:25:45 [info]: Incoming Request: GET /api/geofences
+2026-04-16 21:26:26 [info]: MongoDB Connected: ac-lokdmj8-shard-00-00.7zypd8b.mongodb.net
+2026-04-16 21:26:45 [info]: MongoDB Connected: ac-lokdmj8-shard-00-00.7zypd8b.mongodb.net
+2026-04-16 21:27:06 [info]: MongoDB Connected: ac-lokdmj8-shard-00-00.7zypd8b.mongodb.net
+2026-04-16 21:27:06 [info]: 🚀 Server running on http://localhost:3000
+2026-04-16 21:27:06 [info]:    Environment: development
+2026-04-16 21:27:07 [info]: Socket connected: IjMAxNSpgKoWj7yiAAAB (user 69e0f6ec4be9f34aaa8e2d6a)
+2026-04-16 21:27:31 [info]: Incoming Request: GET /api/geofences
+2026-04-16 21:27:32 [info]: Incoming Request: GET /api/alerts?status=active
+2026-04-16 21:27:33 [info]: Incoming Request: GET /api/animals
+2026-04-16 21:27:34 [info]: Incoming Request: GET /api/animals
+2026-04-16 21:27:34 [info]: Incoming Request: GET /api/geofences
+2026-04-16 21:27:41 [info]: MongoDB Connected: ac-lokdmj8-shard-00-00.7zypd8b.mongodb.net
+2026-04-16 21:28:12 [info]: Socket disconnected: IjMAxNSpgKoWj7yiAAAB — client namespace disconnect
+2026-04-16 21:28:16 [info]: Incoming Request: GET /api/auth/me
+2026-04-16 21:28:17 [info]: Incoming Request: GET /api/animals
+2026-04-16 21:28:17 [info]: Incoming Request: GET /api/geofences
+2026-04-16 21:28:17 [info]: Incoming Request: GET /api/animals
+2026-04-16 21:28:17 [info]: Incoming Request: GET /api/geofences
+2026-04-16 21:28:17 [info]: Socket connected: w32PrqNWpRWFWYTFAAAD (user 69e0f6ec4be9f34aaa8e2d6a)
+2026-04-16 21:28:17 [info]: Incoming Request: GET /api/animals
+2026-04-16 21:28:17 [info]: Incoming Request: GET /api/geofences
+2026-04-16 21:28:22 [info]: Incoming Request: GET /api/geofences
+2026-04-16 21:28:24 [info]: Incoming Request: GET /api/alerts?status=active
+2026-04-16 21:28:25 [info]: Incoming Request: GET /api/animals
+2026-04-16 21:28:26 [info]: Incoming Request: GET /api/animals/69e10b008a500d1d8def0533
+2026-04-16 21:28:29 [info]: Incoming Request: GET /api/animals
+2026-04-16 21:28:29 [info]: Incoming Request: GET /api/geofences
+2026-04-16 21:28:58 [info]: Incoming Request: GET /api/animals
+2026-04-16 21:28:58 [info]: Incoming Request: GET /api/geofences
+2026-04-16 21:30:42 [info]: MongoDB Connected: ac-lokdmj8-shard-00-00.7zypd8b.mongodb.net
+2026-04-16 21:30:42 [info]: 🚀 Server running on http://localhost:3000
+2026-04-16 21:30:42 [info]:    Environment: development
+2026-04-16 21:30:44 [info]: Socket connected: Kh7JOMYZlgN2jhRgAAAB (user 69e0f6ec4be9f34aaa8e2d6a)
+2026-04-16 21:30:57 [info]: Socket disconnected: Kh7JOMYZlgN2jhRgAAAB — client namespace disconnect
+2026-04-16 21:31:02 [info]: Incoming Request: GET /api/auth/me
+2026-04-16 21:31:02 [info]: Incoming Request: GET /api/animals
+2026-04-16 21:31:02 [info]: Incoming Request: GET /api/animals
+2026-04-16 21:31:02 [info]: Incoming Request: GET /api/geofences
+2026-04-16 21:31:02 [info]: Incoming Request: GET /api/geofences
+2026-04-16 21:31:02 [info]: Socket connected: CRkbQAJcwFryzZkpAAAD (user 69e0f6ec4be9f34aaa8e2d6a)
+2026-04-16 21:31:02 [info]: Incoming Request: GET /api/animals
+2026-04-16 21:31:02 [info]: Incoming Request: GET /api/geofences
+2026-04-16 21:31:12 [info]: Incoming Request: GET /api/animals
+2026-04-16 21:31:15 [info]: Incoming Request: GET /api/animals/69e144915a7d9cefa910dff4
+2026-04-16 21:31:18 [info]: Incoming Request: GET /api/animals/69e1283b971dca5232dddfa1
+2026-04-16 21:31:21 [info]: Incoming Request: GET /api/animals/69e144915a7d9cefa910dff4
+2026-04-16 21:31:24 [info]: Incoming Request: DELETE /api/animals/69e144915a7d9cefa910dff4
+2026-04-16 21:31:25 [info]: Incoming Request: GET /api/animals/69e10b008a500d1d8def0533
+2026-04-16 21:31:29 [info]: Incoming Request: GET /api/geofences
+2026-04-16 21:31:31 [info]: Incoming Request: GET /api/animals
+2026-04-16 21:31:31 [info]: Incoming Request: GET /api/geofences
+2026-04-16 21:32:19 [info]: Incoming Request: GET /api/animals
+2026-04-16 21:32:19 [info]: Incoming Request: GET /api/geofences
+2026-04-16 21:32:19 [info]: Incoming Request: GET /api/animals
+2026-04-16 21:32:19 [info]: Incoming Request: GET /api/geofences
+2026-04-16 21:32:22 [info]: Incoming Request: GET /api/animals
+2026-04-16 21:32:22 [info]: Incoming Request: GET /api/geofences
+2026-04-16 21:32:22 [info]: Incoming Request: GET /api/animals
+2026-04-16 21:32:22 [info]: Incoming Request: GET /api/geofences
+2026-04-16 21:34:12 [info]: MongoDB Connected: ac-lokdmj8-shard-00-00.7zypd8b.mongodb.net
+2026-04-16 21:34:12 [info]: 🚀 Server running on http://localhost:3000
+2026-04-16 21:34:12 [info]:    Environment: development
+2026-04-16 21:34:13 [info]: Socket connected: U04pug9jQvHJWT85AAAB (user 69e0f6ec4be9f34aaa8e2d6a)
+2026-04-16 21:34:50 [info]: Socket disconnected: U04pug9jQvHJWT85AAAB — client namespace disconnect
+2026-04-16 21:34:57 [info]: MongoDB Connected: ac-lokdmj8-shard-00-00.7zypd8b.mongodb.net
+2026-04-16 21:35:03 [info]: MongoDB Connected: ac-lokdmj8-shard-00-00.7zypd8b.mongodb.net
+2026-04-16 21:36:14 [info]: MongoDB Connected: ac-lokdmj8-shard-00-00.7zypd8b.mongodb.net
+2026-04-16 21:36:14 [info]: 🚀 Server running on http://localhost:3000
+2026-04-16 21:36:14 [info]:    Environment: development
+2026-04-16 21:37:53 [info]: Incoming Request: GET /api/auth/me
+2026-04-16 21:37:53 [info]: Incoming Request: POST /api/auth/refresh
+2026-04-16 21:37:53 [info]: Incoming Request: GET /api/auth/me
+2026-04-16 21:37:54 [info]: Incoming Request: GET /api/animals
+2026-04-16 21:37:54 [info]: Incoming Request: GET /api/animals
+2026-04-16 21:37:54 [info]: Incoming Request: GET /api/geofences
+2026-04-16 21:37:54 [info]: Incoming Request: GET /api/geofences
+2026-04-16 21:37:54 [info]: Socket connected: z9DwmqkNfqzX4R8GAAAB (user 69e0f6ec4be9f34aaa8e2d6a)
+2026-04-16 21:37:54 [info]: Incoming Request: GET /api/animals
+2026-04-16 21:37:54 [info]: Incoming Request: GET /api/geofences
+2026-04-16 21:38:04 [info]: Incoming Request: GET /api/alerts?status=active
+2026-04-16 21:38:06 [info]: Incoming Request: GET /api/geofences
+2026-04-16 21:38:08 [info]: Incoming Request: GET /api/animals
+2026-04-16 21:38:08 [info]: Incoming Request: GET /api/geofences
+2026-04-16 21:38:19 [info]: Incoming Request: GET /api/animals
+2026-04-16 21:38:23 [info]: Incoming Request: GET /api/animals/69e10b008a500d1d8def0533
+2026-04-16 21:38:28 [info]: Incoming Request: GET /api/animals/69e1283b971dca5232dddfa1
+2026-04-16 21:38:35 [info]: Incoming Request: GET /api/animals
+2026-04-16 21:38:35 [info]: Incoming Request: GET /api/geofences
+2026-04-16 21:38:46 [info]: Incoming Request: GET /api/animals
+2026-04-16 21:38:46 [info]: Incoming Request: GET /api/geofences
+2026-04-16 21:41:51 [info]: Incoming Request: GET /api/animals
+2026-04-16 21:41:51 [info]: Incoming Request: GET /api/geofences
+2026-04-16 21:41:51 [info]: Incoming Request: GET /api/animals
+2026-04-16 21:41:51 [info]: Incoming Request: GET /api/geofences
+2026-04-16 21:42:34 [info]: Incoming Request: GET /api/animals
+2026-04-16 21:42:34 [info]: Incoming Request: GET /api/geofences
+2026-04-16 21:42:34 [info]: Incoming Request: GET /api/animals
+2026-04-16 21:42:34 [info]: Incoming Request: GET /api/geofences
+2026-04-16 21:43:44 [info]: Socket disconnected: z9DwmqkNfqzX4R8GAAAB — client namespace disconnect
+2026-04-16 21:43:48 [info]: Incoming Request: GET /api/auth/me
+2026-04-16 21:43:48 [info]: Incoming Request: GET /api/animals
+2026-04-16 21:43:49 [info]: Incoming Request: GET /api/geofences
+2026-04-16 21:43:49 [info]: Incoming Request: GET /api/animals
+2026-04-16 21:43:49 [info]: Incoming Request: GET /api/geofences
+2026-04-16 21:43:49 [info]: Socket connected: M6xUZz9O0LhMv-0ZAAAD (user 69e0f6ec4be9f34aaa8e2d6a)
+2026-04-16 21:43:49 [info]: Incoming Request: GET /api/animals
+2026-04-16 21:43:49 [info]: Incoming Request: GET /api/geofences
+2026-04-16 21:44:06 [info]: Incoming Request: GET /api/alerts?status=active
+2026-04-16 21:44:09 [info]: Incoming Request: GET /api/geofences
+2026-04-16 21:44:10 [info]: Incoming Request: GET /api/animals
+2026-04-16 21:44:10 [info]: Incoming Request: GET /api/geofences
+2026-04-16 21:44:17 [info]: Incoming Request: GET /api/animals
+2026-04-16 21:44:17 [info]: Incoming Request: GET /api/geofences
+2026-04-16 21:44:22 [info]: Incoming Request: GET /api/animals
+2026-04-16 21:44:31 [info]: Incoming Request: GET /api/animals/69e10b008a500d1d8def0533
+2026-04-16 21:44:34 [info]: Incoming Request: GET /api/animals
+2026-04-16 21:44:34 [info]: Incoming Request: GET /api/geofences
+2026-04-16 21:46:39 [info]: Socket disconnected: M6xUZz9O0LhMv-0ZAAAD — ping timeout
+2026-04-16 21:47:25 [info]: Incoming Request: GET /api/auth/me
+2026-04-16 21:47:26 [info]: Incoming Request: GET /api/animals
+2026-04-16 21:47:26 [info]: Incoming Request: GET /api/geofences
+2026-04-16 21:47:26 [info]: Incoming Request: GET /api/animals
+2026-04-16 21:47:26 [info]: Incoming Request: GET /api/geofences
+2026-04-16 21:47:26 [info]: Socket connected: wHXadPQQMB7Q042SAAAF (user 69e0f6ec4be9f34aaa8e2d6a)
+2026-04-16 21:47:26 [info]: Incoming Request: GET /api/animals
+2026-04-16 21:47:26 [info]: Incoming Request: GET /api/geofences
+2026-04-16 21:48:18 [info]: Incoming Request: GET /api/geofences
+2026-04-16 21:48:20 [info]: Incoming Request: GET /api/alerts?status=active
+2026-04-16 21:48:20 [info]: Incoming Request: GET /api/animals
+2026-04-16 21:48:22 [info]: Incoming Request: GET /api/animals/69e10b008a500d1d8def0533
+2026-04-16 21:48:24 [info]: Incoming Request: GET /api/animals/69e1283b971dca5232dddfa1
+2026-04-16 21:51:49 [info]: Socket disconnected: wHXadPQQMB7Q042SAAAF — client namespace disconnect
+2026-04-16 21:51:49 [info]: Incoming Request: GET /api/auth/me
+2026-04-16 21:51:49 [info]: Incoming Request: GET /api/animals
+2026-04-16 21:51:49 [info]: Incoming Request: GET /api/geofences
+2026-04-16 21:51:49 [info]: Incoming Request: GET /api/animals
+2026-04-16 21:51:49 [info]: Incoming Request: GET /api/geofences
+2026-04-16 21:51:50 [info]: Socket connected: vlOim669A-P5ujLdAAAH (user 69e0f6ec4be9f34aaa8e2d6a)
+2026-04-16 21:51:50 [info]: Incoming Request: GET /api/animals
+2026-04-16 21:51:50 [info]: Incoming Request: GET /api/geofences
+2026-04-16 21:53:18 [info]: Socket disconnected: vlOim669A-P5ujLdAAAH — client namespace disconnect
+2026-04-16 21:53:22 [info]: Incoming Request: GET /api/auth/me
+2026-04-16 21:53:22 [info]: Incoming Request: POST /api/auth/refresh
+2026-04-16 21:53:22 [info]: Incoming Request: GET /api/auth/me
+2026-04-16 21:53:23 [info]: Incoming Request: GET /api/animals
+2026-04-16 21:53:23 [info]: Incoming Request: GET /api/animals
+2026-04-16 21:53:23 [info]: Socket connected: VsvudCgkJH1b1VKXAAAJ (user 69e0f6ec4be9f34aaa8e2d6a)
+2026-04-16 21:53:23 [info]: Incoming Request: GET /api/geofences
+2026-04-16 21:53:23 [info]: Incoming Request: GET /api/geofences
+2026-04-16 21:53:23 [info]: Incoming Request: GET /api/animals
+2026-04-16 21:53:23 [info]: Incoming Request: GET /api/geofences
+2026-04-16 21:53:27 [info]: Incoming Request: GET /api/geofences
+2026-04-16 21:53:28 [info]: Incoming Request: GET /api/alerts?status=active
+2026-04-16 21:53:29 [info]: Incoming Request: GET /api/alerts?status=active
+2026-04-16 21:53:31 [info]: Incoming Request: GET /api/alerts?status=resolved
+2026-04-16 21:53:32 [info]: Incoming Request: GET /api/alerts?
+2026-04-16 21:53:33 [info]: Incoming Request: GET /api/alerts?severity=critical
+2026-04-16 21:53:34 [info]: Incoming Request: GET /api/alerts?severity=critical&status=active
+2026-04-16 21:53:36 [info]: Incoming Request: GET /api/animals
+2026-04-16 21:53:36 [info]: Incoming Request: GET /api/geofences
+2026-04-16 21:53:41 [info]: Incoming Request: GET /api/animals
+2026-04-16 21:53:41 [info]: Incoming Request: GET /api/geofences
+2026-04-16 21:53:49 [info]: Incoming Request: GET /api/geofences
+2026-04-16 21:53:49 [info]: Incoming Request: GET /api/devices?status=free
+2026-04-16 21:53:49 [info]: Incoming Request: GET /api/animals/69e10b008a500d1d8def0533
+2026-04-16 21:53:52 [info]: Incoming Request: POST /api/animals/69e10b008a500d1d8def0533/action
+2026-04-16 21:53:53 [info]: Incoming Request: POST /api/animals/69e10b008a500d1d8def0533/action
+2026-04-16 21:53:54 [info]: Incoming Request: POST /api/animals/69e10b008a500d1d8def0533/action
+2026-04-16 21:53:56 [info]: Incoming Request: GET /api/animals
+2026-04-16 21:53:56 [info]: Incoming Request: GET /api/geofences
+2026-04-16 21:54:00 [info]: Incoming Request: GET /api/animals
+2026-04-16 21:54:00 [info]: Incoming Request: GET /api/geofences
+2026-04-16 21:54:10 [info]: Incoming Request: GET /api/animals
+2026-04-16 21:54:10 [info]: Incoming Request: GET /api/geofences
+2026-04-16 21:54:19 [info]: Incoming Request: GET /api/animals
+2026-04-16 21:54:19 [info]: Incoming Request: GET /api/geofences
+2026-04-16 21:54:35 [info]: Incoming Request: GET /api/alerts?severity=critical&status=active
+2026-04-16 21:54:36 [info]: Incoming Request: GET /api/alerts?severity=critical&status=active
+2026-04-16 21:54:36 [info]: Incoming Request: GET /api/alerts?severity=critical&status=active
+2026-04-16 21:54:36 [info]: Incoming Request: GET /api/alerts?severity=critical&status=active
+2026-04-16 21:57:41 [info]: Socket disconnected: VsvudCgkJH1b1VKXAAAJ — client namespace disconnect
+2026-04-16 21:57:41 [info]: Incoming Request: GET /api/auth/me
+2026-04-16 21:57:41 [info]: Incoming Request: GET /api/animals
+2026-04-16 21:57:41 [info]: Socket connected: ZAU08xF0zGB96w47AAAL (user 69e0f6ec4be9f34aaa8e2d6a)
+2026-04-16 21:57:41 [info]: Incoming Request: GET /api/geofences
+2026-04-16 21:57:41 [info]: Incoming Request: GET /api/animals
+2026-04-16 21:57:41 [info]: Incoming Request: GET /api/geofences
+2026-04-16 21:57:41 [info]: Incoming Request: GET /api/animals
+2026-04-16 21:57:41 [info]: Incoming Request: GET /api/geofences
+2026-04-16 21:57:52 [info]: Incoming Request: GET /api/geofences
+2026-04-16 21:57:52 [info]: Incoming Request: GET /api/animals
+2026-04-16 21:57:52 [info]: Incoming Request: GET /api/animals
+2026-04-16 21:57:52 [info]: Incoming Request: GET /api/geofences
+2026-04-16 21:59:30 [info]: Socket disconnected: ZAU08xF0zGB96w47AAAL — client namespace disconnect
+2026-04-16 22:00:29 [info]: Incoming Request: GET /api/auth/me
+2026-04-16 22:00:29 [info]: Incoming Request: GET /api/animals
+2026-04-16 22:00:29 [info]: Incoming Request: GET /api/animals
+2026-04-16 22:00:29 [info]: Socket connected: xanYwItwMG5KDv9TAAAN (user 69e0f6ec4be9f34aaa8e2d6a)
+2026-04-16 22:00:29 [info]: Incoming Request: GET /api/geofences
+2026-04-16 22:00:29 [info]: Incoming Request: GET /api/geofences
+2026-04-16 22:00:30 [info]: Incoming Request: GET /api/animals
+2026-04-16 22:00:30 [info]: Incoming Request: GET /api/geofences
+2026-04-16 22:00:34 [info]: Incoming Request: GET /api/geofences
+2026-04-16 22:00:36 [info]: Incoming Request: GET /api/alerts?status=active
+2026-04-16 22:00:38 [info]: Incoming Request: GET /api/animals
+2026-04-16 22:00:41 [info]: Incoming Request: GET /api/animals/69e10b008a500d1d8def0533
+2026-04-16 22:00:45 [info]: Incoming Request: GET /api/animals/69e1283b971dca5232dddfa1
+2026-04-16 22:00:51 [info]: Incoming Request: GET /api/animals
+2026-04-16 22:00:51 [info]: Incoming Request: GET /api/geofences
+2026-04-16 22:01:06 [info]: Incoming Request: GET /api/animals
+2026-04-16 22:01:06 [info]: Incoming Request: GET /api/geofences
+2026-04-16 22:01:07 [info]: Incoming Request: GET /api/animals
+2026-04-16 22:01:07 [info]: Incoming Request: GET /api/geofences
+2026-04-16 22:01:19 [info]: Incoming Request: GET /api/animals
+2026-04-16 22:01:19 [info]: Incoming Request: GET /api/geofences
+2026-04-16 22:01:27 [info]: Incoming Request: GET /api/animals
+2026-04-16 22:01:27 [info]: Incoming Request: GET /api/geofences
+2026-04-16 22:01:34 [info]: Incoming Request: GET /api/animals
+2026-04-16 22:01:38 [info]: Incoming Request: GET /api/animals
+2026-04-16 22:01:38 [info]: Incoming Request: GET /api/geofences
+2026-04-16 22:04:03 [info]: Socket disconnected: xanYwItwMG5KDv9TAAAN — client namespace disconnect
+2026-04-16 22:04:03 [info]: Incoming Request: GET /api/auth/me
+2026-04-16 22:04:03 [info]: Incoming Request: GET /api/animals
+2026-04-16 22:04:03 [info]: Incoming Request: GET /api/geofences
+2026-04-16 22:04:03 [info]: Incoming Request: GET /api/animals
+2026-04-16 22:04:03 [info]: Incoming Request: GET /api/geofences
+2026-04-16 22:04:03 [info]: Incoming Request: GET /api/animals
+2026-04-16 22:04:04 [info]: Socket connected: Y5qjpijQdFC5meEiAAAP (user 69e0f6ec4be9f34aaa8e2d6a)
+2026-04-16 22:04:04 [info]: Incoming Request: GET /api/geofences
+2026-04-16 22:05:53 [info]: Socket disconnected: Y5qjpijQdFC5meEiAAAP — client namespace disconnect
+2026-04-16 22:07:50 [info]: Incoming Request: GET /api/auth/me
+2026-04-16 22:08:40 [info]: Incoming Request: GET /api/auth/me
+2026-04-16 22:08:40 [info]: Incoming Request: POST /api/auth/refresh
+2026-04-16 22:08:40 [info]: Incoming Request: GET /api/auth/me
+2026-04-16 22:08:40 [info]: Incoming Request: GET /api/animals
+2026-04-16 22:08:40 [info]: Incoming Request: GET /api/geofences
+2026-04-16 22:08:40 [info]: Socket connected: e4k3Me8iTc3OwvKvAAAR (user 69e0f6ec4be9f34aaa8e2d6a)
+2026-04-16 22:09:05 [info]: Incoming Request: GET /api/geofences
+2026-04-16 22:09:06 [info]: Incoming Request: GET /api/alerts?status=active
+2026-04-16 22:09:07 [info]: Incoming Request: GET /api/animals
+2026-04-16 22:09:12 [info]: Incoming Request: GET /api/geofences
+2026-04-16 22:09:12 [info]: Incoming Request: GET /api/devices?status=free
+2026-04-16 22:09:39 [info]: Incoming Request: GET /api/geofences
+2026-04-16 22:09:39 [info]: Incoming Request: GET /api/animals
+2026-04-16 22:10:01 [info]: Socket disconnected: e4k3Me8iTc3OwvKvAAAR — client namespace disconnect
+2026-04-16 22:10:05 [info]: Incoming Request: GET /api/auth/me
+2026-04-16 22:10:06 [info]: Incoming Request: GET /api/animals
+2026-04-16 22:10:06 [info]: Incoming Request: GET /api/geofences
+2026-04-16 22:10:06 [info]: Socket connected: tESzoBEICCV4zjC8AAAT (user 69e0f6ec4be9f34aaa8e2d6a)
+2026-04-16 22:12:48 [info]: Incoming Request: GET /api/animals
+2026-04-16 22:12:48 [info]: Incoming Request: GET /api/geofences
+2026-04-16 22:13:04 [info]: Incoming Request: GET /api/animals
+2026-04-16 22:13:04 [info]: Incoming Request: GET /api/geofences
+2026-04-16 22:13:24 [info]: Socket disconnected: tESzoBEICCV4zjC8AAAT — client namespace disconnect
+2026-04-16 22:15:21 [info]: Incoming Request: GET /api/auth/me
+2026-04-16 22:15:22 [info]: Incoming Request: GET /api/animals
+2026-04-16 22:15:22 [info]: Incoming Request: GET /api/geofences
+2026-04-16 22:15:22 [info]: Socket connected: jYS_t_mQb-iE8dbvAAAV (user 69e0f6ec4be9f34aaa8e2d6a)
+2026-04-16 22:23:43 [info]: Socket disconnected: jYS_t_mQb-iE8dbvAAAV — client namespace disconnect
