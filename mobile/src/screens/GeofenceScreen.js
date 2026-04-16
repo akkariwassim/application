@@ -5,6 +5,7 @@ import {
 } from 'react-native';
 import MapView, { Polygon, Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import { Ionicons } from '@expo/vector-icons';
+import * as Location from 'expo-location';
 import useGeofenceStore from '../store/geofenceStore';
 import useAnimalStore   from '../store/animalStore';
 import { calculateCentroid, calculatePolygonArea } from '../utils/geoUtils';
@@ -32,6 +33,48 @@ export default function GeofenceScreen({ route }) {
   const [priority, setPriority] = useState(1);
   const [fillColor, setFillColor] = useState('#4F46E5');
   const [area, setArea] = useState(0);
+
+  // ── Center on User ──────────────────────────────────────────
+  const centerOnUser = useCallback(async () => {
+    try {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') return;
+      
+      // ⚡ Try last known location first (Instant)
+      const lastKnown = await Location.getLastKnownPositionAsync({});
+      if (lastKnown && mapRef) {
+        mapRef.animateToRegion({
+          latitude: lastKnown.coords.latitude,
+          longitude: lastKnown.coords.longitude,
+          latitudeDelta: 0.005,
+          longitudeDelta: 0.005,
+        }, 500);
+      }
+      
+      // 🛰️ Refine with current location (More precise, slower)
+      const location = await Location.getCurrentPositionAsync({ 
+        accuracy: Location.Accuracy.Balanced 
+      });
+      
+      if (mapRef) {
+        mapRef.animateToRegion({
+          latitude: location.coords.latitude,
+          longitude: location.coords.longitude,
+          latitudeDelta: 0.005,
+          longitudeDelta: 0.005,
+        }, 1000);
+      }
+    } catch (err) {
+      console.warn('Could not get current location', err);
+    }
+  }, [mapRef]);
+
+  // Handle centering when map is ready
+  useEffect(() => {
+    if (mapRef) {
+      centerOnUser();
+    }
+  }, [mapRef, centerOnUser]);
 
   useEffect(() => {
     fetchGeofences();
@@ -182,12 +225,6 @@ export default function GeofenceScreen({ route }) {
           provider={PROVIDER_GOOGLE}
           mapType="hybrid"
           onPress={handleMapPress}
-          initialRegion={{
-            latitude: 35.038,
-            longitude: 9.484,
-            latitudeDelta: 0.1,
-            longitudeDelta: 0.1,
-          }}
         >
           {/* Existing Geofences */}
           {geofences.map((gf) => {
@@ -254,9 +291,14 @@ export default function GeofenceScreen({ route }) {
             </TouchableOpacity>
           </View>
         ) : (
-          <TouchableOpacity style={styles.fab} onPress={() => setIsDrawing(true)}>
-            <Ionicons name="add" size={30} color="#fff" />
-          </TouchableOpacity>
+          <>
+            <TouchableOpacity style={[styles.fab, styles.locationFab]} onPress={centerOnUser}>
+              <Ionicons name="location" size={24} color="#fff" />
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.fab} onPress={() => setIsDrawing(true)}>
+              <Ionicons name="add" size={30} color="#fff" />
+            </TouchableOpacity>
+          </>
         )}
 
         {/* Save Modal */}
@@ -355,6 +397,7 @@ const styles = StyleSheet.create({
   listContainer:  { flex: 1, padding: 16 },
   listHeader:     { color: COLORS.text, fontSize: 18, fontWeight: '700', marginBottom: 12 },
   fab:            { position: 'absolute', bottom: 20, right: 20, width: 56, height: 56, borderRadius: 28, backgroundColor: COLORS.primary, alignItems: 'center', justifyContent: 'center', elevation: 5, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.3, shadowRadius: 3 },
+  locationFab:    { bottom: 86, backgroundColor: COLORS.surface, borderWidth: 1, borderColor: COLORS.border },
   drawControls:   { position: 'absolute', bottom: 20, left: 20, right: 20, flexDirection: 'row', gap: 12 },
   controlBtn:     { flex: 1, height: 48, borderRadius: 12, backgroundColor: COLORS.surface, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, borderWidth: 1, borderColor: COLORS.border },
   saveBtn:        { backgroundColor: COLORS.primary, borderColor: COLORS.primary },

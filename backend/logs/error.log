@@ -102,3 +102,14 @@
     at model.<anonymous> (C:\Users\Wassim\Desktop\mon-application\backend\src\models\Zone.js:101:3)
     at Kareem.execPre (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\kareem\index.js:68:39)
     at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+2026-04-16 15:25:23 [error]: CRITICAL: Error connecting to MongoDB!
+2026-04-16 16:27:37 [error]: MongoServerError: E11000 duplicate key error collection: smart_fence.animals index: device_id_1 dup key: { device_id: "123456" }
+    at InsertOneOperation.handleOk (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\mongodb\lib\operations\insert.js:51:19)
+    at tryOperation (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\mongodb\lib\operations\execute_operation.js:217:34)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async executeOperation (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\mongodb\lib\operations\execute_operation.js:80:16)
+    at async Collection.insertOne (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\mongodb\lib\collection.js:154:16)
+    at async model.$__save (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\mongoose\lib\model.js:428:16)
+    at async model.save (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\mongoose\lib\model.js:667:5)
+    at async model.create (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\mongoose\lib\model.js:2754:5)
+    at async createAnimal (C:\Users\Wassim\Desktop\mon-application\backend\src\controllers\animalsController.js:39:20)

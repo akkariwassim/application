@@ -30,7 +30,8 @@ const server = http.createServer(app);
 // ── Security ───────────────────────────────────────────────────
 app.use(helmet());
 app.use(cors({
-  origin: process.env.CLIENT_URL || '*',
+  origin: process.env.CLIENT_URL === '*' ? true : (process.env.CLIENT_URL || '*'),
+  methods: ['GET', 'POST'],
   credentials: true
 }));
 

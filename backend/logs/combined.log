@@ -382,3 +382,100 @@
 2026-04-08 02:20:56 [info]: Socket disconnected: 72IQQhojWlIIxVYyAAAB — client namespace disconnect
 2026-04-08 02:20:59 [info]: Socket connected: acadVd0cmKfyvpBBAAAD (user 69d53a98f629b2d56de2c135)
 2026-04-08 02:21:09 [info]: Profile updated for user: akkariwassim11@gmail.com
+2026-04-16 15:25:23 [error]: CRITICAL: Error connecting to MongoDB!
+2026-04-16 15:30:45 [info]: MongoDB Connected: ac-lokdmj8-shard-00-00.7zypd8b.mongodb.net
+2026-04-16 15:35:30 [info]: MongoDB Connected: ac-lokdmj8-shard-00-00.7zypd8b.mongodb.net
+2026-04-16 15:35:30 [info]: 🚀 Server running on http://localhost:3000
+2026-04-16 15:35:30 [info]:    Environment: development
+2026-04-16 15:36:05 [warn]: MongoDB disconnected
+2026-04-16 15:36:13 [info]: MongoDB Connected: ac-lokdmj8-shard-00-00.7zypd8b.mongodb.net
+2026-04-16 15:36:13 [info]: 🚀 Server running on http://localhost:3000
+2026-04-16 15:36:13 [info]:    Environment: development
+2026-04-16 15:36:48 [warn]: Login failed: User not found - akkariwassim11@gmail.com
+2026-04-16 15:37:18 [warn]: Registration failed: Email already taken - wassimakkari6@gmail.com
+2026-04-16 15:37:33 [info]: ✅ New user registered and logged in: akkariwassim11@gmail.com
+2026-04-16 15:37:33 [info]: Socket connected: g5FrpfrQVr4QTlKXAAAB (user 69e0f42c0eeac5ebd2f47fb1)
+2026-04-16 15:37:46 [info]: Socket disconnected: g5FrpfrQVr4QTlKXAAAB — transport close
+2026-04-16 15:38:54 [info]: MongoDB Connected: ac-lokdmj8-shard-00-00.7zypd8b.mongodb.net
+2026-04-16 15:38:54 [info]: 🚀 Server running on http://localhost:3000
+2026-04-16 15:38:54 [info]:    Environment: development
+2026-04-16 15:39:31 [info]: Socket connected: fek6QqimhPcvZRH_AAAB (user 69e0f42c0eeac5ebd2f47fb1)
+2026-04-16 15:39:36 [info]: Socket disconnected: fek6QqimhPcvZRH_AAAB — client namespace disconnect
+2026-04-16 15:39:42 [info]: Socket connected: fjXm-K-3XQ2oyiNaAAAD (user 69e0f42c0eeac5ebd2f47fb1)
+2026-04-16 15:40:39 [info]: MongoDB Connected: ac-lokdmj8-shard-00-00.7zypd8b.mongodb.net
+2026-04-16 15:40:39 [info]: 🚀 Server running on http://localhost:3000
+2026-04-16 15:40:39 [info]:    Environment: development
+2026-04-16 15:40:39 [info]: Socket connected: YBoLEFvH2dSXQlMZAAAB (user 69e0f42c0eeac5ebd2f47fb1)
+2026-04-16 15:40:57 [info]: Socket disconnected: YBoLEFvH2dSXQlMZAAAB — transport close
+2026-04-16 15:41:50 [info]: ✅ New user registered and logged in: iheb6410@gmail.com
+2026-04-16 15:41:50 [info]: Socket connected: Q9kcDHBhfOougALZAAAD (user 69e0f52d0f26e3ff8fed380f)
+2026-04-16 15:42:10 [info]: ✅ New user registered and logged in: akkariwassim11@gmail.com
+2026-04-16 15:42:11 [info]: Socket connected: Qq3EaA9GKpMONUw3AAAF (user 69e0f5420f26e3ff8fed3811)
+2026-04-16 15:44:50 [info]: MongoDB Connected: ac-lokdmj8-shard-00-00.7zypd8b.mongodb.net
+2026-04-16 15:44:50 [info]: 🚀 Server running on http://localhost:3000
+2026-04-16 15:44:50 [info]:    Environment: development
+2026-04-16 15:44:50 [info]: Socket connected: 3NXZMHJzSHMQX8oAAAAB (user 69e0f5420f26e3ff8fed3811)
+2026-04-16 15:44:50 [info]: Socket connected: cekb5YgkNPTEbtp1AAAD (user 69e0f52d0f26e3ff8fed380f)
+2026-04-16 15:46:38 [info]: MongoDB Connected: ac-lokdmj8-shard-00-00.7zypd8b.mongodb.net
+2026-04-16 15:46:38 [info]: 🚀 Server running on http://localhost:3000
+2026-04-16 15:46:38 [info]:    Environment: development
+2026-04-16 15:46:39 [info]: Socket connected: tDdWVQLYH7W4F538AAAB (user 69e0f5420f26e3ff8fed3811)
+2026-04-16 15:46:40 [info]: Socket connected: OwBxOD71WCCXcYHTAAAD (user 69e0f52d0f26e3ff8fed380f)
+2026-04-16 15:47:56 [info]: Socket disconnected: tDdWVQLYH7W4F538AAAB — client namespace disconnect
+2026-04-16 15:47:56 [info]: Socket disconnected: OwBxOD71WCCXcYHTAAAD — client namespace disconnect
+2026-04-16 15:48:20 [info]: ✅ New user registered and logged in: iheb6410@gmail.com
+2026-04-16 15:48:20 [info]: Socket connected: -OeqF7_Mnm3ChXeZAAAF (user 69e0f6b34be9f34aaa8e2d68)
+2026-04-16 15:49:17 [info]: ✅ New user registered and logged in: akkariwassim11@gmail.com
+2026-04-16 15:49:17 [info]: Socket connected: v_jG8rTRZeiGxsa_AAAH (user 69e0f6ec4be9f34aaa8e2d6a)
+2026-04-16 15:49:54 [info]: Socket disconnected: -OeqF7_Mnm3ChXeZAAAF — client namespace disconnect
+2026-04-16 15:49:54 [info]: Socket disconnected: v_jG8rTRZeiGxsa_AAAH — client namespace disconnect
+2026-04-16 15:49:54 [info]: Socket connected: _uRg2Uoy-9Sea3BLAAAJ (user 69e0f6ec4be9f34aaa8e2d6a)
+2026-04-16 15:49:54 [info]: Socket connected: Rwhiwb_8ZbjdCsm_AAAL (user 69e0f6b34be9f34aaa8e2d68)
+2026-04-16 15:55:44 [info]: Socket disconnected: _uRg2Uoy-9Sea3BLAAAJ — client namespace disconnect
+2026-04-16 15:55:44 [info]: Socket disconnected: Rwhiwb_8ZbjdCsm_AAAL — client namespace disconnect
+2026-04-16 15:55:51 [info]: Socket connected: 77ssggzjPBneAbBJAAAN (user 69e0f6b34be9f34aaa8e2d68)
+2026-04-16 15:55:51 [info]: Socket connected: Y6D0spwAWZI-PpQOAAAP (user 69e0f6ec4be9f34aaa8e2d6a)
+2026-04-16 15:56:24 [info]: Socket disconnected: Y6D0spwAWZI-PpQOAAAP — transport close
+2026-04-16 16:02:05 [info]: Socket disconnected: 77ssggzjPBneAbBJAAAN — transport close
+2026-04-16 16:02:31 [info]: Socket connected: kQakyyjhlq893WLSAAAR (user 69e0f6b34be9f34aaa8e2d68)
+2026-04-16 16:06:54 [info]: Socket disconnected: kQakyyjhlq893WLSAAAR — client namespace disconnect
+2026-04-16 16:07:01 [info]: Socket connected: gk7rI1rFkWp_gVYEAAAT (user 69e0f6b34be9f34aaa8e2d68)
+2026-04-16 16:10:54 [info]: Socket disconnected: gk7rI1rFkWp_gVYEAAAT — client namespace disconnect
+2026-04-16 16:11:00 [info]: Socket connected: SVtlzhzkFH3tSxmFAAAX (user 69e0f6b34be9f34aaa8e2d68)
+2026-04-16 16:11:01 [info]: Socket connected: eyQdCtPlvjxcnAh9AAAZ (user 69e0f6ec4be9f34aaa8e2d6a)
+2026-04-16 16:12:27 [info]: Socket disconnected: SVtlzhzkFH3tSxmFAAAX — transport close
+2026-04-16 16:15:11 [info]: Socket connected: 7a772sBxvEjAcLG3AAAb (user 69e0f6b34be9f34aaa8e2d68)
+2026-04-16 16:15:19 [info]: Socket disconnected: 7a772sBxvEjAcLG3AAAb — client namespace disconnect
+2026-04-16 16:15:19 [info]: Socket disconnected: eyQdCtPlvjxcnAh9AAAZ — client namespace disconnect
+2026-04-16 16:15:27 [info]: Socket connected: Miqqcx2DzBCqVljbAAAd (user 69e0f6b34be9f34aaa8e2d68)
+2026-04-16 16:15:27 [info]: Socket connected: j7z-Wnp29Fl7Tk7zAAAf (user 69e0f6ec4be9f34aaa8e2d6a)
+2026-04-16 16:16:17 [info]: Socket disconnected: Miqqcx2DzBCqVljbAAAd — transport close
+2026-04-16 16:16:44 [info]: Socket connected: vaHWnVpJWlaRvpeFAAAh (user 69e0f6b34be9f34aaa8e2d68)
+2026-04-16 16:20:55 [info]: Socket disconnected: j7z-Wnp29Fl7Tk7zAAAf — client namespace disconnect
+2026-04-16 16:20:56 [info]: Socket disconnected: vaHWnVpJWlaRvpeFAAAh — client namespace disconnect
+2026-04-16 16:21:02 [info]: Socket connected: HfCoWYmLTmYfsltsAAAj (user 69e0f6ec4be9f34aaa8e2d6a)
+2026-04-16 16:21:09 [info]: Socket connected: vjItfnlnH93TpwtzAAAl (user 69e0f6b34be9f34aaa8e2d68)
+2026-04-16 16:22:16 [info]: Socket disconnected: vjItfnlnH93TpwtzAAAl — transport close
+2026-04-16 16:24:32 [info]: Socket connected: GxxloE1jqMeBI5l3AAAn (user 69e0f6b34be9f34aaa8e2d68)
+2026-04-16 16:24:37 [info]: Socket disconnected: HfCoWYmLTmYfsltsAAAj — client namespace disconnect
+2026-04-16 16:24:37 [info]: Socket disconnected: GxxloE1jqMeBI5l3AAAn — client namespace disconnect
+2026-04-16 16:24:43 [info]: Socket connected: bLynf7XTHucXizKyAAAp (user 69e0f6b34be9f34aaa8e2d68)
+2026-04-16 16:24:45 [info]: Socket connected: oTtM9Z68jioEyLo2AAAr (user 69e0f6ec4be9f34aaa8e2d6a)
+2026-04-16 16:27:35 [info]: Socket disconnected: bLynf7XTHucXizKyAAAp — client namespace disconnect
+2026-04-16 16:27:37 [error]: MongoServerError: E11000 duplicate key error collection: smart_fence.animals index: device_id_1 dup key: { device_id: "123456" }
+    at InsertOneOperation.handleOk (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\mongodb\lib\operations\insert.js:51:19)
+    at tryOperation (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\mongodb\lib\operations\execute_operation.js:217:34)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async executeOperation (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\mongodb\lib\operations\execute_operation.js:80:16)
+    at async Collection.insertOne (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\mongodb\lib\collection.js:154:16)
+    at async model.$__save (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\mongoose\lib\model.js:428:16)
+    at async model.save (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\mongoose\lib\model.js:667:5)
+    at async model.create (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\mongoose\lib\model.js:2754:5)
+    at async createAnimal (C:\Users\Wassim\Desktop\mon-application\backend\src\controllers\animalsController.js:39:20)
+2026-04-16 16:27:41 [info]: Socket connected: v9-4rIQNhpSKK7NaAAAt (user 69e0f6b34be9f34aaa8e2d68)
+2026-04-16 16:27:53 [info]: Socket disconnected: oTtM9Z68jioEyLo2AAAr — client namespace disconnect
+2026-04-16 16:28:00 [info]: Socket connected: f9flIodfFk6vnoiaAAAv (user 69e0f6ec4be9f34aaa8e2d6a)
+2026-04-16 16:30:06 [info]: Socket disconnected: v9-4rIQNhpSKK7NaAAAt — client namespace disconnect
+2026-04-16 16:30:06 [info]: Socket disconnected: f9flIodfFk6vnoiaAAAv — client namespace disconnect
+2026-04-16 16:30:12 [info]: Socket connected: BULPhd_HWNJMBj9NAAAx (user 69e0f6b34be9f34aaa8e2d68)
+2026-04-16 16:30:13 [info]: Socket connected: fSZLMk-LJ-FJWXFZAAAz (user 69e0f6ec4be9f34aaa8e2d6a)

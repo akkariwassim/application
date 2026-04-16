@@ -2,7 +2,24 @@ import { io } from 'socket.io-client';
 import * as SecureStore from 'expo-secure-store';
 import Constants from 'expo-constants';
 
-const API_URL = Constants.expoConfig?.extra?.API_URL || 'http://10.0.2.2:3000';
+// ── Robust Dynamic host detection ───────────────────────────────
+const getBaseUrl = () => {
+  if (Constants.expoConfig?.extra?.API_URL) return Constants.expoConfig.extra.API_URL;
+  if (Constants.manifest?.extra?.API_URL) return Constants.manifest.extra.API_URL;
+
+  const hostUri = Constants.expoConfig?.hostUri || 
+                  Constants.manifest?.debuggerHost || 
+                  Constants.manifest2?.extra?.expoGo?.packagerOpts?.hostType;
+  
+  if (hostUri && typeof hostUri === 'string') {
+    const ip = hostUri.split(':')[0];
+    if (ip && ip !== 'localhost') return `http://${ip}:3000`;
+  }
+
+  return 'http://10.0.2.2:3000';
+};
+
+const API_URL = getBaseUrl() || 'http://localhost:3000';
 
 let socket = null;
 

@@ -7,6 +7,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
 import useAnimalStore from '../store/animalStore';
+import useGeofenceStore from '../store/geofenceStore';
 
 const COLORS = {
   primary:'#4F46E5', background:'#0A0F1E', surface:'#131929',
@@ -23,36 +24,28 @@ const AnimalSchema = Yup.object().shape({
   breed:    Yup.string().optional(),
   weightKg: Yup.number().min(0).optional().nullable(),
   deviceId: Yup.string().optional(),
+  latitude: Yup.number().optional(),
+  longitude: Yup.number().optional(),
 });
 
 export default function AnimalDetailScreen({ route, navigation }) {
-  const { animal, mode } = route.params || {};
+  const { animal, mode, initialLocation, initialZoneId } = route.params || {};
   const isCreate   = mode === 'create';
   const [saving, setSaving] = useState(false);
-  const { createAnimal, updateAnimal, setGeofence } = useAnimalStore();
-  const [gfEnabled, setGfEnabled] = useState(!!animal?.center_lat);
-  const [gfLat, setGfLat]     = useState(String(animal?.center_lat || ''));
-  const [gfLon, setGfLon]     = useState(String(animal?.center_lon || ''));
-  const [gfRadius, setGfRadius] = useState(String(animal?.radius_m || '500'));
+  const { createAnimal, updateAnimal } = useAnimalStore();
+  const { geofences, fetchGeofences } = useGeofenceStore();
+
+  useEffect(() => {
+    fetchGeofences();
+  }, []);
 
   const handleSave = async (values) => {
     setSaving(true);
     try {
-      let saved;
       if (isCreate) {
-        saved = await createAnimal(values);
+        await createAnimal(values);
       } else {
-        saved = await updateAnimal(animal.id, values);
-      }
-
-      // Save geofence if enabled
-      if (gfEnabled && gfLat && gfLon) {
-        await setGeofence(saved.id || animal.id, {
-          type: 'circle',
-          centerLat: parseFloat(gfLat),
-          centerLon: parseFloat(gfLon),
-          radiusM:   parseFloat(gfRadius) || 500,
-        });
+        await updateAnimal(animal.id, values);
       }
 
       Alert.alert('Success', isCreate ? 'Animal created!' : 'Animal updated!');
@@ -78,6 +71,9 @@ export default function AnimalDetailScreen({ route, navigation }) {
             weightKg: animal?.weight_kg ? String(animal.weight_kg) : '',
             deviceId: animal?.device_id || '',
             colorHex: animal?.color_hex || '#4CAF50',
+            currentZoneId: animal?.current_zone_id || initialZoneId || '',
+            latitude: animal?.latitude || initialLocation?.latitude || 0,
+            longitude: animal?.longitude || initialLocation?.longitude || 0,
           }}
           validationSchema={AnimalSchema}
           onSubmit={handleSave}
@@ -132,38 +128,56 @@ export default function AnimalDetailScreen({ route, navigation }) {
                   value={values.deviceId} onChangeText={handleChange('deviceId')} />
               </View>
 
-              {/* Geofence */}
+              {/* Zone Placement */}
               <View style={styles.sectionHeader}>
-                <Text style={styles.sectionTitle}>🗺 Geofence</Text>
-                <TouchableOpacity style={[styles.toggle, gfEnabled && styles.toggleActive]}
-                  onPress={() => setGfEnabled(!gfEnabled)}>
-                  <Text style={[styles.toggleText, gfEnabled && { color: COLORS.primary }]}>
-                    {gfEnabled ? 'Enabled' : 'Disabled'}
-                  </Text>
-                </TouchableOpacity>
+                <Text style={styles.sectionTitle}>🗺 Zone Assignment</Text>
               </View>
-
-              {gfEnabled && (
-                <View style={styles.gfBox}>
-                  <View style={styles.gfRow}>
-                    <View style={[styles.field, { flex:1, marginRight:8 }]}>
-                      <Text style={styles.label}>Lat</Text>
-                      <TextInput style={styles.input} placeholder="35.038" keyboardType="numeric"
-                        placeholderTextColor={COLORS.subtext} value={gfLat} onChangeText={setGfLat} />
-                    </View>
-                    <View style={[styles.field, { flex:1 }]}>
-                      <Text style={styles.label}>Lon</Text>
-                      <TextInput style={styles.input} placeholder="9.484" keyboardType="numeric"
-                        placeholderTextColor={COLORS.subtext} value={gfLon} onChangeText={setGfLon} />
-                    </View>
-                  </View>
-                  <View style={styles.field}>
-                    <Text style={styles.label}>Radius (metres)</Text>
-                    <TextInput style={styles.input} placeholder="500" keyboardType="numeric"
-                      placeholderTextColor={COLORS.subtext} value={gfRadius} onChangeText={setGfRadius} />
-                  </View>
-                </View>
-              )}
+              
+              <View style={styles.zoneList}>
+                {geofences.length === 0 ? (
+                  <Text style={styles.emptyZones}>No zones found. Create one in the Zones tab first.</Text>
+                ) : (
+                  geofences.map((gf) => (
+                    <TouchableOpacity 
+                      key={gf.id}
+                      style={[
+                        styles.zoneItem, 
+                        values.currentZoneId === gf.id && styles.zoneItemActive
+                      ]}
+                      onPress={() => {
+                        setFieldValue('currentZoneId', gf.id);
+                        // If coordinates are missing or at 0,0, snap to zone center
+                        const lat = parseFloat(values.latitude || 0);
+                        const lon = parseFloat(values.longitude || 0);
+                        if ((Math.abs(lat) < 0.001 && Math.abs(lon) < 0.001) && gf.center_lat && gf.center_lon) {
+                          setFieldValue('latitude', gf.center_lat);
+                          setFieldValue('longitude', gf.center_lon);
+                        }
+                      }}
+                    >
+                      <View style={[styles.zoneColor, { backgroundColor: gf.fill_color || COLORS.primary }]} />
+                      <View style={{ flex: 1 }}>
+                        <Text style={[styles.zoneName, values.currentZoneId === gf.id && { color: COLORS.primary }]}>
+                          {gf.name}
+                        </Text>
+                        <Text style={styles.zoneType}>{gf.zone_type} · {(gf.area_sqm / 10000).toFixed(2)} Ha</Text>
+                      </View>
+                      {values.currentZoneId === gf.id && (
+                        <Ionicons name="checkmark-circle" size={20} color={COLORS.primary} />
+                      )}
+                    </TouchableOpacity>
+                  ))
+                )}
+                
+                {values.currentZoneId !== '' && (
+                  <TouchableOpacity 
+                    style={styles.clearZone} 
+                    onPress={() => setFieldValue('currentZoneId', '')}
+                  >
+                    <Text style={styles.clearZoneText}>No Zone Assignment</Text>
+                  </TouchableOpacity>
+                )}
+              </View>
 
               {/* Save */}
               <TouchableOpacity style={[styles.saveBtn, saving && { opacity:0.6 }]}
@@ -198,8 +212,15 @@ const styles = StyleSheet.create({
   toggle:        { paddingHorizontal:12, paddingVertical:5, borderRadius:10, borderWidth:1, borderColor:COLORS.border },
   toggleActive:  { borderColor:COLORS.primary, backgroundColor:COLORS.primary+'22' },
   toggleText:    { color:COLORS.subtext, fontSize:12, fontWeight:'600' },
-  gfBox:         { backgroundColor:COLORS.surface, borderRadius:14, padding:14, marginBottom:16, borderWidth:1, borderColor:COLORS.border },
-  gfRow:         { flexDirection:'row' },
-  saveBtn:       { backgroundColor:COLORS.primary, borderRadius:14, height:52, alignItems:'center', justifyContent:'center', marginTop:8 },
-  saveBtnText:   { color:'#fff', fontSize:16, fontWeight:'700' },
+  zoneList:      { marginBottom: 20 },
+  zoneItem:      { flexDirection: 'row', alignItems: 'center', backgroundColor: COLORS.surface, borderRadius: 12, padding: 12, marginBottom: 8, borderWidth: 1, borderColor: COLORS.border, gap: 12 },
+  zoneItemActive: { borderColor: COLORS.primary, backgroundColor: COLORS.primary + '11' },
+  zoneColor:     { width: 4, height: 32, borderRadius: 2 },
+  zoneName:      { color: COLORS.text, fontSize: 14, fontWeight: '700' },
+  zoneType:      { color: COLORS.subtext, fontSize: 11 },
+  emptyZones:    { color: COLORS.subtext, textAlign: 'center', padding: 20, fontStyle: 'italic' },
+  clearZone:     { alignItems: 'center', paddingVertical: 10 },
+  clearZoneText: { color: COLORS.danger, fontSize: 13, fontWeight: '600' },
+  saveBtn:       { backgroundColor: COLORS.primary, borderRadius: 14, height: 52, alignItems: 'center', justifyContent: 'center', marginTop: 8 },
+  saveBtnText:   { color:'#fff', fontSize: 16, fontWeight:'700' },
 });

@@ -2,7 +2,32 @@ import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
 import Constants from 'expo-constants';
 
-const API_URL = Constants.expoConfig?.extra?.API_URL || 'http://192.168.1.236:5000';
+// ── Robust Dynamic host detection ───────────────────────────────
+const getBaseUrl = () => {
+  // 1. Explicit override from app.json / extra
+  if (Constants.expoConfig?.extra?.API_URL) return Constants.expoConfig.extra.API_URL;
+  if (Constants.manifest?.extra?.API_URL) return Constants.manifest.extra.API_URL;
+
+  // 2. Try to find the host machine IP from Expo Packager
+  const hostUri = Constants.expoConfig?.hostUri || 
+                  Constants.manifest?.debuggerHost || 
+                  Constants.manifest2?.extra?.expoGo?.packagerOpts?.hostType;
+  
+  if (hostUri && typeof hostUri === 'string') {
+    const ip = hostUri.split(':')[0];
+    if (ip && ip !== 'localhost') {
+      const url = `http://${ip}:3000`;
+      console.log(`[API] Detected host IP: ${ip} -> targeting ${url}`);
+      return url;
+    }
+  }
+
+  // 3. Last resort fallbacks
+  console.warn('[API] Could not detect host IP, using defaults');
+  return 'http://10.0.2.2:3000'; // Works for Android Emulators
+};
+
+const API_URL = getBaseUrl() || 'http://localhost:3000'; // Guaranteed non-undefined
 
 const api = axios.create({
   baseURL: API_URL,
@@ -92,8 +117,13 @@ api.interceptors.response.use(
     }
 
     if (error.response) {
-      console.error(`[API Error] ${error.config.method?.toUpperCase()} ${error.config.url} - Status: ${error.response.status}`);
-      console.error('Data:', JSON.stringify(error.response.data, null, 2));
+      // ── Mute expected 404 on session check (initial load) ─────
+      const isMe404 = error.config.url.includes('/auth/me') && error.response.status === 404;
+
+      if (!isMe404) {
+        console.error(`[API Error] ${error.config.method?.toUpperCase()} ${error.config.url} - Status: ${error.response.status}`);
+        console.error('Data:', JSON.stringify(error.response.data, null, 2));
+      }
     } else if (error.request) {
       console.error(`[Network Error] ${error.config.method?.toUpperCase()} ${error.config.url} - No response received`);
     } else {

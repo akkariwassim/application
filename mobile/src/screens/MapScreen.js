@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { 
   View, Text, StyleSheet, TouchableOpacity, Image, Dimensions, 
-  ActivityIndicator, Modal, FlatList, ScrollView, Animated
+  ActivityIndicator, Modal, FlatList, ScrollView, Animated, Alert
 } from 'react-native';
 import MapView, { Marker, Polygon, PROVIDER_GOOGLE, Callout } from 'react-native-maps';
 import { Ionicons } from '@expo/vector-icons';
@@ -10,6 +10,7 @@ import * as Location from 'expo-location';
 import useAnimalStore from '../store/animalStore';
 import useGeofenceStore from '../store/geofenceStore';
 import { isPointInPolygon } from '../utils/geoUtils';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 
 const { width, height } = Dimensions.get('window');
 
@@ -34,6 +35,7 @@ const COLORS = {
 
 export default function MapScreen() {
   const insets = useSafeAreaInsets();
+  const navigation = useNavigation();
   const mapRef = useRef(null);
   const { animals, fetchAnimals, isLoading } = useAnimalStore();
   const { geofences, fetchGeofences } = useGeofenceStore();
@@ -45,13 +47,26 @@ export default function MapScreen() {
   useEffect(() => {
     fetchAnimals();
     fetchGeofences();
-    
-    // Auto-center on user upon load
-    centerOnUser();
-
     const interval = setInterval(fetchAnimals, 5000);
     return () => clearInterval(interval);
   }, []);
+
+  // Screen Listener to detect "Safe Zone" and auto-focus
+  useFocusEffect(
+    useCallback(() => {
+      // Small delay to ensure map/geofences are ready
+      const timeout = setTimeout(() => {
+        const primaryZone = geofences.find(gf => gf.is_primary === 1 || gf.is_primary === true);
+        if (primaryZone) {
+          console.log("Auto-focusing on Safe Zone:", primaryZone.name);
+          focusZone(primaryZone);
+        } else if (!selectedAnimal) {
+          centerOnUser();
+        }
+      }, 800);
+      return () => clearTimeout(timeout);
+    }, [geofences.length])
+  );
 
   const centerOnUser = async () => {
     try {
@@ -101,15 +116,16 @@ export default function MapScreen() {
 
   const focusZone = (gf) => {
     setShowZonesList(false);
-    if (!gf.center_lat || !gf.center_lon) return;
-
+    
     if (gf.type === 'polygon' && gf.polygon_coords) {
       const coords = typeof gf.polygon_coords === 'string' ? JSON.parse(gf.polygon_coords) : gf.polygon_coords;
-      mapRef.current?.fitToCoordinates(coords, {
-        edgePadding: { top: 100, right: 100, bottom: 250, left: 100 },
-        animated: true,
-      });
-    } else {
+      if (coords && coords.length > 0) {
+        mapRef.current?.fitToCoordinates(coords, {
+          edgePadding: { top: 100, right: 100, bottom: 250, left: 100 },
+          animated: true,
+        });
+      }
+    } else if (gf.center_lat && gf.center_lon) {
       mapRef.current?.animateToRegion({
         latitude: parseFloat(gf.center_lat),
         longitude: parseFloat(gf.center_lon),
@@ -118,19 +134,59 @@ export default function MapScreen() {
       }, 1000);
     }
     
-    // Select the zone to show stats
-    const coords = typeof gf.polygon_coords === 'string' ? JSON.parse(gf.polygon_coords) : gf.polygon_coords;
-    const animalsInside = animals.filter(a => !!a.latitude && isPointInPolygon({ latitude: parseFloat(a.latitude), longitude: parseFloat(a.longitude) }, coords)).length;
-    setSelectedAnimal({ isZone: true, ...gf, animalsInside, area: gf.area_sqm });
+    // Select the zone to show stats and triggering highlighting
+    const zoneId = gf.id || gf._id;
+    const animalsInside = animals.filter(a => String(a.current_zone_id || '') === String(zoneId)).length;
+    setSelectedAnimal({ isZone: true, ...gf, id: zoneId, animalsInside, area: gf.area_sqm });
+  };
+  
+  const handleMapLongPress = (e) => {
+    const { latitude, longitude } = e.nativeEvent.coordinate;
+    
+    // Check if point is in a zone
+    let matchingZoneId = '';
+    for (const gf of geofences) {
+      if (gf.type === 'polygon' && gf.polygon_coords) {
+        const coords = typeof gf.polygon_coords === 'string' ? JSON.parse(gf.polygon_coords) : gf.polygon_coords;
+        if (isPointInPolygon({ latitude, longitude }, coords)) {
+          matchingZoneId = gf.id;
+          break;
+        }
+      }
+    }
+
+    Alert.alert(
+      'New Animal',
+      'Add a new animal at this location?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { 
+          text: 'Add Animal', 
+          onPress: () => navigation.navigate('Animals', { 
+            screen: 'AnimalDetail', 
+            params: { 
+              mode: 'create', 
+              initialLocation: { latitude, longitude },
+              initialZoneId: matchingZoneId
+            } 
+          }) 
+        },
+      ]
+    );
   };
 
   return (
     <View style={styles.container}>
+      {/* Version Tag to confirm updates */}
+      <View style={{ position: 'absolute', top: insets.top + 5, right: 10, zIndex: 9999, backgroundColor: '#000', paddingHorizontal: 6, borderRadius: 4, borderWidth: 1, borderColor: COLORS.success }}>
+        <Text style={{ color: COLORS.success, fontSize: 10, fontWeight: '800' }}>V4 ACTIVE</Text>
+      </View>
       <MapView
         ref={mapRef}
         style={StyleSheet.absoluteFillObject}
         provider={PROVIDER_GOOGLE}
         mapType="hybrid"
+        onLongPress={handleMapLongPress}
         initialRegion={{
           latitude: 35.038,
           longitude: 9.484,
@@ -142,13 +198,19 @@ export default function MapScreen() {
         {geofences.map((gf) => {
           if (gf.type === 'polygon' && gf.polygon_coords) {
             const coords = typeof gf.polygon_coords === 'string' ? JSON.parse(gf.polygon_coords) : gf.polygon_coords;
+            const gfId = gf.id || gf._id;
+            const isSelected = selectedAnimal?.isZone && String(selectedAnimal.id) === String(gfId);
+
             return (
               <Polygon
-                key={`poly-${gf.id}`}
+                key={`poly-${gf.id}-${isSelected}`}
                 coordinates={coords}
-                fillColor={gf.fill_color ? `${gf.fill_color}44` : 'rgba(79, 70, 229, 0.2)'}
-                strokeColor={gf.fill_color || COLORS.primary}
-                strokeWidth={2}
+                // Bright Yellow for maximum visibility on satellite
+                fillColor={isSelected ? 'rgba(255, 255, 0, 0.4)' : (gf.fill_color ? `${gf.fill_color}33` : 'rgba(79, 70, 229, 0.2)')}
+                strokeColor={isSelected ? '#FFFF00' : (gf.fill_color || COLORS.primary)}
+                strokeWidth={isSelected ? 6 : 2}
+                tappable={true}
+                onPress={() => focusZone(gf)}
               />
             );
           }
@@ -158,18 +220,29 @@ export default function MapScreen() {
         {/* Zone Markers (Centers) with Labels */}
         {geofences.map((gf) => {
           if (!gf.center_lat || !gf.center_lon) return null;
+          const gfId = gf.id || gf._id;
+          const isSelected = selectedAnimal?.isZone && String(selectedAnimal.id) === String(gfId);
           return (
             <Marker
-              key={`marker-${gf.id}`}
+              key={`marker-${gf.id}-${isSelected}`}
               coordinate={{ latitude: parseFloat(gf.center_lat), longitude: parseFloat(gf.center_lon) }}
               onPress={() => focusZone(gf)}
+              zIndex={isSelected ? 10 : 1}
             >
               <View style={styles.zoneMarkerWrapper}>
-                <View style={[styles.farmMarker, gf.is_primary && { borderColor: COLORS.success }]}>
-                  <Ionicons name="location" size={18} color={gf.is_primary ? COLORS.success : COLORS.primary} />
+                <View style={[
+                  styles.farmMarker, 
+                  gf.is_primary && { borderColor: COLORS.success },
+                  isSelected && { transform: [{ scale: 1.2 }], borderColor: '#fff' }
+                ]}>
+                  <Ionicons 
+                    name={isSelected ? "location-sharp" : "location"} 
+                    size={isSelected ? 22 : 18} 
+                    color={isSelected ? '#fff' : (gf.is_primary ? COLORS.success : COLORS.primary)} 
+                  />
                 </View>
                 {gf.name && (
-                  <View style={styles.zoneLabelContainer}>
+                  <View style={[styles.zoneLabelContainer, isSelected && { backgroundColor: COLORS.primary }]}>
                     <Text style={styles.zoneLabelText} numberOfLines={1}>
                       {gf.name} • {(gf.area_sqm / 10000).toFixed(2)} Ha
                     </Text>
@@ -194,20 +267,29 @@ export default function MapScreen() {
         )}
 
         {/* Animal Markers */}
-        {animals.map((animal) => (
-          <Marker
-            key={animal.id}
-            coordinate={{
-              latitude: parseFloat(animal.latitude),
-              longitude: parseFloat(animal.longitude)
-            }}
-            onPress={() => setSelectedAnimal({ ...animal, isZone: false })}
-          >
-            <View style={[styles.animalMarker, { borderColor: STATUS_COLOR[animal.status] || COLORS.offline }]}>
-              <Ionicons name="paw" size={16} color={STATUS_COLOR[animal.status] || COLORS.offline} />
-            </View>
-          </Marker>
-        ))}
+        {animals
+          .filter((animal) => {
+            // If a zone is selected, only show animals assigned to it
+            if (selectedAnimal?.isZone) {
+              const zoneId = selectedAnimal.id || selectedAnimal._id;
+              return String(animal.current_zone_id || '') === String(zoneId);
+            }
+            return true;
+          })
+          .map((animal) => (
+            <Marker
+              key={animal.id}
+              coordinate={{
+                latitude: parseFloat(animal.latitude),
+                longitude: parseFloat(animal.longitude)
+              }}
+              onPress={() => setSelectedAnimal({ ...animal, isZone: false })}
+            >
+              <View style={[styles.animalMarker, { borderColor: STATUS_COLOR[animal.status] || COLORS.offline }]}>
+                <Ionicons name="paw" size={16} color={STATUS_COLOR[animal.status] || COLORS.offline} />
+              </View>
+            </Marker>
+          ))}
       </MapView>
 
       {/* Top Controls */}
@@ -272,7 +354,14 @@ export default function MapScreen() {
           <View style={styles.sheetHeader}>
             <View style={[styles.statusDot, { backgroundColor: selectedAnimal.isZone ? (selectedAnimal.fill_color || COLORS.primary) : (STATUS_COLOR[selectedAnimal.status] || COLORS.offline) }]} />
             <Text style={styles.sheetName}>{selectedAnimal.name || (selectedAnimal.isZone ? `Zone #${selectedAnimal.id}` : 'Animal')}</Text>
-            <Text style={styles.sheetBadge}>{selectedAnimal.isZone ? (selectedAnimal.zone_type || 'ZONE').toUpperCase() : selectedAnimal.status.toUpperCase()}</Text>
+            <TouchableOpacity 
+              onPress={() => setSelectedAnimal(null)}
+              style={styles.sheetBadge}
+            >
+              <Text style={styles.sheetBadgeText}>
+                {selectedAnimal.isZone ? 'CLEAR FILTER' : selectedAnimal.status.toUpperCase()}
+              </Text>
+            </TouchableOpacity>
           </View>
           
           {selectedAnimal.isZone ? (
@@ -309,11 +398,22 @@ const styles = StyleSheet.create({
   sheetHeader:    { flexDirection:'row', alignItems:'center', gap:8, marginBottom:4 },
   statusDot:      { width:10, height:10, borderRadius:5 },
   sheetName:      { color:COLORS.text, fontSize:18, fontWeight:'700', flex:1 },
-  sheetBadge:     { fontSize:10, fontWeight:'700', color:COLORS.danger },
+  sheetBadge:     { backgroundColor: COLORS.danger + '22', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 8 },
+  sheetBadgeText: { fontSize:10, fontWeight:'700', color:COLORS.danger },
   sheetMeta:      { color:COLORS.subtext, fontSize:13, marginTop:2 },
   sheetCoords:    { color:COLORS.subtext, fontSize:12, marginTop:4 },
   loadingOverlay: { ...StyleSheet.absoluteFillObject, backgroundColor:'rgba(0,0,0,0.4)', alignItems:'center', justifyContent:'center' },
-  animalMarker:   { backgroundColor:'#FFF', padding:4, borderRadius:12, borderWidth:2 },
+  animalMarker:   { 
+    backgroundColor:'#FFF', 
+    width: 36, 
+    height: 36, 
+    borderRadius: 18, 
+    borderWidth: 2, 
+    alignItems: 'center', 
+    justifyContent: 'center',
+    elevation: 5,
+    overflow: 'visible'
+  },
   farmMarker:     { backgroundColor:COLORS.surface, padding:6, borderRadius:15, borderWidth:2, borderColor:COLORS.primary },
   dualButtonContainer: { position: 'absolute', left: 16, right: 16, flexDirection: 'row', gap: 10, justifyContent: 'center' },
   mainControlBtn: { flex: 1, height: 48, backgroundColor: 'rgba(19,25,41,0.92)', borderRadius: 12, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.2, shadowRadius: 4, elevation: 4, borderWidth: 1, borderColor: COLORS.border },

@@ -34,8 +34,36 @@ async function getAnimal(req, res, next) {
  */
 async function createAnimal(req, res, next) {
   try {
-    const { name, type, breed, weightKg, birthDate, rfidTag, deviceId, colorHex, notes, latitude, longitude } = req.body;
+    const isAtZero = (lat, lon) => {
+      const l = parseFloat(lat);
+      const n = parseFloat(lon);
+      return isNaN(l) || isNaN(n) || (Math.abs(l) < 0.001 && Math.abs(n) < 0.001);
+    };
+
+    let finalLat = parseFloat(latitude);
+    let finalLon = parseFloat(longitude);
     
+    if (isNaN(finalLat)) finalLat = 0;
+    if (isNaN(finalLon)) finalLon = 0;
+
+    // If assigned to a zone but no location provided (or at 0,0), center in zone
+    if (currentZoneId && isAtZero(finalLat, finalLon)) {
+      const zone = await Zone.findById(currentZoneId);
+      if (zone) {
+        if (zone.center_lat && zone.center_lon) {
+          finalLat = zone.center_lat;
+          finalLon = zone.center_lon;
+        } else if (zone.polygon_coords) {
+          // Fallback: calculate a simple center from polygon
+          const coords = typeof zone.polygon_coords === 'string' ? JSON.parse(zone.polygon_coords) : zone.polygon_coords;
+          if (coords.length > 0) {
+            finalLat = coords.reduce((acc, c) => acc + c.latitude, 0) / coords.length;
+            finalLon = coords.reduce((acc, c) => acc + c.longitude, 0) / coords.length;
+          }
+        }
+      }
+    }
+
     const animal = await Animal.create({
       user_id: req.user.id,
       name,
@@ -47,8 +75,9 @@ async function createAnimal(req, res, next) {
       device_id: deviceId,
       color_hex: colorHex || '#4CAF50',
       notes,
-      latitude: latitude || 0,
-      longitude: longitude || 0,
+      latitude: finalLat,
+      longitude: finalLon,
+      current_zone_id: currentZoneId || null,
       status: 'safe',
       last_seen: new Date()
     });
@@ -73,7 +102,41 @@ async function updateAnimal(req, res, next) {
     if (updates.rfidTag) { updates.rfid_tag = updates.rfidTag; delete updates.rfidTag; }
     if (updates.deviceId) { updates.device_id = updates.deviceId; delete updates.deviceId; }
     if (updates.colorHex) { updates.color_hex = updates.colorHex; delete updates.colorHex; }
-    if (updates.currentZoneId) { updates.current_zone_id = updates.currentZoneId; delete updates.currentZoneId; }
+    
+    if (updates.currentZoneId) { 
+      updates.current_zone_id = updates.currentZoneId; 
+      delete updates.currentZoneId; 
+    }
+
+    const isAtZero = (lat, lon) => {
+      const l = parseFloat(lat);
+      const n = parseFloat(lon);
+      return isNaN(l) || isNaN(n) || (Math.abs(l) < 0.001 && Math.abs(n) < 0.001);
+    };
+
+    // Auto-center if animal is currently at 0,0 and we have a zone
+    const existing = await Animal.findOne({ _id: id, user_id: req.user.id });
+    if (!existing) return res.status(404).json({ error: 'Animal not found' });
+
+    const currentLat = updates.latitude !== undefined ? updates.latitude : existing.latitude;
+    const currentLon = updates.longitude !== undefined ? updates.longitude : existing.longitude;
+    const zoneId = updates.current_zone_id || existing.current_zone_id;
+
+    if (zoneId && isAtZero(currentLat, currentLon)) {
+      const zone = await Zone.findById(zoneId);
+      if (zone) {
+        if (zone.center_lat && zone.center_lon) {
+          updates.latitude = zone.center_lat;
+          updates.longitude = zone.center_lon;
+        } else if (zone.polygon_coords) {
+          const coords = typeof zone.polygon_coords === 'string' ? JSON.parse(zone.polygon_coords) : zone.polygon_coords;
+          if (coords.length > 0) {
+            updates.latitude = coords.reduce((acc, c) => acc + c.latitude, 0) / coords.length;
+            updates.longitude = coords.reduce((acc, c) => acc + c.longitude, 0) / coords.length;
+          }
+        }
+      }
+    }
 
     const animal = await Animal.findOneAndUpdate(
       { _id: id, user_id: req.user.id },

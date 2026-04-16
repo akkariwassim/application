@@ -13,6 +13,11 @@ services:
       - "3306:3306"
     volumes:
       - db_data:/var/lib/mysql
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-prootpass" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   # ── MongoDB Database (New) ────────────────────────────────────
   mongodb:
@@ -24,7 +29,7 @@ services:
     volumes:
       - mongodb_data:/data/db
     healthcheck:
-      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      test: [ "CMD", "mongosh", "--eval", "db.adminCommand('ping')" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -39,19 +44,23 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      mongodb:
+        condition: service_healthy
     environment:
       NODE_ENV: production
       PORT: 3000
+      MONGODB_URI: ${MONGODB_URI:-mongodb+srv://wassim:Wassimakkari1@smartfence.7zypd8b.mongodb.net/smart_fence?appName=smartfence}
       DB_HOST: db
       DB_PORT: 3306
       DB_NAME: smart_fence
       DB_USER: root
       DB_PASSWORD: rootpass
-      JWT_SECRET: CHANGE_ME_PRODUCTION_SECRET_32_CHARS
-      JWT_REFRESH_SECRET: CHANGE_ME_PRODUCTION_REFRESH_64_CHARS
+      JWT_SECRET: ${JWT_SECRET:-CHANGE_ME_PRODUCTION_SECRET_32_CHARS}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-CHANGE_ME_PRODUCTION_REFRESH_64_CHARS}
       JWT_EXPIRES_IN: 15m
       JWT_REFRESH_EXPIRES_IN: 7d
       LOG_LEVEL: info
+      CLIENT_URL: "*"
     ports:
       - "3000:3000"
     volumes:
