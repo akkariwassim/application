@@ -35,13 +35,21 @@ app.use(cors({
   credentials: true
 }));
 
-// ── Rate limiting ──────────────────────────────────────────────
+// ── Request Logging (DEBUG) ────────────────────────────────────
+app.use((req, res, next) => {
+  logger.info(`Incoming Request: ${req.method} ${req.url}`);
+  next();
+});
+
+// ── Rate limiting (DISABLED FOR DEBUG) ─────────────────────────
+/*
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 200,
   message: { error: 'Too many requests, please try again later.' }
 });
 app.use('/api/', limiter);
+*/
 
 // ── Body parsing & compression ─────────────────────────────────
 app.use(compression());
@@ -87,7 +95,7 @@ const PORT = parseInt(process.env.PORT) || 3000;
 
 async function start() {
   await connectDB();
-  server.listen(PORT, () => {
+  server.listen(PORT, '0.0.0.0', () => {
     logger.info(`🚀 Server running on http://localhost:${PORT}`);
     logger.info(`   Environment: ${process.env.NODE_ENV || 'development'}`);
   });

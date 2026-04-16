@@ -38,7 +38,19 @@ const userSchema = new mongoose.Schema({
   refresh_tokens: [{
     token: String,
     expiresAt: Date,
-  }]
+  }],
+  farm_latitude: {
+    type: Number,
+    default: null
+  },
+  farm_longitude: {
+    type: Number,
+    default: null
+  },
+  farm_name: {
+    type: String,
+    default: 'Ma Ferme'
+  }
 }, {
   timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' },
   toJSON: { 
