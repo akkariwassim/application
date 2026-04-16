@@ -2,7 +2,6 @@ import { io } from 'socket.io-client';
 import * as SecureStore from 'expo-secure-store';
 import Constants from 'expo-constants';
 
-<<<<<<< HEAD
 // ── Robust Dynamic host detection ───────────────────────────────
 const getBaseUrl = () => {
   if (Constants.expoConfig?.extra?.API_URL) return Constants.expoConfig.extra.API_URL;
@@ -21,9 +20,6 @@ const getBaseUrl = () => {
 };
 
 const API_URL = getBaseUrl() || 'http://localhost:3000';
-=======
-const API_URL = Constants.expoConfig?.extra?.API_URL || 'http://192.168.100.152:3000';
->>>>>>> 440470a6bb27bacf6886edd154bcb792cdea0e3a
 
 let socket = null;
 

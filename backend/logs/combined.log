@@ -526,3 +526,284 @@
 2026-04-16 16:38:00 [info]: 🚀 Server running on http://localhost:3000
 2026-04-16 16:38:00 [info]:    Environment: development
 2026-04-16 16:38:01 [info]: Incoming Request: GET /api/animals
+2026-04-16 16:38:03 [info]: Incoming Request: GET /api/animals
+2026-04-16 16:38:08 [info]: Incoming Request: GET /api/animals
+2026-04-16 16:38:13 [info]: Incoming Request: GET /api/animals
+2026-04-16 16:38:18 [info]: Incoming Request: GET /api/animals
+2026-04-16 16:38:23 [info]: Incoming Request: GET /api/animals
+2026-04-16 16:38:28 [info]: Incoming Request: GET /api/animals
+2026-04-16 16:38:33 [info]: Incoming Request: GET /api/animals
+2026-04-16 16:38:34 [info]: Incoming Request: GET /api/geofences
+2026-04-16 16:38:36 [info]: Incoming Request: DELETE /api/geofences/69e0ff9c4be9f34aaa8e2d8c
+2026-04-16 16:38:36 [info]: Incoming Request: GET /api/geofences
+2026-04-16 16:38:37 [info]: Incoming Request: GET /api/animals
+2026-04-16 16:38:38 [info]: Incoming Request: GET /api/animals
+2026-04-16 16:38:43 [info]: Incoming Request: GET /api/animals
+2026-04-16 16:38:48 [info]: Incoming Request: GET /api/animals
+2026-04-16 16:38:53 [info]: MongoDB Connected: ac-lokdmj8-shard-00-00.7zypd8b.mongodb.net
+2026-04-16 16:38:53 [info]: Incoming Request: GET /api/animals
+2026-04-16 16:38:58 [info]: Incoming Request: GET /api/animals
+2026-04-16 16:39:03 [info]: Incoming Request: GET /api/animals
+2026-04-16 16:39:08 [info]: Incoming Request: GET /api/animals
+2026-04-16 16:39:13 [info]: Incoming Request: GET /api/animals
+2026-04-16 16:39:18 [info]: Incoming Request: GET /api/animals
+2026-04-16 16:39:23 [info]: Incoming Request: GET /api/animals
+2026-04-16 16:39:28 [info]: Incoming Request: GET /api/animals
+2026-04-16 16:39:33 [info]: Incoming Request: GET /api/animals
+2026-04-16 16:39:38 [info]: Incoming Request: GET /api/animals
+2026-04-16 16:39:43 [info]: Incoming Request: GET /api/animals
+2026-04-16 16:39:48 [info]: Incoming Request: GET /api/animals
+2026-04-16 16:39:53 [info]: Incoming Request: GET /api/animals
+2026-04-16 16:40:03 [info]: MongoDB Connected: ac-lokdmj8-shard-00-00.7zypd8b.mongodb.net
+2026-04-16 16:40:03 [info]: 🚀 Server running on http://localhost:3000
+2026-04-16 16:40:03 [info]:    Environment: development
+2026-04-16 16:40:04 [info]: Incoming Request: GET /api/animals
+2026-04-16 16:40:05 [info]: Incoming Request: GET /api/animals
+2026-04-16 16:40:08 [info]: Incoming Request: GET /api/animals
+2026-04-16 16:40:13 [info]: Incoming Request: GET /api/animals
+2026-04-16 16:40:49 [info]: Incoming Request: GET /api/animals
+2026-04-16 16:40:49 [info]: Incoming Request: GET /api/animals
+2026-04-16 16:40:54 [info]: Incoming Request: GET /api/animals
+2026-04-16 16:40:59 [info]: Incoming Request: GET /api/animals
+2026-04-16 16:41:04 [info]: Incoming Request: GET /api/animals
+2026-04-16 16:41:11 [info]: Incoming Request: GET /api/auth/me
+2026-04-16 16:41:12 [info]: Incoming Request: GET /api/animals
+2026-04-16 16:41:12 [info]: Incoming Request: GET /api/geofences
+2026-04-16 16:41:12 [info]: Socket connected: 6Gp3-srsDCl8VkhOAAAD (user 69e0f6b34be9f34aaa8e2d68)
+2026-04-16 16:41:13 [info]: Incoming Request: GET /api/auth/me
+2026-04-16 16:41:13 [info]: Incoming Request: GET /api/animals
+2026-04-16 16:41:13 [info]: Incoming Request: GET /api/geofences
+2026-04-16 16:41:13 [info]: Socket connected: bq5gHju5qflm3_88AAAF (user 69e0f6ec4be9f34aaa8e2d6a)
+2026-04-16 16:41:19 [info]: Incoming Request: GET /api/geofences
+2026-04-16 16:41:24 [info]: Incoming Request: GET /api/geofences
+2026-04-16 16:41:26 [info]: Incoming Request: GET /api/geofences
+2026-04-16 16:41:53 [info]: Incoming Request: POST /api/geofences
+2026-04-16 16:41:54 [info]: Incoming Request: GET /api/geofences
+2026-04-16 16:42:10 [info]: Incoming Request: GET /api/alerts?status=active
+2026-04-16 16:42:11 [info]: Incoming Request: GET /api/animals
+2026-04-16 16:42:12 [info]: Incoming Request: GET /api/animals/69e0f7a54be9f34aaa8e2d6f
+2026-04-16 16:42:14 [info]: Incoming Request: GET /api/animals/69e1001f4be9f34aaa8e2d90
+2026-04-16 16:42:17 [info]: Incoming Request: GET /api/animals/69e0f7a54be9f34aaa8e2d6f
+2026-04-16 16:42:48 [info]: Socket disconnected: bq5gHju5qflm3_88AAAF — ping timeout
+2026-04-16 16:45:36 [info]: Socket disconnected: 6Gp3-srsDCl8VkhOAAAD — transport close
+2026-04-16 16:47:01 [info]: MongoDB Connected: ac-lokdmj8-shard-00-00.7zypd8b.mongodb.net
+2026-04-16 16:47:01 [info]: 🚀 Server running on http://localhost:3000
+2026-04-16 16:47:01 [info]:    Environment: development
+2026-04-16 16:47:45 [info]: Incoming Request: GET /api/auth/me
+2026-04-16 16:47:46 [info]: Incoming Request: GET /api/animals
+2026-04-16 16:47:46 [info]: Incoming Request: GET /api/geofences
+2026-04-16 16:47:46 [info]: Socket connected: 4KhhBsKeg3bpGzgFAAAB (user 69e0f6b34be9f34aaa8e2d68)
+2026-04-16 16:47:53 [info]: Incoming Request: GET /api/animals
+2026-04-16 16:47:59 [info]: Incoming Request: GET /api/geofences
+2026-04-16 16:48:01 [info]: Incoming Request: DELETE /api/geofences/69e10342ed1596eabea20ee1
+2026-04-16 16:48:01 [info]: Incoming Request: GET /api/geofences
+2026-04-16 16:48:04 [info]: Incoming Request: GET /api/geofences
+2026-04-16 16:48:27 [info]: Incoming Request: POST /api/geofences
+2026-04-16 16:48:27 [info]: Incoming Request: POST /api/auth/refresh
+2026-04-16 16:48:28 [info]: Incoming Request: POST /api/geofences
+2026-04-16 16:48:28 [info]: Incoming Request: POST /api/geofences
+2026-04-16 16:48:28 [info]: Incoming Request: POST /api/geofences
+2026-04-16 16:48:28 [info]: Incoming Request: GET /api/geofences
+2026-04-16 16:48:28 [info]: Incoming Request: GET /api/geofences
+2026-04-16 16:48:33 [info]: Incoming Request: DELETE /api/geofences/69e104cc863ca441291a79c4
+2026-04-16 16:48:33 [info]: Incoming Request: GET /api/geofences
+2026-04-16 16:48:36 [info]: Incoming Request: DELETE /api/geofences/69e104cc863ca441291a79c5
+2026-04-16 16:48:36 [info]: Incoming Request: GET /api/geofences
+2026-04-16 16:48:45 [info]: Incoming Request: POST /api/geofences
+2026-04-16 16:48:45 [info]: Incoming Request: GET /api/geofences
+2026-04-16 16:48:58 [info]: Incoming Request: GET /api/animals
+2026-04-16 16:49:15 [info]: Incoming Request: GET /api/animals
+2026-04-16 16:49:17 [info]: Incoming Request: GET /api/geofences
+2026-04-16 16:49:37 [info]: Incoming Request: POST /api/animals
+2026-04-16 16:49:49 [info]: Socket disconnected: 4KhhBsKeg3bpGzgFAAAB — transport close
+2026-04-16 16:50:05 [info]: Incoming Request: GET /api/auth/me
+2026-04-16 16:50:05 [info]: Incoming Request: GET /api/animals
+2026-04-16 16:50:05 [info]: Incoming Request: GET /api/geofences
+2026-04-16 16:50:05 [info]: Socket connected: Y5Ll2_A25MHfFgTaAAAD (user 69e0f6b34be9f34aaa8e2d68)
+2026-04-16 16:50:27 [info]: Incoming Request: GET /api/animals
+2026-04-16 16:50:28 [info]: Incoming Request: GET /api/animals/69e10511863ca441291a79c7
+2026-04-16 16:50:40 [info]: Incoming Request: GET /api/geofences
+2026-04-16 16:50:49 [info]: Incoming Request: GET /api/auth/me
+2026-04-16 16:50:49 [info]: Incoming Request: GET /api/animals
+2026-04-16 16:50:49 [info]: Incoming Request: GET /api/geofences
+2026-04-16 16:50:49 [info]: Socket connected: EB5b0-uD2GkAPnjuAAAF (user 69e0f6ec4be9f34aaa8e2d6a)
+2026-04-16 16:51:06 [info]: Incoming Request: GET /api/animals
+2026-04-16 16:51:31 [info]: Socket disconnected: Y5Ll2_A25MHfFgTaAAAD — transport close
+2026-04-16 16:51:33 [info]: Socket connected: s2FqigPuTAvCOJn5AAAH (user 69e0f6b34be9f34aaa8e2d68)
+2026-04-16 16:52:02 [info]: Incoming Request: GET /api/animals
+2026-04-16 16:52:02 [info]: Incoming Request: GET /api/geofences
+2026-04-16 16:52:02 [info]: Incoming Request: GET /api/animals
+2026-04-16 16:52:02 [info]: Incoming Request: GET /api/geofences
+2026-04-16 16:52:13 [info]: Socket disconnected: s2FqigPuTAvCOJn5AAAH — transport close
+2026-04-16 16:53:03 [info]: Socket connected: xP39FIL1v1WEPI5TAAAJ (user 69e0f6b34be9f34aaa8e2d68)
+2026-04-16 16:53:04 [info]: Socket disconnected: xP39FIL1v1WEPI5TAAAJ — client namespace disconnect
+2026-04-16 16:53:09 [info]: Incoming Request: GET /api/auth/me
+2026-04-16 16:53:10 [info]: Incoming Request: GET /api/animals
+2026-04-16 16:53:10 [info]: Incoming Request: GET /api/geofences
+2026-04-16 16:53:10 [info]: Incoming Request: GET /api/animals
+2026-04-16 16:53:10 [info]: Incoming Request: GET /api/geofences
+2026-04-16 16:53:10 [info]: Socket connected: SIXX-U1zU_9xQx81AAAL (user 69e0f6b34be9f34aaa8e2d68)
+2026-04-16 16:53:10 [info]: Incoming Request: GET /api/animals
+2026-04-16 16:53:10 [info]: Incoming Request: GET /api/geofences
+2026-04-16 16:53:30 [info]: Incoming Request: GET /api/animals
+2026-04-16 16:53:41 [info]: Incoming Request: GET /api/animals
+2026-04-16 16:53:41 [info]: Incoming Request: POST /api/auth/refresh
+2026-04-16 16:53:42 [info]: Incoming Request: GET /api/animals
+2026-04-16 16:53:46 [info]: Incoming Request: GET /api/animals
+2026-04-16 16:53:52 [info]: Incoming Request: GET /api/animals
+2026-04-16 16:53:55 [info]: Incoming Request: DELETE /api/animals/69e0f7a54be9f34aaa8e2d6f
+2026-04-16 16:53:58 [info]: Incoming Request: DELETE /api/animals/69e1001f4be9f34aaa8e2d90
+2026-04-16 16:53:59 [info]: Incoming Request: GET /api/geofences
+2026-04-16 16:54:11 [info]: Incoming Request: POST /api/animals
+2026-04-16 16:54:11 [error]: MongoServerError: E11000 duplicate key error collection: smart_fence.animals index: device_id_1 dup key: { device_id: "" }
+    at InsertOneOperation.handleOk (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\mongodb\lib\operations\insert.js:51:19)
+    at tryOperation (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\mongodb\lib\operations\execute_operation.js:217:34)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async executeOperation (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\mongodb\lib\operations\execute_operation.js:80:16)
+    at async Collection.insertOne (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\mongodb\lib\collection.js:154:16)
+    at async model.$__save (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\mongoose\lib\model.js:428:16)
+    at async model.save (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\mongoose\lib\model.js:667:5)
+    at async model.create (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\mongoose\lib\model.js:2754:5)
+    at async createAnimal (C:\Users\Wassim\Desktop\mon-application\backend\src\controllers\animalsController.js:131:20)
+2026-04-16 16:54:36 [info]: MongoDB Connected: ac-lokdmj8-shard-00-00.7zypd8b.mongodb.net
+2026-04-16 16:54:36 [info]: 🚀 Server running on http://localhost:3000
+2026-04-16 16:54:36 [info]:    Environment: development
+2026-04-16 16:54:40 [info]: Socket connected: cdgUsujG2CO94RlSAAAD (user 69e0f6b34be9f34aaa8e2d68)
+2026-04-16 16:54:47 [info]: Incoming Request: POST /api/animals
+2026-04-16 16:54:47 [error]: MongoServerError: E11000 duplicate key error collection: smart_fence.animals index: device_id_1 dup key: { device_id: "" }
+    at InsertOneOperation.handleOk (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\mongodb\lib\operations\insert.js:51:19)
+    at tryOperation (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\mongodb\lib\operations\execute_operation.js:217:34)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async executeOperation (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\mongodb\lib\operations\execute_operation.js:80:16)
+    at async Collection.insertOne (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\mongodb\lib\collection.js:154:16)
+    at async model.$__save (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\mongoose\lib\model.js:428:16)
+    at async model.save (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\mongoose\lib\model.js:667:5)
+    at async model.create (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\mongoose\lib\model.js:2754:5)
+    at async createAnimal (C:\Users\Wassim\Desktop\mon-application\backend\src\controllers\animalsController.js:131:20)
+2026-04-16 16:55:33 [info]: Incoming Request: POST /api/animals
+2026-04-16 16:55:37 [info]: Incoming Request: GET /api/animals
+2026-04-16 16:55:37 [info]: Incoming Request: GET /api/geofences
+2026-04-16 16:55:44 [info]: Incoming Request: GET /api/animals
+2026-04-16 16:55:48 [info]: Incoming Request: GET /api/animals
+2026-04-16 16:56:02 [info]: Incoming Request: GET /api/animals
+2026-04-16 16:56:15 [info]: Socket disconnected: cdgUsujG2CO94RlSAAAD — transport close
+2026-04-16 16:56:35 [info]: Incoming Request: GET /api/animals
+2026-04-16 16:56:37 [info]: Incoming Request: GET /api/animals/69e106758a500d1d8def052a
+2026-04-16 16:56:39 [info]: Incoming Request: GET /api/animals
+2026-04-16 16:56:39 [info]: Incoming Request: GET /api/geofences
+2026-04-16 16:56:40 [info]: Incoming Request: GET /api/geofences
+2026-04-16 16:56:41 [info]: Incoming Request: GET /api/animals
+2026-04-16 16:56:41 [info]: Incoming Request: GET /api/geofences
+2026-04-16 16:56:49 [info]: Incoming Request: GET /api/animals
+2026-04-16 16:57:02 [info]: Incoming Request: GET /api/alerts?status=active
+2026-04-16 17:00:41 [info]: Incoming Request: GET /api/auth/me
+2026-04-16 17:00:41 [info]: Incoming Request: GET /api/animals
+2026-04-16 17:00:41 [info]: Incoming Request: GET /api/geofences
+2026-04-16 17:00:41 [info]: Incoming Request: GET /api/animals
+2026-04-16 17:00:41 [info]: Incoming Request: GET /api/geofences
+2026-04-16 17:00:41 [info]: Socket connected: hzgK5_gxk_o8A1oxAAAF (user 69e0f6ec4be9f34aaa8e2d6a)
+2026-04-16 17:00:41 [info]: Incoming Request: GET /api/animals
+2026-04-16 17:00:41 [info]: Incoming Request: GET /api/geofences
+2026-04-16 17:00:48 [info]: Incoming Request: GET /api/geofences
+2026-04-16 17:00:50 [info]: Incoming Request: DELETE /api/geofences/69e0f73b4be9f34aaa8e2d6e
+2026-04-16 17:00:50 [info]: Incoming Request: GET /api/geofences
+2026-04-16 17:00:51 [info]: Incoming Request: GET /api/animals
+2026-04-16 17:00:53 [info]: Incoming Request: DELETE /api/animals/69e106758a500d1d8def052a
+2026-04-16 17:00:53 [info]: Incoming Request: GET /api/animals
+2026-04-16 17:00:53 [info]: Incoming Request: GET /api/geofences
+2026-04-16 17:00:55 [info]: Incoming Request: GET /api/geofences
+2026-04-16 17:01:30 [info]: Incoming Request: POST /api/geofences
+2026-04-16 17:01:31 [info]: Incoming Request: GET /api/geofences
+2026-04-16 17:01:33 [info]: Incoming Request: GET /api/geofences
+2026-04-16 17:01:51 [info]: Incoming Request: POST /api/animals
+2026-04-16 17:01:54 [info]: Incoming Request: GET /api/animals
+2026-04-16 17:01:54 [info]: Incoming Request: GET /api/geofences
+2026-04-16 17:01:57 [info]: Incoming Request: GET /api/animals
+2026-04-16 17:02:06 [info]: Incoming Request: GET /api/animals
+2026-04-16 17:02:08 [info]: Incoming Request: GET /api/animals
+2026-04-16 17:02:17 [info]: Incoming Request: GET /api/animals
+2026-04-16 17:02:20 [info]: Incoming Request: GET /api/animals
+2026-04-16 17:02:34 [info]: Incoming Request: GET /api/animals
+2026-04-16 17:02:36 [info]: Incoming Request: GET /api/geofences
+2026-04-16 17:02:49 [info]: Incoming Request: POST /api/animals
+2026-04-16 17:02:53 [info]: Incoming Request: GET /api/animals
+2026-04-16 17:02:53 [info]: Incoming Request: GET /api/geofences
+2026-04-16 17:03:04 [info]: Incoming Request: GET /api/animals
+2026-04-16 17:03:12 [info]: Incoming Request: GET /api/animals
+2026-04-16 17:03:13 [info]: Incoming Request: GET /api/animals
+2026-04-16 17:03:25 [info]: Incoming Request: GET /api/animals
+2026-04-16 17:03:28 [info]: Incoming Request: GET /api/animals
+2026-04-16 17:03:34 [info]: Incoming Request: GET /api/animals
+2026-04-16 17:03:47 [info]: Incoming Request: GET /api/animals
+2026-04-16 17:03:47 [info]: Incoming Request: GET /api/geofences
+2026-04-16 17:03:47 [info]: Incoming Request: GET /api/animals
+2026-04-16 17:03:47 [info]: Incoming Request: GET /api/geofences
+2026-04-16 17:04:05 [info]: Incoming Request: GET /api/animals
+2026-04-16 17:04:09 [info]: Socket disconnected: hzgK5_gxk_o8A1oxAAAF — client namespace disconnect
+2026-04-16 17:04:14 [info]: Incoming Request: GET /api/auth/me
+2026-04-16 17:04:15 [info]: Incoming Request: GET /api/animals
+2026-04-16 17:04:15 [info]: Incoming Request: GET /api/geofences
+2026-04-16 17:04:15 [info]: Incoming Request: GET /api/animals
+2026-04-16 17:04:15 [info]: Incoming Request: GET /api/geofences
+2026-04-16 17:04:15 [info]: Socket connected: egLdx7-xvvtwsy7UAAAH (user 69e0f6ec4be9f34aaa8e2d6a)
+2026-04-16 17:04:15 [info]: Incoming Request: GET /api/animals
+2026-04-16 17:04:15 [info]: Incoming Request: GET /api/geofences
+2026-04-16 17:04:25 [info]: Incoming Request: GET /api/geofences
+2026-04-16 17:04:27 [info]: Incoming Request: GET /api/animals
+2026-04-16 17:04:30 [info]: Incoming Request: GET /api/animals/69e107ef8a500d1d8def052d
+2026-04-16 17:04:34 [info]: Incoming Request: GET /api/animals
+2026-04-16 17:04:34 [info]: Incoming Request: GET /api/geofences
+2026-04-16 17:04:41 [info]: Incoming Request: GET /api/animals
+2026-04-16 17:04:49 [info]: Incoming Request: GET /api/animals
+2026-04-16 17:04:49 [info]: Incoming Request: GET /api/geofences
+2026-04-16 17:06:08 [info]: Incoming Request: GET /api/animals
+2026-04-16 17:06:08 [info]: Incoming Request: GET /api/geofences
+2026-04-16 17:06:31 [info]: Incoming Request: GET /api/animals
+2026-04-16 17:06:31 [info]: Incoming Request: GET /api/geofences
+2026-04-16 17:13:24 [info]: Incoming Request: GET /api/animals
+2026-04-16 17:13:24 [info]: Incoming Request: GET /api/geofences
+2026-04-16 17:13:24 [info]: Incoming Request: GET /api/animals
+2026-04-16 17:13:24 [info]: Incoming Request: GET /api/geofences
+2026-04-16 17:13:24 [info]: Incoming Request: POST /api/auth/refresh
+2026-04-16 17:13:25 [info]: Incoming Request: GET /api/animals
+2026-04-16 17:13:25 [info]: Incoming Request: GET /api/geofences
+2026-04-16 17:13:25 [info]: Incoming Request: GET /api/animals
+2026-04-16 17:13:25 [info]: Incoming Request: GET /api/geofences
+2026-04-16 17:14:11 [info]: Socket disconnected: egLdx7-xvvtwsy7UAAAH — client namespace disconnect
+2026-04-16 17:14:17 [info]: Incoming Request: GET /api/auth/me
+2026-04-16 17:14:17 [info]: Incoming Request: GET /api/animals
+2026-04-16 17:14:17 [info]: Incoming Request: GET /api/geofences
+2026-04-16 17:14:17 [info]: Incoming Request: GET /api/animals
+2026-04-16 17:14:17 [info]: Incoming Request: GET /api/geofences
+2026-04-16 17:14:18 [info]: Socket connected: NErYhOWakddv6jgiAAAJ (user 69e0f6ec4be9f34aaa8e2d6a)
+2026-04-16 17:14:18 [info]: Incoming Request: GET /api/animals
+2026-04-16 17:14:18 [info]: Incoming Request: GET /api/geofences
+2026-04-16 17:14:24 [info]: Incoming Request: GET /api/animals
+2026-04-16 17:14:32 [info]: Incoming Request: GET /api/animals
+2026-04-16 17:14:34 [info]: Incoming Request: GET /api/animals/69e107ef8a500d1d8def052d
+2026-04-16 17:14:37 [info]: Incoming Request: DELETE /api/animals/69e107ef8a500d1d8def052d
+2026-04-16 17:14:38 [info]: Incoming Request: GET /api/geofences
+2026-04-16 17:14:56 [info]: Incoming Request: POST /api/animals
+2026-04-16 17:14:58 [info]: Incoming Request: GET /api/geofences
+2026-04-16 17:14:59 [info]: Incoming Request: GET /api/animals
+2026-04-16 17:14:59 [info]: Incoming Request: GET /api/geofences
+2026-04-16 17:15:03 [info]: Incoming Request: GET /api/animals
+2026-04-16 17:15:17 [info]: Incoming Request: GET /api/animals/69e108298a500d1d8def052e
+2026-04-16 17:15:19 [info]: Incoming Request: GET /api/animals/69e10b008a500d1d8def0533
+2026-04-16 17:15:22 [info]: Incoming Request: GET /api/animals
+2026-04-16 17:15:22 [info]: Incoming Request: GET /api/geofences
+2026-04-16 17:15:27 [info]: Incoming Request: GET /api/animals
+2026-04-16 17:19:08 [info]: Incoming Request: GET /api/animals
+2026-04-16 17:19:08 [info]: Incoming Request: GET /api/geofences
+2026-04-16 17:19:08 [info]: Incoming Request: GET /api/animals
+2026-04-16 17:19:08 [info]: Incoming Request: GET /api/geofences
+2026-04-16 17:19:39 [info]: Socket disconnected: NErYhOWakddv6jgiAAAJ — client namespace disconnect
+2026-04-16 17:19:45 [info]: Incoming Request: GET /api/auth/me
+2026-04-16 17:19:45 [info]: Incoming Request: GET /api/animals
+2026-04-16 17:19:45 [info]: Incoming Request: GET /api/geofences
+2026-04-16 17:19:45 [info]: Incoming Request: GET /api/animals
+2026-04-16 17:19:45 [info]: Incoming Request: GET /api/geofences
+2026-04-16 17:19:45 [info]: Socket connected: oG8Poh4bhLw4lahhAAAL (user 69e0f6ec4be9f34aaa8e2d6a)
+2026-04-16 17:19:46 [info]: Incoming Request: GET /api/animals
+2026-04-16 17:19:46 [info]: Incoming Request: GET /api/geofences
+2026-04-16 17:19:52 [info]: Incoming Request: GET /api/animals

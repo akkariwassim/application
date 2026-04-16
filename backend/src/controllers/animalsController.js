@@ -4,6 +4,80 @@ const Animal = require('../models/Animal');
 const Zone   = require('../models/Zone');
 
 /**
+ * Generate a random point guaranteed to be inside a polygon.
+ * Uses bounding-box rejection sampling.
+ */
+function randomPointInPolygon(coords) {
+  if (!coords || coords.length < 3) return null;
+
+  // Compute bounding box
+  let minLat = Infinity, maxLat = -Infinity, minLon = Infinity, maxLon = -Infinity;
+  for (const c of coords) {
+    if (c.latitude < minLat) minLat = c.latitude;
+    if (c.latitude > maxLat) maxLat = c.latitude;
+    if (c.longitude < minLon) minLon = c.longitude;
+    if (c.longitude > maxLon) maxLon = c.longitude;
+  }
+
+  // Rejection sampling: pick random points in the bounding box until one is inside
+  for (let attempt = 0; attempt < 200; attempt++) {
+    const lat = minLat + Math.random() * (maxLat - minLat);
+    const lon = minLon + Math.random() * (maxLon - minLon);
+
+    if (isPointInsidePolygon(lat, lon, coords)) {
+      return { latitude: lat, longitude: lon };
+    }
+  }
+
+  // Fallback: centroid
+  const centLat = coords.reduce((s, c) => s + c.latitude, 0) / coords.length;
+  const centLon = coords.reduce((s, c) => s + c.longitude, 0) / coords.length;
+  return { latitude: centLat, longitude: centLon };
+}
+
+/**
+ * Ray-casting point-in-polygon test
+ */
+function isPointInsidePolygon(lat, lon, polygon) {
+  let inside = false;
+  for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+    const xi = polygon[i].latitude, yi = polygon[i].longitude;
+    const xj = polygon[j].latitude, yj = polygon[j].longitude;
+    const intersect = ((yi > lon) !== (yj > lon)) && (lat < (xj - xi) * (lon - yi) / (yj - yi) + xi);
+    if (intersect) inside = !inside;
+  }
+  return inside;
+}
+
+const isAtZero = (lat, lon) => {
+  const l = parseFloat(lat);
+  const n = parseFloat(lon);
+  return isNaN(l) || isNaN(n) || (Math.abs(l) < 0.001 && Math.abs(n) < 0.001);
+};
+
+/**
+ * Given a zone, returns a random coordinate inside it
+ */
+async function getRandomPointInZone(zoneId) {
+  const zone = await Zone.findById(zoneId);
+  if (!zone) return null;
+
+  if (zone.polygon_coords) {
+    const coords = typeof zone.polygon_coords === 'string' ? JSON.parse(zone.polygon_coords) : zone.polygon_coords;
+    if (coords.length >= 3) {
+      return randomPointInPolygon(coords);
+    }
+  }
+
+  // Fallback to center
+  if (zone.center_lat && zone.center_lon) {
+    return { latitude: zone.center_lat, longitude: zone.center_lon };
+  }
+
+  return null;
+}
+
+/**
  * GET /api/animals
  */
 async function getAnimals(req, res, next) {
@@ -34,33 +108,23 @@ async function getAnimal(req, res, next) {
  */
 async function createAnimal(req, res, next) {
   try {
-    const isAtZero = (lat, lon) => {
-      const l = parseFloat(lat);
-      const n = parseFloat(lon);
-      return isNaN(l) || isNaN(n) || (Math.abs(l) < 0.001 && Math.abs(n) < 0.001);
-    };
+    const { name, type, breed, latitude, longitude, 
+            weightKg, birthDate, rfidTag, deviceId, 
+            colorHex, notes, currentZoneId, current_zone_id } = req.body;
+
+    const zoneId = currentZoneId || current_zone_id || null;
 
     let finalLat = parseFloat(latitude);
     let finalLon = parseFloat(longitude);
-    
     if (isNaN(finalLat)) finalLat = 0;
     if (isNaN(finalLon)) finalLon = 0;
 
-    // If assigned to a zone but no location provided (or at 0,0), center in zone
-    if (currentZoneId && isAtZero(finalLat, finalLon)) {
-      const zone = await Zone.findById(currentZoneId);
-      if (zone) {
-        if (zone.center_lat && zone.center_lon) {
-          finalLat = zone.center_lat;
-          finalLon = zone.center_lon;
-        } else if (zone.polygon_coords) {
-          // Fallback: calculate a simple center from polygon
-          const coords = typeof zone.polygon_coords === 'string' ? JSON.parse(zone.polygon_coords) : zone.polygon_coords;
-          if (coords.length > 0) {
-            finalLat = coords.reduce((acc, c) => acc + c.latitude, 0) / coords.length;
-            finalLon = coords.reduce((acc, c) => acc + c.longitude, 0) / coords.length;
-          }
-        }
+    // If assigned to a zone but coordinates missing/zero → random point inside zone
+    if (zoneId && isAtZero(finalLat, finalLon)) {
+      const point = await getRandomPointInZone(zoneId);
+      if (point) {
+        finalLat = point.latitude;
+        finalLon = point.longitude;
       }
     }
 
@@ -71,19 +135,23 @@ async function createAnimal(req, res, next) {
       breed,
       weight_kg: weightKg,
       birth_date: birthDate,
-      rfid_tag: rfidTag,
-      device_id: deviceId,
+      // Convert empty strings to null to avoid duplicate-key conflicts on sparse index
+      rfid_tag:  rfidTag  && rfidTag.trim()  ? rfidTag.trim()  : null,
+      device_id: deviceId && deviceId.trim() ? deviceId.trim() : null,
       color_hex: colorHex || '#4CAF50',
       notes,
-      latitude: finalLat,
+      latitude:  finalLat,
       longitude: finalLon,
-      current_zone_id: currentZoneId || null,
+      current_zone_id: zoneId,
       status: 'safe',
       last_seen: new Date()
     });
     
     res.status(201).json(animal);
   } catch (err) {
+    if (err.code === 11000) {
+      return res.status(400).json({ error: 'DUPLICATE_DEVICE', message: 'Ce device_id ou rfid_tag est déjà utilisé par un autre animal.' });
+    }
     next(err);
   }
 }
@@ -108,13 +176,6 @@ async function updateAnimal(req, res, next) {
       delete updates.currentZoneId; 
     }
 
-    const isAtZero = (lat, lon) => {
-      const l = parseFloat(lat);
-      const n = parseFloat(lon);
-      return isNaN(l) || isNaN(n) || (Math.abs(l) < 0.001 && Math.abs(n) < 0.001);
-    };
-
-    // Auto-center if animal is currently at 0,0 and we have a zone
     const existing = await Animal.findOne({ _id: id, user_id: req.user.id });
     if (!existing) return res.status(404).json({ error: 'Animal not found' });
 
@@ -122,19 +183,12 @@ async function updateAnimal(req, res, next) {
     const currentLon = updates.longitude !== undefined ? updates.longitude : existing.longitude;
     const zoneId = updates.current_zone_id || existing.current_zone_id;
 
+    // Auto-place inside zone if animal is at 0,0
     if (zoneId && isAtZero(currentLat, currentLon)) {
-      const zone = await Zone.findById(zoneId);
-      if (zone) {
-        if (zone.center_lat && zone.center_lon) {
-          updates.latitude = zone.center_lat;
-          updates.longitude = zone.center_lon;
-        } else if (zone.polygon_coords) {
-          const coords = typeof zone.polygon_coords === 'string' ? JSON.parse(zone.polygon_coords) : zone.polygon_coords;
-          if (coords.length > 0) {
-            updates.latitude = coords.reduce((acc, c) => acc + c.latitude, 0) / coords.length;
-            updates.longitude = coords.reduce((acc, c) => acc + c.longitude, 0) / coords.length;
-          }
-        }
+      const point = await getRandomPointInZone(zoneId);
+      if (point) {
+        updates.latitude = point.latitude;
+        updates.longitude = point.longitude;
       }
     }
 
