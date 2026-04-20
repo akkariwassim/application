@@ -206,7 +206,7 @@ async function createAnimal(req, res, next) {
     }
 
     // 2. Data Construction (Omit empty strings to satisfy sparse index)
-    const animalData = {
+    const animal = await Animal.create({
       user_id: req.user.id,
       name,
       type,
