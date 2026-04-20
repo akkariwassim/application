@@ -1,127 +1,102 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import {
   View, Text, ScrollView, TextInput, TouchableOpacity,
-  StyleSheet, Alert, ActivityIndicator, KeyboardAvoidingView, Platform,
-  Animated, StatusBar
+  StyleSheet, Alert, ActivityIndicator, KeyboardAvoidingView, Platform, Dimensions
 } from 'react-native';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+
+const { width } = Dimensions.get('window');
 import { Formik } from 'formik';
 import * as Yup from 'yup';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import useAnimalStore from '../store/animalStore';
 import useGeofenceStore from '../store/geofenceStore';
-import theme, { COLORS, SPACING, BORDER_RADIUS, SHADOWS, TYPOGRAPHY } from '../config/theme';
-import HealthWidget from '../components/HealthWidget';
+
+const COLORS = {
+  primary:    '#6366F1', 
+  background: '#0F172A', 
+  surface:    '#1E293B', 
+  card:       '#1E2A45', 
+  text:       '#F8FAFC', 
+  subtext:    '#94A3B8', 
+  danger:     '#EF4444', 
+  safe:       '#10B981',
+  border:     'rgba(255, 255, 255, 0.08)',
+};
+
+const TYPES = ['bovine', 'ovine', 'caprine', 'equine', 'other'];
+const TYPE_ICONS = { bovine: 'cow', ovine: 'sheep', caprine: 'sheep', equine: 'horse-variant', other: 'paw' };
 
 const AnimalSchema = Yup.object().shape({
-  name:     Yup.string().required('Nom requis'),
-  type:     Yup.string().oneOf(['cow','sheep','goat','camel','horse','other']).required(),
-  breed:    Yup.string().optional(),
-  weightKg: Yup.number().min(0).optional().nullable(),
-  age:      Yup.number().min(0).optional().nullable(),
-  deviceId: Yup.string().required('ID Collar requis'),
-  currentZoneId: Yup.string().optional(),
+  name:     Yup.string().required('Name is required'),
+  type:     Yup.string().oneOf(TYPES).required(),
+  age:      Yup.number().min(0).max(50).nullable(),
+  weightKg: Yup.number().min(0).nullable(),
+  deviceId: Yup.string().nullable(), // Optional mode
+  rfidTag:  Yup.string().nullable(),
 });
 
-const ANIMAL_TYPES = [
-  { id: 'cow',   label: 'Vache', icon: 'cow' },
-  { id: 'sheep', label: 'Mouton', icon: 'sheep' },
-  { id: 'goat',  label: 'Chèvre', icon: 'paw' },
-  { id: 'camel', label: 'Chameau', icon: 'paw' },
-  { id: 'horse', label: 'Cheval', icon: 'horse-variant' },
-  { id: 'other', label: 'Autre', icon: 'dots-horizontal' },
-];
+// ── UTILITY: Auto-Generate IDs ──
+const generateHardwareId = (prefix) => {
+  const ts = Math.floor(Date.now() / 1000).toString().slice(-6);
+  const rand = Math.random().toString(36).substring(2, 6).toUpperCase();
+  return `${prefix}_${ts}_${rand}`;
+};
 
 export default function AnimalDetailScreen({ route, navigation }) {
-  const { animal: initialAnimal, mode } = route.params || {};
+  const insets = useSafeAreaInsets();
+  const { animal, mode, initialLocation, initialZoneId } = route.params || {};
   const isCreate = mode === 'create';
-  
-  const [isEditing, setIsEditing] = useState(isCreate);
   const [saving, setSaving] = useState(false);
-  const [animal, setAnimal] = useState(initialAnimal || {});
-
-  const { createAnimal, updateAnimal, fetchAnimal, triggerAction, fetchFreeDevices, freeDevices } = useAnimalStore();
+  
+  const { createAnimal, updateAnimal, fetchAvailableDevices, availableDevices } = useAnimalStore();
   const { geofences, fetchGeofences } = useGeofenceStore();
 
   const [lastSyncDiff, setLastSyncDiff] = useState(0);
 
   useEffect(() => {
     fetchGeofences();
-    fetchFreeDevices(); // Load available hardware
-    if (!isCreate && animal.id) {
-      refreshData();
-    }
+    fetchAvailableDevices();
   }, []);
 
-  // Update "last sync" timer every second & Auto-refresh on focus
-  useEffect(() => {
-    const timer = setInterval(() => {
-      if (animal.last_sync) {
-        const diff = Math.floor((new Date() - new Date(animal.last_sync)) / 1000);
-        setLastSyncDiff(diff);
-        
-        // Auto-refresh biometric data if focused and stale (> 10s)
-        if (diff > 10 && !isEditing && !saving) {
-            refreshData();
-        }
-      }
-    }, 2000);
-    return () => clearInterval(timer);
-  }, [animal.last_sync, isEditing, saving]);
+  const handleSave = async (values, { setFieldValue, submitForm }) => {
+    console.log(`[AnimalDetail] Submitting ${mode} request:`, {
+      name: values.name,
+      device_id: values.deviceId,
+      rfid_tag: values.rfidTag,
+    });
 
-  const refreshData = async () => {
-    const updated = await fetchAnimal(animal.id);
-    if (updated) setAnimal(updated);
-  };
-
-  const handleAction = async (type, currentState) => {
-    try {
-      const newState = !currentState;
-      await triggerAction(animal.id, type, newState);
-      setAnimal(prev => ({
-        ...prev,
-        actuators: { ...prev.actuators, [type]: newState }
-      }));
-    } catch (err) {
-      Alert.alert('Erreur Hardware', err.message);
-    }
-  };
-
-  const handleSave = async (values) => {
     setSaving(true);
     try {
-      // Professional Data Mapping (UI -> API)
-      const payload = {
-        ...values,
-        weightKg: values.weightKg ? Number(values.weightKg) : null,
-        birthDate: values.age ? new Date(new Date().setFullYear(new Date().getFullYear() - Number(values.age))).toISOString() : null,
-        deviceId:  values.deviceId?.trim(),
-        currentZoneId: values.currentZoneId || null,
-      };
-
       if (isCreate) {
-        await createAnimal(payload);
-        Alert.alert('Succès ✅', "L'animal a été enregistré avec son équipement IoT.");
-        
-        // Dynamic Inventory Refresh
-        fetchFreeDevices(); 
-        
-        // Auto Reset & Close (Professional UX)
-        navigation.goBack();
+        await createAnimal(values);
       } else {
-        const updated = await updateAnimal(animal.id, payload);
-        setAnimal(updated);
-        setIsEditing(false);
-        Alert.alert('Mis à jour', 'Les modifications ont été synchronisées.');
+        await updateAnimal(animal.id, values);
       }
+      
+      Alert.alert('Success', `Animal ${isCreate ? 'registered' : 'updated'} successfully.`);
+      navigation.goBack();
     } catch (err) {
-      // Professional Conflict Handling (409)
-      if (err.message.includes('409') || err.message.includes('DUPLICATE_DEVICE')) {
+      // ── DUPLICATE RESOLUTION FLOW ──
+      if (err.message.includes('déjà utilisé') || err.message.includes('duplicate')) {
         Alert.alert(
-          '⚠️ Conflit Matériel', 
-          "Ce collier ou cet identifiant est déjà assigné à un autre animal sur la ferme. Veuillez choisir un autre équipement disponible."
+          'Conflict Detected',
+          `${err.message}\n\nWould you like to auto-generate a unique ID to continue?`,
+          [
+            { text: 'Cancel', style: 'cancel' },
+            { 
+              text: 'Auto-Generate', 
+              onPress: async () => {
+                const newId = generateHardwareId('DEV');
+                setFieldValue('deviceId', newId);
+                // We don't submit immediately to let user see the new ID
+                Alert.alert('ID Generated', `New ID: ${newId}. Press Save again to confirm.`);
+              }
+            }
+          ]
         );
       } else {
-        Alert.alert('Erreur Système', err.message);
+        Alert.alert('Registration Conflict', err.message);
       }
     } finally {
       setSaving(false);
@@ -146,20 +121,201 @@ export default function AnimalDetailScreen({ route, navigation }) {
   const typeIcon = typeInfo.icon;
 
   return (
-    <View style={styles.container}>
-      <StatusBar barStyle="light-content" />
-      
-      {/* Header Area */}
-      <View style={[styles.header, { backgroundColor: statusColor }]}>
-        <View style={styles.headerTop}>
-          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.IconButton}>
-            <Ionicons name="arrow-back" size={24} color={COLORS.white} />
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>{isCreate ? 'Nouvel Animal' : animal.name}</Text>
-          {!isCreate && (
-            <TouchableOpacity onPress={() => setIsEditing(!isEditing)} style={styles.IconButton}>
-              <Ionicons name={isEditing ? 'close' : 'create-outline'} size={24} color={COLORS.white} />
-            </TouchableOpacity>
+    <KeyboardAvoidingView 
+      style={{ flex: 1, backgroundColor: COLORS.background }}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+    >
+      {/* Header */}
+      <View style={[styles.header, { paddingTop: insets.top + 10 }]}>
+        <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
+          <Ionicons name="close" size={24} color={COLORS.text} />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>{isCreate ? 'Add New Animal' : 'Edit Animal'}</Text>
+        <View style={{ width: 44 }} />
+      </View>
+
+      <ScrollView contentContainerStyle={styles.scroll}>
+        <Formik
+          initialValues={{
+            name:     animal?.name || '',
+            type:     animal?.type || 'bovine',
+            age:      animal?.age ? String(animal.age) : '',
+            breed:    animal?.breed || '',
+            weightKg: animal?.weight_kg ? String(animal.weight_kg) : '',
+            deviceId: animal?.device_id || '',
+            rfidTag:  animal?.rfid_tag || '',
+            colorHex: animal?.color_hex || '#6366F1',
+            currentZoneId: animal?.current_zone_id || initialZoneId || '',
+            latitude:  animal?.latitude || initialLocation?.latitude || 0,
+            longitude: animal?.longitude || initialLocation?.longitude || 0,
+          }}
+          validationSchema={AnimalSchema}
+          onSubmit={handleSave}
+        >
+          {({ handleChange, handleBlur, handleSubmit, values, errors, touched, setFieldValue }) => (
+            <View style={styles.form}>
+              
+              {/* SECTION: IDENTITY */}
+              <View style={styles.section}>
+                <Text style={styles.sectionLabel}>identity</Text>
+                
+                <View style={styles.field}>
+                  <Text style={styles.label}>Animal Name *</Text>
+                  <TextInput 
+                    style={[styles.input, touched.name && errors.name && styles.inputErr]}
+                    placeholder="e.g. Luna"
+                    placeholderTextColor={COLORS.subtext}
+                    value={values.name}
+                    onChangeText={handleChange('name')}
+                    onBlur={handleBlur('name')}
+                  />
+                  {touched.name && errors.name && <Text style={styles.err}>{errors.name}</Text>}
+                </View>
+
+                <View style={styles.field}>
+                  <Text style={styles.label}>Species *</Text>
+                  <View style={styles.typeGrid}>
+                    {TYPES.map(t => (
+                      <TouchableOpacity 
+                        key={t}
+                        style={[styles.typeBtn, values.type === t && styles.typeBtnActive]}
+                        onPress={() => setFieldValue('type', t)}
+                      >
+                        <MaterialCommunityIcons 
+                          name={TYPE_ICONS[t]} 
+                          size={24} 
+                          color={values.type === t ? '#fff' : COLORS.subtext} 
+                        />
+                        <Text style={[styles.typeBtnText, values.type === t && { color: '#fff' }]}>{t}</Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                </View>
+
+                <View style={styles.row}>
+                  <View style={[styles.field, { flex: 1 }]}>
+                    <Text style={styles.label}>Age (Years)</Text>
+                    <TextInput 
+                      style={styles.input}
+                      keyboardType="numeric"
+                      placeholder="5"
+                      placeholderTextColor={COLORS.subtext}
+                      value={values.age}
+                      onChangeText={handleChange('age')}
+                    />
+                  </View>
+                  <View style={[styles.field, { flex: 1 }]}>
+                    <Text style={styles.label}>Weight (KG)</Text>
+                    <TextInput 
+                      style={styles.input}
+                      keyboardType="numeric"
+                      placeholder="450"
+                      placeholderTextColor={COLORS.subtext}
+                      value={values.weightKg}
+                      onChangeText={handleChange('weightKg')}
+                    />
+                  </View>
+                </View>
+              </View>
+
+              {/* SECTION: HARDWARE */}
+              <View style={styles.section}>
+                <Text style={styles.sectionLabel}>tracking hardware</Text>
+                
+                <View style={styles.field}>
+                  <Text style={styles.label}>Device / Collar ID (Optional)</Text>
+                  
+                  {/* Fleet Selection */}
+                  <View style={styles.devicePickerContainer}>
+                    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 10 }}>
+                      {availableDevices.map(dev => (
+                        <TouchableOpacity 
+                          key={dev.device_id}
+                          style={[styles.deviceBubble, values.deviceId === dev.device_id && styles.deviceBubbleActive]}
+                          onPress={() => setFieldValue('deviceId', dev.device_id)}
+                        >
+                          <MaterialCommunityIcons 
+                            name="watch" 
+                            size={16} 
+                            color={values.deviceId === dev.device_id ? '#fff' : COLORS.subtext} 
+                          />
+                          <Text style={[styles.deviceBubbleText, values.deviceId === dev.device_id && { color: '#fff' }]}>
+                            {dev.device_id}
+                          </Text>
+                        </TouchableOpacity>
+                      ))}
+                    </ScrollView>
+                  </View>
+
+                  <Text style={[styles.label, { marginTop: 15 }]}>Or enter manually:</Text>
+                  <TextInput 
+                    style={[styles.input, touched.deviceId && errors.deviceId && styles.inputErr]}
+                    placeholder="e.g. IOT_772"
+                    placeholderTextColor={COLORS.subtext}
+                    autoCapitalize="none"
+                    value={values.deviceId}
+                    onChangeText={handleChange('deviceId')}
+                    onBlur={handleBlur('deviceId')}
+                  />
+                  {touched.deviceId && errors.deviceId && <Text style={styles.err}>{errors.deviceId}</Text>}
+                </View>
+
+                <View style={styles.field}>
+                  <Text style={styles.label}>RFID Tag (Optional)</Text>
+                  <TextInput 
+                    style={styles.input}
+                    placeholder="e.g. RFID_991"
+                    placeholderTextColor={COLORS.subtext}
+                    autoCapitalize="none"
+                    value={values.rfidTag}
+                    onChangeText={handleChange('rfidTag')}
+                  />
+                </View>
+              </View>
+
+              {/* SECTION: ZONE */}
+              <View style={styles.section}>
+                <Text style={styles.sectionLabel}>zone assignment</Text>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.zoneScroll}>
+                  {geofences.map(gf => (
+                    <TouchableOpacity 
+                      key={gf.id}
+                      style={[styles.zoneCard, values.currentZoneId === gf.id && styles.zoneCardActive]}
+                      onPress={() => setFieldValue('currentZoneId', gf.id)}
+                    >
+                      <View style={[styles.zoneIcon, { backgroundColor: gf.fill_color || COLORS.primary }]}>
+                        <Ionicons name="map" size={18} color="#fff" />
+                      </View>
+                      <Text style={[styles.zoneName, values.currentZoneId === gf.id && { color: COLORS.primary }]}>{gf.name}</Text>
+                      {values.currentZoneId === gf.id && <Ionicons name="checkmark-circle" size={16} color={COLORS.primary} />}
+                    </TouchableOpacity>
+                  ))}
+                  <TouchableOpacity 
+                    style={[styles.zoneCard, values.currentZoneId === '' && styles.zoneCardActive]}
+                    onPress={() => setFieldValue('currentZoneId', '')}
+                  >
+                    <View style={[styles.zoneIcon, { backgroundColor: COLORS.offline }]}>
+                      <Ionicons name="ban" size={18} color="#fff" />
+                    </View>
+                    <Text style={styles.zoneName}>Unassigned</Text>
+                  </TouchableOpacity>
+                </ScrollView>
+              </View>
+
+              {/* SAVE BUTTON */}
+              <TouchableOpacity 
+                style={[styles.saveBtn, saving && { opacity: 0.7 }]}
+                onPress={handleSubmit}
+                disabled={saving}
+              >
+                {saving ? <ActivityIndicator color="#fff" /> : (
+                  <>
+                    <Ionicons name="checkmark-sharp" size={24} color="#fff" />
+                    <Text style={styles.saveBtnText}>{isCreate ? 'Create Animal' : 'Save Changes'}</Text>
+                  </>
+                )}
+              </TouchableOpacity>
+            </View>
           )}
         </View>
 
@@ -456,83 +612,43 @@ export default function AnimalDetailScreen({ route, navigation }) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: COLORS.background },
-  header: { paddingHorizontal: SPACING.lg, paddingBottom: SPACING.xl, borderBottomLeftRadius: 30, borderBottomRightRadius: 30 },
-  headerTop: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingTop: Platform.OS === 'ios' ? 50 : 20 },
-  IconButton: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center', borderRadius: 20, backgroundColor: 'rgba(255,255,255,0.2)' },
-  headerTitle: { color: COLORS.white, fontSize: 18, fontWeight: '800' },
-  headerContent: { alignItems: 'center', marginTop: SPACING.lg },
-  avatarContainer: { width: 80, height: 80, borderRadius: 40, backgroundColor: 'rgba(255,255,255,0.2)', alignItems: 'center', justifyContent: 'center', marginBottom: SPACING.md },
-  statusBadge: { flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.25)', paddingHorizontal: 12, paddingVertical: 4, borderRadius: 12 },
-  statusDot: { width: 6, height: 6, borderRadius: 3, marginRight: 6 },
-  statusText: { color: COLORS.white, fontSize: 10, fontWeight: '800', letterSpacing: 0.5 },
-  
-  scroll: { paddingBottom: 100 },
-  sectionHeaderRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingRight: SPACING.lg },
-  sectionTitle: { color: COLORS.white, fontSize: 16, fontWeight: '800', marginLeft: SPACING.lg, marginTop: SPACING.xl, marginBottom: SPACING.md },
-  staleBadge: { backgroundColor: COLORS.warning + '33', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6, marginTop: 10 },
-  staleBadgeText: { color: COLORS.warning, fontSize: 9, fontWeight: '900' },
-  
-  // Dashboard
-  dashboard: { paddingHorizontal: SPACING.md },
-  healthGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: SPACING.sm, justifyContent: 'space-between' },
-  distanceCard: { backgroundColor: COLORS.card, borderRadius: BORDER_RADIUS.lg, padding: SPACING.lg, marginTop: SPACING.md, borderWidth: 1, borderColor: COLORS.border, ...SHADOWS.soft },
-  distanceLabel: { color: COLORS.textMuted, fontSize: 13, fontWeight: '600' },
-  distanceValue: { color: COLORS.white, fontSize: 32, fontWeight: '800', marginVertical: 8 },
-  distanceUnit: { fontSize: 16, color: COLORS.textDim },
-  distanceGoal: { color: COLORS.textDim, fontSize: 11 },
-  distanceProgress: { height: 6, backgroundColor: COLORS.divider, borderRadius: 3, marginTop: SPACING.md, overflow: 'hidden' },
-  progressBar: { height: '100%', borderRadius: 3 },
-  
-  infoList: { backgroundColor: COLORS.card, borderRadius: BORDER_RADIUS.lg, paddingHorizontal: SPACING.md, borderWidth: 1, borderColor: COLORS.border },
-  infoItem: { flexDirection: 'row', alignItems: 'center', paddingVertical: SPACING.md, borderBottomWidth: 1, borderBottomColor: COLORS.divider },
-  infoKey: { color: COLORS.textMuted, fontSize: 14, flex: 1, marginLeft: 12 },
-  infoVal: { color: COLORS.white, fontSize: 14, fontWeight: '700' },
+  header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingBottom: 15, backgroundColor: COLORS.surface },
+  backBtn: { width: 44, height: 44, borderRadius: 14, backgroundColor: COLORS.background, justifyContent: 'center', alignItems: 'center', borderWidth: 1, borderColor: COLORS.border },
+  headerTitle: { color: COLORS.text, fontSize: 18, fontWeight: '900' },
 
-  // Form
-  form: { padding: SPACING.lg },
-  inputGroup: { marginBottom: SPACING.lg },
-  inputRow: { flexDirection: 'row', gap: SPACING.md },
-  inputLabel: { color: COLORS.textMuted, fontSize: 12, fontWeight: '700', textTransform: 'uppercase', marginBottom: 8, marginLeft: 4 },
-  input: { backgroundColor: COLORS.card, borderRadius: BORDER_RADIUS.md, height: 52, paddingHorizontal: 16, color: COLORS.white, fontSize: 15, borderWidth: 1, borderColor: COLORS.border },
-  inputError: { borderColor: COLORS.danger },
-  saveBtn: { height: 56, borderRadius: BORDER_RADIUS.md, alignItems: 'center', justifyContent: 'center', marginTop: SPACING.lg, ...SHADOWS.hard },
-  saveBtnText: { color: COLORS.white, fontSize: 16, fontWeight: '800' },
-
-  // Actuators
-  actuatorCard: { backgroundColor: COLORS.card, borderRadius: BORDER_RADIUS.lg, padding: SPACING.md, borderWidth: 1, borderColor: COLORS.border, ...SHADOWS.soft },
-  actuatorRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 12 },
-  actuatorLabelCol: { flexDirection: 'row', alignItems: 'center' },
-  actuatorName: { color: COLORS.white, fontSize: 15, fontWeight: '700' },
-  actuatorSub: { color: COLORS.textDim, fontSize: 11 },
-  actuatorToggle: { width: 44, height: 24, borderRadius: 12, backgroundColor: COLORS.divider, padding: 2, justifyContent: 'center' },
-  actuatorActive: { backgroundColor: COLORS.danger },
-  actuatorActiveLed: { backgroundColor: COLORS.success },
-  actuatorActiveRelay: { backgroundColor: COLORS.info },
-  toggleCircle: { width: 20, height: 20, borderRadius: 10, backgroundColor: COLORS.white },
-  toggleCircleActive: { alignSelf: 'flex-end' },
-  divider: { height: 1, backgroundColor: COLORS.divider, marginHorizontal: -SPACING.md },
-  syncTimer: { color: 'rgba(255,255,255,0.7)', fontSize: 11, fontWeight: '600', marginTop: 8 },
-
-  errorText: { color: COLORS.danger, fontSize: 10, marginTop: 4, marginLeft: 4, fontWeight: '600' },
+  scroll: { paddingBottom: 60 },
+  form: { padding: 20 },
+  section: { marginBottom: 30 },
+  sectionLabel: { color: COLORS.primary, fontSize: 11, fontWeight: '800', textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 15 },
   
-  // Custom Selector
-  typeSelector: { flexDirection: 'row', marginBottom: 4 },
-  typeItem: { 
-    alignItems: 'center', 
-    justifyContent: 'center', 
-    backgroundColor: COLORS.card, 
-    borderRadius: 16, 
-    padding: 12, 
-    marginRight: 10, 
-    borderWidth: 1, 
-    borderColor: COLORS.border,
-    minWidth: 80
+  field: { marginBottom: 18 },
+  label: { color: COLORS.subtext, fontSize: 13, fontWeight: '700', marginBottom: 8 },
+  input: { backgroundColor: COLORS.surface, borderRadius: 16, height: 54, paddingHorizontal: 16, color: COLORS.text, fontSize: 16, borderWidth: 1, borderColor: COLORS.border },
+  inputErr: { borderColor: COLORS.danger },
+  err: { color: COLORS.danger, fontSize: 12, marginTop: 5, fontWeight: '600' },
+  
+  row: { flexDirection: 'row', gap: 12 },
+
+  typeGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
+  typeBtn: { width: (width - 60) / 3, height: 80, backgroundColor: COLORS.surface, borderRadius: 18, justifyContent: 'center', alignItems: 'center', borderWidth: 1, borderColor: COLORS.border },
+  typeBtnActive: { backgroundColor: COLORS.primary, borderColor: COLORS.primary },
+  typeBtnText: { color: COLORS.subtext, fontSize: 10, fontWeight: '800', marginTop: 6, textTransform: 'uppercase' },
+
+  zoneScroll: { gap: 12, paddingRight: 40 },
+  zoneCard: { width: 140, backgroundColor: COLORS.surface, borderRadius: 20, padding: 15, alignItems: 'center', borderWidth: 1, borderColor: COLORS.border },
+  zoneCardActive: { borderColor: COLORS.primary, backgroundColor: COLORS.primary + '11' },
+  zoneIcon: { width: 40, height: 40, borderRadius: 12, justifyContent: 'center', alignItems: 'center', marginBottom: 10 },
+  zoneName: { color: COLORS.text, fontSize: 12, fontWeight: '800', marginBottom: 5 },
+
+  devicePickerContainer: { marginBottom: 10 },
+  deviceBubble: { 
+    flexDirection: 'row', alignItems: 'center', 
+    backgroundColor: COLORS.surface, paddingHorizontal: 15, paddingVertical: 10, 
+    borderRadius: 12, borderWidth: 1, borderColor: COLORS.border 
   },
-  typeItemActive: { backgroundColor: COLORS.primary, borderColor: COLORS.primary },
-  typeLabel: { color: COLORS.textDim, fontSize: 10, fontWeight: '700', marginTop: 6 },
-  typeLabelActive: { color: COLORS.white },
+  deviceBubbleActive: { backgroundColor: COLORS.primary, borderColor: COLORS.primary },
+  deviceBubbleText: { color: COLORS.subtext, fontSize: 13, fontWeight: '700', marginLeft: 8 },
 
-  emptyDeviceContainer: { marginTop: 4 },
-  emptyDeviceText: { color: COLORS.textMuted, fontSize: 10, marginTop: 4, fontStyle: 'italic' },
+  saveBtn: { height: 58, backgroundColor: COLORS.primary, borderRadius: 20, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10, shadowColor: COLORS.primary, shadowOpacity: 0.3, shadowRadius: 10, shadowOffset: { width: 0, height: 4 } },
+  saveBtnText: { color: '#fff', fontSize: 18, fontWeight: '800' },
 });

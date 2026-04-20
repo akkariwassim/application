@@ -7,17 +7,19 @@ const deviceSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Hardware ID is required'],
     unique: true,
+    index: true,
     trim: true,
-  },
-  type: {
-    type: String,
-    enum: ['collar', 'tag', 'sensor'],
-    default: 'collar',
   },
   status: {
     type: String,
     enum: ['free', 'assigned', 'maintenance', 'lost'],
     default: 'free',
+    index: true,
+  },
+  type: {
+    type: String,
+    enum: ['collar', 'tag', 'sensor', 'drone'],
+    default: 'collar',
   },
   battery_level: {
     type: Number,
@@ -26,6 +28,11 @@ const deviceSchema = new mongoose.Schema({
   last_sync: {
     type: Date,
     default: Date.now,
+  },
+  assigned_to_animal_id: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Animal',
+    default: null,
   },
   manufacturer: String,
   production_date: Date,
@@ -39,7 +46,8 @@ const deviceSchema = new mongoose.Schema({
       delete ret.__v;
       return ret;
     }
-  }
+  },
+  toObject: { virtuals: true }
 });
 
 const Device = mongoose.model('Device', deviceSchema);

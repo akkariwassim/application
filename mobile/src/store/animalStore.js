@@ -4,7 +4,9 @@ import api from '../services/api';
 const useAnimalStore = create((set, get) => ({
   animals: [],
   selectedAnimal: null,
+  selectedAnimalAI: null,
   isLoading: false,
+  isFetchingMore: false,
   error: null,
   freeDevices: [],
 
@@ -20,16 +22,74 @@ const useAnimalStore = create((set, get) => ({
 
   lastUpdateMap: {},
 
-  fetchAnimals: async () => {
-    set({ isLoading: true, error: null });
+  // ── Pagination State ──────────────────────────────────────
+  page: 1,
+  limit: 20,
+  hasMore: true,
+  total: 0,
+  filters: {
+    search: '',
+    status: null,
+    type: null,
+    zone_id: null,
+    sortBy: 'created_at',
+    sortOrder: 'desc'
+  },
+  stats: {
+    total: 0,
+    safe: 0,
+    warning: 0,
+    danger: 0,
+    offline: 0
+  },
+  availableDevices: [],
+
+  fetchAvailableDevices: async () => {
     try {
-      const { data } = await api.get('/animals');
-      // Professional Deduplication & ID Normalization
-      const normalized = data.map(a => ({ ...a, id: a.id || a._id }));
-      set({ animals: normalized, isLoading: false });
+      const { data } = await api.get('/devices', { params: { status: 'free' } });
+      set({ availableDevices: data });
     } catch (err) {
-      set({ error: err.response?.data?.error || 'Failed to load animals', isLoading: false });
+      console.error('Failed to fetch devices:', err.message);
     }
+  },
+
+  fetchAnimals: async (isNextPage = false) => {
+    const { page, limit, filters, animals, hasMore } = get();
+    if (isNextPage && !hasMore) return;
+
+    if (!isNextPage) {
+      set({ isLoading: true, error: null, page: 1, animals: [] });
+    } else {
+      set({ isFetchingMore: true });
+    }
+
+    try {
+      const currentPage = isNextPage ? page + 1 : 1;
+      const { data } = await api.get('/animals', {
+        params: { ...filters, page: currentPage, limit }
+      });
+
+      set({
+        animals: isNextPage ? [...animals, ...data.animals] : data.animals,
+        total: data.pagination.total,
+        stats: data.stats || get().stats, // Use stats from backend if available
+        page: currentPage,
+        hasMore: data.pagination.hasMore,
+        isLoading: false,
+        isFetchingMore: false
+      });
+    } catch (err) {
+      set({ 
+        error: err.response?.data?.error || 'Failed to load animals', 
+        isLoading: false, 
+        isFetchingMore: false 
+      });
+    }
+  },
+
+  setFilters: (newFilters) => {
+    set((state) => ({ filters: { ...state.filters, ...newFilters } }));
+    get().fetchAnimals(); // Refresh from page 1
   },
 
   fetchAnimal: async (id) => {
@@ -43,17 +103,30 @@ const useAnimalStore = create((set, get) => ({
     }
   },
 
+  fetchAIAnalysis: async (animalId) => {
+    set({ selectedAnimalAI: null });
+    try {
+      const { data } = await api.get(`/ai/animal/${animalId}`);
+      set({ selectedAnimalAI: data });
+      return data;
+    } catch (err) {
+      console.warn('AI analysis not found for this animal');
+      set({ selectedAnimalAI: null });
+    }
+  },
+
+  // ... (create/update/delete remain similar but can trigger re-fetch if needed)
+  createAnimal: async (animalData) => {
     try {
       const { data } = await api.post('/animals', animalData);
-      const normalized = { ...data, id: data.id || data._id };
-      set((state) => {
-        // Prevent double entries for the same ID
-        const filtered = state.animals.filter(a => a.id !== normalized.id);
-        return { animals: [...filtered, normalized] };
-      });
-      return normalized;
+      set((state) => ({ 
+        animals: [data, ...state.animals], 
+        total: state.total + 1,
+        stats: { ...state.stats, total: state.stats.total + 1, [data.status || 'safe']: (state.stats[data.status || 'safe'] || 0) + 1 }
+      }));
+      return data;
     } catch (err) {
-      throw new Error(err.response?.data?.error || 'Failed to create animal');
+      throw new Error(err.response?.data?.message || err.response?.data?.error || 'Failed to create animal');
     }
 
   updateAnimal: async (id, updates) => {
@@ -65,27 +138,54 @@ const useAnimalStore = create((set, get) => ({
       }));
       return data;
     } catch (err) {
-      throw new Error(err.response?.data?.error || 'Failed to update animal');
+      throw new Error(err.response?.data?.message || err.response?.data?.error || 'Failed to update animal');
     }
   },
 
   deleteAnimal: async (id) => {
+    const animalToDelete = get().animals.find(a => a.id === id);
+    if (!animalToDelete) return;
+
+    // Optimistic delete
+    const previousAnimals = get().animals;
+    set({ 
+      animals: previousAnimals.filter((a) => a.id !== id),
+      lastDeletedAnimal: animalToDelete 
+    });
+
     try {
       await api.delete(`/animals/${id}`);
-      set((state) => ({
-        animals: state.animals.filter((a) => a.id !== id),
-      }));
+      // Clear undo reference after 5 seconds
+      setTimeout(() => {
+        if (get().lastDeletedAnimal?.id === id) {
+          set({ lastDeletedAnimal: null });
+        }
+      }, 5000);
     } catch (err) {
-      throw new Error(err.response?.data?.error || 'Failed to delete animal');
+      set({ animals: previousAnimals, lastDeletedAnimal: null });
+      throw err;
     }
   },
 
-  setGeofence: async (animalId, geofenceData) => {
+  restoreAnimal: async () => {
+    const animal = get().lastDeletedAnimal;
+    if (!animal) return;
+
     try {
-      const { data } = await api.post(`/animals/${animalId}/geofence`, geofenceData);
-      return data;
+      // Re-create in backend (simplified restore)
+      const res = await api.post('/animals', {
+        ...animal,
+        deviceId: animal.device_id,
+        rfidTag: animal.rfid_tag,
+        weightKg: animal.weight_kg,
+        currentZoneId: animal.current_zone_id
+      });
+      set(state => ({
+        animals: [res.data, ...state.animals],
+        lastDeletedAnimal: null
+      }));
     } catch (err) {
-      throw new Error(err.response?.data?.error || 'Failed to set geofence');
+      console.error('Failed to restore animal:', err.message);
     }
   },
 
@@ -115,48 +215,39 @@ const useAnimalStore = create((set, get) => ({
         (a.id === animalId || a._id === animalId)
           ? { 
               ...a, 
-              latitude:      positionData.latitude      !== undefined ? positionData.latitude      : a.latitude, 
-              longitude:     positionData.longitude     !== undefined ? positionData.longitude     : a.longitude, 
-              temperature:   positionData.temperature   !== undefined ? positionData.temperature   : a.temperature,
-              heart_rate:    positionData.heart_rate    !== undefined ? positionData.heart_rate    : a.heart_rate,
-              battery_level: positionData.battery_level !== undefined ? positionData.battery_level : a.battery_level,
-              gps_signal:    positionData.gps_signal    !== undefined ? positionData.gps_signal    : a.gps_signal,
-              activity:      positionData.activity      !== undefined ? positionData.activity      : a.activity,
-              actuators:     positionData.actuators     !== undefined ? positionData.actuators     : a.actuators,
-              last_sync:     positionData.timestamp     || new Date().toISOString(),
-              last_seen:     new Date().toISOString()
+              latitude: positionData.latitude, 
+              longitude: positionData.longitude, 
+              temperature: positionData.temperature,
+              heart_rate: positionData.heartRate || positionData.heart_rate,
+              battery_level: positionData.batteryLevel || positionData.battery_level,
+              signal_strength: positionData.signalStrength || positionData.signal_strength,
+              activity: positionData.activity,
+              last_seen: positionData.timestamp || new Date() 
             }
           : a
       ),
     }));
   },
 
-  /**
-   * Batch Update positions for high-density tracking
-   * Updates multiple animals in a single commit to reduce re-renders
-   */
-  batchUpdatePositions: (updates) => {
-    set((state) => {
-      const newAnimals = [...state.animals];
-      const newUpdateMap = { ...state.lastUpdateMap };
-      const now = Date.now();
-
-      updates.forEach((update) => {
-        const uId = update.animalId || update.id || update._id;
-        const idx = newAnimals.findIndex(a => a.id === uId || a._id === uId);
-        if (idx !== -1) {
-          newAnimals[idx] = { 
-            ...newAnimals[idx], 
-            ...update, 
-            last_sync: update.timestamp || new Date().toISOString(),
-            last_seen: new Date().toISOString()
-          };
-          newUpdateMap[update.animalId] = now;
-        }
-      });
-
-      return { animals: newAnimals, lastUpdateMap: newUpdateMap };
-    });
+  batchUpdatePositions: (batch) => {
+    const updatesMap = new Map(batch.map(item => [item.animalId, item]));
+    set((state) => ({
+      animals: state.animals.map(a => {
+        const up = updatesMap.get(a.id);
+        if (!up) return a;
+        return { 
+          ...a, 
+          latitude: up.latitude, 
+          longitude: up.longitude,
+          temperature: up.temperature,
+          heart_rate: up.heartRate || up.heart_rate,
+          battery_level: up.batteryLevel || up.battery_level,
+          signal_strength: up.signalStrength || up.signal_strength,
+          activity: up.activity,
+          last_seen: up.timestamp || new Date()
+        };
+      })
+    }));
   },
 
   updateAnimalStatus: (animalId, status) => {

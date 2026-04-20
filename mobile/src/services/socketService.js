@@ -4,17 +4,23 @@ import Constants from 'expo-constants';
 
 // ── Robust Dynamic host detection ───────────────────────────────
 const getBaseUrl = () => {
-  if (Constants.expoConfig?.extra?.API_URL) return Constants.expoConfig.extra.API_URL;
-  if (Constants.manifest?.extra?.API_URL) return Constants.manifest.extra.API_URL;
-
+  // 1. Try to find the host machine IP from Expo Packager (MANDATORY for physical devices)
   const hostUri = Constants.expoConfig?.hostUri || 
                   Constants.manifest?.debuggerHost || 
                   Constants.manifest2?.extra?.expoGo?.packagerOpts?.hostType;
   
   if (hostUri && typeof hostUri === 'string') {
     const ip = hostUri.split(':')[0];
-    if (ip && ip !== 'localhost') return `http://${ip}:3000`;
+    if (ip && ip !== 'localhost') {
+      const url = `http://${ip}:3000`;
+      console.log(`[Socket] Detected host IP: ${ip} -> targeting ${url}`);
+      return url;
+    }
   }
+
+  // 2. Fallback to app.json
+  if (Constants.expoConfig?.extra?.API_URL) return Constants.expoConfig.extra.API_URL;
+  if (Constants.manifest?.extra?.API_URL) return Constants.manifest.extra.API_URL;
 
   return 'http://10.0.2.2:3000';
 };

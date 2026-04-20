@@ -4,7 +4,8 @@ const Animal          = require('../models/Animal');
 const SensorData      = require('../models/SensorData');
 const Zone            = require('../models/Zone');
 const Alert           = require('../models/Alert');
-const monitorService  = require('../services/monitorService');
+const geofenceService = require('../services/geofenceService');
+const aiService       = require('../services/aiService');
 const socketConfig    = require('../config/socket');
 const logger          = require('../utils/logger');
 
@@ -39,40 +40,47 @@ async function submitPosition(req, res, next) {
       { new: true }
     );
     
-    if (!animal) return res.status(404).json({ error: 'Animal not found' });
+    if (!animal) return res.status(404).json({ 
+      success: false,
+      error: 'ANIMAL_NOT_FOUND',
+      message: 'Animal non trouvé.' 
+    });
 
-    // 2. Save to SensorData (History)
-    await SensorData.create({
+    // 2. Save Historical SensorData
+    const sensorData = await SensorData.create({
       animal_id: animalId,
       user_id: req.user.id,
-      latitude:      animal.latitude,
-      longitude:     animal.longitude,
-      temperature:   animal.temperature,
-      heart_rate:    animal.heart_rate,
-      battery_level: animal.battery_level,
-      gps_signal:    animal.gps_signal,
-      activity:      animal.activity,
-      timestamp:     animal.last_sync
-    });
-    
-    // 3. Broadcast real-time update via WebSocket (Always, for live UI)
-    socketConfig.emitPositionUpdate(req.user.id, animalId, { 
-      latitude:      animal.latitude, 
-      longitude:     animal.longitude, 
-      temperature:   animal.temperature, 
-      heart_rate:    animal.heart_rate,
-      battery_level: animal.battery_level,
-      gps_signal:    animal.gps_signal,
-      activity:      animal.activity,
-      timestamp:     animal.last_sync
+      latitude,
+      longitude,
+      temperature: temperature || 38.5,
+      activity: activity || 50,
+      timestamp: new Date()
     });
 
-    // 4. Persistence Throttling: Save to history only if threshold met
-    const shouldSave = monitorService.shouldPersist(
-      animal.last_sync_history, // We'll add this field or just use a helper
-      { latitude: animal.last_lat_history, longitude: animal.last_lon_history },
-      { latitude, longitude }
-    );
+    // 2b. Trigger AI Prediction (Asynchronous)
+    aiService.processAIPrediction(animal, sensorData).catch(err => {
+      logger.error(`Async AI processing failed: ${err.message}`);
+    });
+    
+    // 3. Broadcast update via WebSocket
+    socketConfig.emitPositionUpdate(req.user.id, animalId, { 
+      latitude, 
+      longitude, 
+      temperature: animal.temperature, 
+      activity: animal.activity,
+      timestamp: animal.last_seen
+    });
+
+    // 4. Geofence Check & Alerting
+    try {
+      const activeZone = await Zone.findByAnimal(animalId, req.user.id);
+      if (activeZone && activeZone.is_active) {
+        let coords = [];
+        if (activeZone.type === 'polygon' && activeZone.polygon_coords) {
+          coords = typeof activeZone.polygon_coords === 'string' 
+            ? JSON.parse(activeZone.polygon_coords) 
+            : activeZone.polygon_coords;
+        }
 
     if (shouldSave) {
       await SensorData.create({
@@ -92,25 +100,7 @@ async function submitPosition(req, res, next) {
       animal.last_lon_history  = longitude;
     }
 
-    // 5. Intelligent Monitoring (Async - don't block response)
-    // We run this in background to keep API response < 100ms
-    setImmediate(async () => {
-      try {
-        const newStatus = await monitorService.checkGeofence(animal, latitude, longitude);
-        if (newStatus !== animal.status) {
-          animal.status = newStatus;
-        }
-        await monitorService.checkVitals(animal, { 
-          temperature, heart_rate, battery_level, gps_signal 
-        }, { latitude, longitude });
-        
-        await animal.save();
-      } catch (err) {
-        logger.error(`[PositionsController] Background Monitor Error: ${err.message}`);
-      }
-    });
-
-    res.json({ message: 'Position received and processed', status: animal.status });
+    res.json({ success: true, data: { message: 'Position mise à jour.', animal } });
   } catch (err) {
     next(err);
   }
@@ -127,7 +117,7 @@ async function getHistory(req, res, next) {
       user_id: req.user.id 
     }).sort({ timestamp: -1 }).limit(100);
     
-    res.json(history);
+    res.json({ success: true, data: history });
   } catch (err) {
     next(err);
   }
@@ -144,8 +134,12 @@ async function getLatest(req, res, next) {
       user_id: req.user.id 
     }).sort({ timestamp: -1 });
     
-    if (!latest) return res.status(404).json({ error: 'No history found' });
-    res.json(latest);
+    if (!latest) return res.status(404).json({ 
+      success: false,
+      error: 'NO_HISTORY',
+      message: 'Aucun historique trouvé.' 
+    });
+    res.json({ success: true, data: latest });
   } catch (err) {
     next(err);
   }

@@ -9,8 +9,7 @@ const logger = require('../utils/logger');
 async function getGeofences(req, res, next) {
   try {
     const zones = await Zone.find({ user_id: req.user.id });
-    logger.info(`[Geofences] Found ${zones.length} zones for user ${req.user.id}`);
-    res.json(zones);
+    res.json({ success: true, data: zones });
   } catch (err) {
     next(err);
   }
@@ -27,7 +26,11 @@ async function createGeofence(req, res, next) {
     if (name) {
       const existing = await Zone.findOne({ user_id: req.user.id, name });
       if (existing) {
-        return res.status(400).json({ error: 'NAME_TAKEN', message: `Le nom "${name}" est déjà utilisé.` });
+        return res.status(400).json({ 
+          success: false,
+          error: 'NAME_TAKEN', 
+          message: `Le nom "${name}" est déjà utilisé.` 
+        });
       }
     }
 
@@ -96,7 +99,7 @@ async function createGeofence(req, res, next) {
       area_sqm: areaSqm
     });
     
-    res.status(201).json(zone);
+    res.status(201).json({ success: true, data: zone });
   } catch (err) {
     next(err);
   }
@@ -114,7 +117,11 @@ async function updateGeofence(req, res, next) {
     if (name) {
       const existing = await Zone.findOne({ user_id: req.user.id, name, _id: { $ne: id } });
       if (existing) {
-        return res.status(400).json({ error: 'NAME_TAKEN', message: `Le nom "${name}" est déjà utilisé pour une autre zone.` });
+        return res.status(400).json({ 
+          success: false,
+          error: 'NAME_TAKEN', 
+          message: `Le nom "${name}" est déjà utilisé pour une autre zone.` 
+        });
       }
     }
 
@@ -180,9 +187,13 @@ async function updateGeofence(req, res, next) {
       { new: true, runValidators: true }
     );
     
-    if (!zone) return res.status(404).json({ error: 'Zone not found' });
+    if (!zone) return res.status(404).json({ 
+      success: false,
+      error: 'ZONE_NOT_FOUND',
+      message: 'Zone non trouvée.'
+    });
     
-    res.json(zone);
+    res.json({ success: true, data: zone });
   } catch (err) {
     next(err);
   }
@@ -195,8 +206,12 @@ async function deleteGeofence(req, res, next) {
   try {
     const { id } = req.params;
     const result = await Zone.deleteOne({ _id: id, user_id: req.user.id });
-    if (result.deletedCount === 0) return res.status(404).json({ error: 'Zone not found' });
-    res.json({ message: 'Geofence deleted successfully' });
+    if (result.deletedCount === 0) return res.status(404).json({ 
+      success: false,
+      error: 'ZONE_NOT_FOUND',
+      message: 'Zone non trouvée.'
+    });
+    res.json({ success: true, message: 'Zone supprimée avec succès.' });
   } catch (err) {
     next(err);
   }

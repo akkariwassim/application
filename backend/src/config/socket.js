@@ -74,14 +74,37 @@ function getIO() {
   return io;
 }
 
+// ── Batch Update Store ──────────────────────────────────────
+const positionBatch = new Map(); // userId -> Map(animalId -> data)
+let batchInterval;
+
 /**
- * Emit a position update to subscribers of an animal and the owner.
+ * Emit a position update to subscribers of an animal.
+ * Now Batched: Collects updates and sends them every 500ms
  */
 function emitPositionUpdate(userId, animalId, data) {
   if (!io) return;
-  // Send to user room (Farmer) and animal room (if any)
-  io.to(`user:${userId}`).emit('position-update', { animalId, ...data });
+
+  // 1. Direct subscription update (legacy / high priority)
   io.to(`animal:${animalId}`).emit('position-update', { animalId, ...data });
+
+  // 2. Add to batch for dashboard/global views
+  if (!positionBatch.has(userId)) {
+    positionBatch.set(userId, new Map());
+  }
+  positionBatch.get(userId).set(animalId, { animalId, ...data });
+
+  // 3. Start batch loop if not running
+  if (!batchInterval) {
+    batchInterval = setInterval(() => {
+      positionBatch.forEach((updates, uId) => {
+        if (updates.size > 0) {
+          io.to(`user:${uId}`).emit('batch-position-update', Array.from(updates.values()));
+          updates.clear();
+        }
+      });
+    }, 500);
+  }
 }
 
 /**

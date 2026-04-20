@@ -50,18 +50,103 @@ const MemoizedAnimalMarker = React.memo(({ animal, onPress }) => {
 
 const { width } = Dimensions.get('window');
 
-// ── Spiderfy Helper: Circular spread for overlapping markers ───────────
-function getSpiderfyPositions(count, center, radius = 0.00018) {
-  if (count <= 1) return [center];
-  const positions = [];
-  for (let i = 0; i < count; i++) {
-    const angle = (2 * Math.PI * i) / count;
-    positions.push({
-      latitude:  center.latitude  + radius * Math.cos(angle),
-      longitude: center.longitude + radius * Math.sin(angle),
-    });
+// ── Design Tokens ─────────────────────────────────────────────────────────────
+const STATUS_COLOR = {
+  safe:    '#22C55E',
+  warning: '#F59E0B',
+  danger:  '#EF4444',
+  offline: '#64748B',
+};
+
+const COLORS = {
+  primary:    '#6366F1',
+  primaryDim: 'rgba(99,102,241,0.18)',
+  background: '#0A0F1E',
+  surface:    '#131929',
+  card:       '#1A2540',
+  text:       '#F1F5F9',
+  subtext:    '#94A3B8',
+  muted:      '#334155',
+  danger:     '#EF4444',
+  success:    '#22C55E',
+  warn:       '#F59E0B',
+  border:     'rgba(255,255,255,0.07)',
+  gold:       '#FBBF24',
+};
+
+// ── Haversine distance in metres (fast inline) ────────────────────────────────
+function haversineDist(lat1, lon1, lat2, lon2) {
+  const R = 6371000;
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a = Math.sin(dLat / 2) ** 2 +
+    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+// ── Offset a point by (dLatM, dLonM) metres ──────────────────────────────────
+function offsetCoord(lat, lon, dLatM, dLonM) {
+  return {
+    latitude:  lat + dLatM / 111320,
+    longitude: lon + dLonM / (111320 * Math.cos(lat * Math.PI / 180)),
+  };
+}
+
+/**
+ * Lightweight Grid-based Clustering
+ * Groups markers into cells based on the zoom level.
+ */
+function getClusters(animals, region, clusterRadius = 40) {
+  if (!animals.length || !region) return [];
+  
+  // 1. Convert clusterRadius from screen pixels to GPS coordinates approx
+  const latPerPixel = region.latitudeDelta / Dimensions.get('window').height;
+  const lonPerPixel = region.longitudeDelta / Dimensions.get('window').width;
+  
+  const clusterSizeLat = clusterRadius * latPerPixel;
+  const clusterSizeLon = clusterRadius * lonPerPixel;
+  
+  const clusters = [];
+  const processed = new Set();
+  
+  for (let i = 0; i < animals.length; i++) {
+    if (processed.has(i)) continue;
+    
+    const a = animals[i];
+    const group = [a];
+    processed.add(i);
+    
+    // Find neighbors in the same grid cell
+    for (let j = i + 1; j < animals.length; j++) {
+      if (processed.has(j)) continue;
+      const b = animals[j];
+      
+      const dLat = Math.abs(parseFloat(a.latitude) - parseFloat(b.latitude));
+      const dLon = Math.abs(parseFloat(a.longitude) - parseFloat(b.longitude));
+      
+      if (dLat < clusterSizeLat && dLon < clusterSizeLon) {
+        group.push(b);
+        processed.add(j);
+      }
+    }
+    
+    if (group.length > 1) {
+      // Create Cluster
+      const avgLat = group.reduce((s, x) => s + parseFloat(x.latitude), 0) / group.length;
+      const avgLon = group.reduce((s, x) => s + parseFloat(x.longitude), 0) / group.length;
+      clusters.push({
+        id: `cluster-${i}`,
+        isCluster: true,
+        count: group.length,
+        latitude: avgLat,
+        longitude: avgLon,
+        animals: group
+      });
+    } else {
+      clusters.push({ ...a, isCluster: false });
+    }
   }
-  return positions;
+  return clusters;
 }
 
 // Safety helper for parsing legacy or malformed polygon data
@@ -139,6 +224,31 @@ export default function MapScreen({ route }) {
     }
   };
 
+  // ── Zoom-proportional collision radius (conservative and capped) ─────────
+  // At farm zoom (latDelta ~0.002-0.005): 5-8m  |  Zoomed out (0.01+): 10m max
+  const spreadRadiusM = useMemo(() => {
+    if (!currentRegion) return 8;
+    return Math.min(12, Math.max(4, currentRegion.latitudeDelta * 1800));
+  }, [currentRegion?.latitudeDelta]);
+
+  // ── Reserved slots: zone center pins that animals must not overlap ────────
+  const reservedSlots = useMemo(() =>
+    geofences
+      .filter(gf => gf.center_lat && gf.center_lon)
+      .map(gf => ({ lat: parseFloat(gf.center_lat), lon: parseFloat(gf.center_lon) })),
+  [geofences]);
+
+  // ── Compute spread markers (memoised for perf) ───────────────────────────
+  const visibleAnimals = useMemo(() => {
+    const filtered = selectedAnimal?.isZone
+      ? animals.filter(a => String(a.current_zone_id || '') === String(selectedAnimal.id || ''))
+      : animals;
+    
+    // Custom grid clustering
+    return getClusters(filtered, currentRegion, 35); 
+  }, [animals, selectedAnimal?.id, selectedAnimal?.isZone, currentRegion]);
+
+  // ── GPS tracking ────────────────────────────────────────────────────────
   const startTracking = async () => {
     try {
       setMapState(MAP_STATES.INITIALIZING);
@@ -480,16 +590,57 @@ export default function MapScreen({ route }) {
           </Marker>
         )}
 
-        {spiderfyData && spiderfyData.animals.map((animal, idx) => (
-          <MemoizedAnimalMarker
-            key={`spider-${animal.id}`}
-            animal={animal}
-            coordinate={spiderfyData.positions[idx]}
-            onPress={() => setSelectedAnimal({ ...animal, isZone: false })}
-          />
-        ))}
+        {/* ── Clusters & Markers ── */}
+        {visibleAnimals.map(item => {
+          if (item.isCluster) {
+            return (
+              <Marker
+                key={item.id}
+                coordinate={{ latitude: item.latitude, longitude: item.longitude }}
+                onPress={() => {
+                  mapRef.current?.animateToRegion({
+                    latitude: item.latitude,
+                    longitude: item.longitude,
+                    latitudeDelta: (currentRegion?.latitudeDelta || 0.02) / 4,
+                    longitudeDelta: (currentRegion?.longitudeDelta || 0.02) / 4,
+                  }, 600);
+                }}
+              >
+                <View style={styles.clusterMarker}>
+                  <View style={styles.clusterInner}>
+                    <Text style={styles.clusterText}>{item.count}</Text>
+                  </View>
+                </View>
+              </Marker>
+            );
+          }
 
-        {animalMarkers}
+          const isSelAnimal = !selectedAnimal?.isZone && selectedAnimal?.id === item.id;
+          const color = STATUS_COLOR[item.status] || STATUS_COLOR.offline;
+          const typeIcon = item.type === 'equine' ? 'horse-variant'
+            : item.type === 'bovine' ? 'cow'
+            : item.type === 'ovine' ? 'sheep' : 'paw';
+
+          return (
+            <Marker
+              key={`anim-${item.id}`}
+              coordinate={{ latitude: parseFloat(item.latitude), longitude: parseFloat(item.longitude) }}
+              anchor={{ x: 0.5, y: 0.5 }}
+              tracksViewChanges={false}
+              zIndex={isSelAnimal ? 50 : 10}
+              onPress={() => setSelectedAnimal({ ...item, isZone: false })}
+            >
+              <View style={[
+                styles.animalPin,
+                { borderColor: color },
+                isSelAnimal && styles.animalPinSelected,
+              ]}>
+                <MaterialCommunityIcons name={typeIcon} size={17} color={color} />
+                {isSelAnimal && <View style={[styles.animalGlow, { borderColor: color }]} />}
+              </View>
+            </Marker>
+          );
+        })}
 
         {selectedAnimal && !selectedAnimal.isZone && userLocation && (
           <Polyline
@@ -714,7 +865,43 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     marginLeft: 10,
   },
-  userDotContainer: { width: 30, height: 30, alignItems: 'center', justifyContent: 'center' },
+  topBtnClear: { borderColor: `${COLORS.gold}55` },
+  topBtnText: { color: COLORS.text, fontSize: 12, fontWeight: '700' },
+  
+  // Clusters
+  clusterMarker: {
+    width: 40, height: 40, borderRadius: 20,
+    backgroundColor: 'rgba(99, 102, 241, 0.4)',
+    alignItems: 'center', justifyContent: 'center',
+    borderWidth: 1, borderColor: 'rgba(99, 102, 241, 0.6)',
+  },
+  clusterInner: {
+    width: 30, height: 30, borderRadius: 15,
+    backgroundColor: COLORS.primary,
+    alignItems: 'center', justifyContent: 'center',
+    elevation: 4, shadowColor: '#000', shadowOpacity: 0.3, shadowRadius: 3, shadowOffset: { width: 0, height: 2 },
+  },
+  clusterText: { color: '#fff', fontSize: 13, fontWeight: '800' },
+
+  // Zone pin
+  zonePinWrapper: { width: 130, height: 64, alignItems: 'center', justifyContent: 'center' },
+  zonePinCircle: {
+    width: 36, height: 36, borderRadius: 18,
+    backgroundColor: COLORS.primary,
+    alignItems: 'center', justifyContent: 'center',
+    elevation: 5, shadowColor: '#000', shadowOpacity: 0.3, shadowRadius: 3, shadowOffset: { width: 0, height: 1 },
+  },
+  zonePinPrimary:  { backgroundColor: COLORS.success },
+  zonePinSelected: { backgroundColor: COLORS.gold, transform: [{ scale: 1.15 }] },
+  zonePinLabel: {
+    marginTop: 3, paddingHorizontal: 7, paddingVertical: 2,
+    backgroundColor: 'rgba(10,15,30,0.9)', borderRadius: 5,
+    borderWidth: 1, borderColor: 'rgba(255,255,255,0.15)',
+  },
+  zonePinLabelText: { color: '#fff', fontSize: 9.5, fontWeight: '800', textTransform: 'uppercase', letterSpacing: 0.4 },
+
+  // User dot
+  userOuter: { width: 32, height: 32, alignItems: 'center', justifyContent: 'center' },
   userPulse: {
     position: 'absolute', width: 30, height: 30, borderRadius: 15,
     backgroundColor: `${COLORS.primary}66`,

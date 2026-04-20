@@ -16,7 +16,7 @@ async function getAlerts(req, res, next) {
     if (type) query.type = type;
     
     const alerts = await Alert.find(query).sort({ created_at: -1 });
-    res.json(alerts);
+    res.json({ success: true, data: alerts });
   } catch (err) {
     next(err);
   }
@@ -29,8 +29,12 @@ async function getAlert(req, res, next) {
   try {
     const { id } = req.params;
     const alert = await Alert.findOne({ _id: id, user_id: req.user.id });
-    if (!alert) return res.status(404).json({ error: 'Alert not found' });
-    res.json(alert);
+    if (!alert) return res.status(404).json({ 
+      success: false,
+      error: 'ALERT_NOT_FOUND',
+      message: 'Alerte non trouvée.'
+    });
+    res.json({ success: true, data: alert });
   } catch (err) {
     next(err);
   }
@@ -48,8 +52,12 @@ async function acknowledgeAlert(req, res, next) {
       { new: true }
     );
     
-    if (!alert) return res.status(404).json({ error: 'Alert not found' });
-    res.json(alert);
+    if (!alert) return res.status(404).json({ 
+      success: false,
+      error: 'ALERT_NOT_FOUND',
+      message: 'Alerte non trouvée.'
+    });
+    res.json({ success: true, data: alert });
   } catch (err) {
     next(err);
   }
@@ -67,8 +75,12 @@ async function resolveAlert(req, res, next) {
       { new: true }
     );
     
-    if (!alert) return res.status(404).json({ error: 'Alert not found' });
-    res.json(alert);
+    if (!alert) return res.status(404).json({ 
+      success: false,
+      error: 'ALERT_NOT_FOUND',
+      message: 'Alerte non trouvée.'
+    });
+    res.json({ success: true, data: alert });
   } catch (err) {
     next(err);
   }
@@ -81,8 +93,12 @@ async function deleteAlert(req, res, next) {
   try {
     const { id } = req.params;
     const result = await Alert.deleteOne({ _id: id, user_id: req.user.id });
-    if (result.deletedCount === 0) return res.status(404).json({ error: 'Alert not found' });
-    res.json({ message: 'Alert deleted successfully' });
+    if (result.deletedCount === 0) return res.status(404).json({ 
+      success: false,
+      error: 'ALERT_NOT_FOUND',
+      message: 'Alerte non trouvée.'
+    });
+    res.json({ success: true, message: 'Alerte supprimée avec succès.' });
   } catch (err) {
     next(err);
   }

@@ -1,19 +1,23 @@
 'use strict';
 
-const router   = require('express').Router();
-const ctrl     = require('../controllers/devicesController');
+const express = require('express');
+const router = express.Router();
+const devicesController = require('../controllers/devicesController');
 const { authenticate } = require('../middleware/auth');
 
 // All device routes require authentication
 router.use(authenticate);
 
 // GET /api/devices
-router.get('/', ctrl.getDevices);
+router.get('/', devicesController.getDevices);
 
 // GET /api/devices/:id
-router.get('/:id', ctrl.getDevice);
+router.get('/:id', devicesController.getDevice);
 
 // POST /api/devices
-router.post('/', ctrl.createDevice);
+router.post('/', devicesController.createDevice);
+
+// DELETE /api/devices/:id
+router.delete('/:id', devicesController.deleteDevice);
 
 module.exports = router;

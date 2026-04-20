@@ -26,11 +26,15 @@ const animalSchema = new mongoose.Schema({
     type: String,
     unique: true,
     sparse: true,
+    trim: true,
+    index: true,
   },
   device_id: {
     type: String,
     unique: true,
     sparse: true,
+    trim: true,
+    index: true,
   },
   color_hex: {
     type: String,
@@ -73,19 +77,24 @@ const animalSchema = new mongoose.Schema({
     max_heart_rate: { type: Number, default: 110 },
   },
   temperature: Number,
-  heart_rate: { type: Number, default: 60 },
-  battery_level: { type: Number, default: 100 },
-  gps_signal: { type: Number, default: 100 },
-  activity: Number,
+  heart_rate:  Number, // BPM
+  activity:    Number, // Percentage or Level
+  battery_level: {
+    type: Number,
+    default: 100,
+  },
+  signal_strength: {
+    type: Number,
+    default: 100,
+  },
   actuators: {
     buzzer: { type: Boolean, default: false },
-    led:    { type: Boolean, default: false },
-    relay:  { type: Boolean, default: false },
+    led: { type: Boolean, default: false },
+    relay: { type: Boolean, default: false },
   },
-  last_sync: {
-    type: Date,
-    default: Date.now,
-  },
+  age: Number,
+  notes: String,
+  avatar_url: String,
   last_seen: {
     type: Date,
     default: Date.now,
@@ -113,6 +122,9 @@ animalSchema.pre('save', async function() {
   }
 });
 
+animalSchema.index({ user_id: 1, created_at: -1 });
+animalSchema.index({ user_id: 1, status: 1 });
+animalSchema.index({ user_id: 1, current_zone_id: 1 });
 animalSchema.index({ current_location: '2dsphere' });
 
 const Animal = mongoose.model('Animal', animalSchema);

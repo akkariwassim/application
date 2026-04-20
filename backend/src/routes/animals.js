@@ -14,6 +14,12 @@ const idParam = param('id').isMongoId().withMessage('Invalid ID format');
 // GET /api/animals
 router.get('/', ctrl.getAnimals);
 
+// POST /api/animals/bulk
+router.post('/bulk', [
+  body('animals').isArray({ min: 1 }).withMessage('An array of animals is required'),
+  validate
+], ctrl.bulkCreateAnimals);
+
 // POST /api/animals
 router.post('/', [
   body('name').trim().notEmpty().withMessage('Name is required'),

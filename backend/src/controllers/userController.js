@@ -12,7 +12,11 @@ async function updateName(req, res, next) {
   try {
     const { name } = req.body;
     if (!name || name.trim().length === 0) {
-      return res.status(400).json({ error: 'INVALID_INPUT', message: 'Le nom est obligatoire.' });
+      return res.status(400).json({ 
+        success: false,
+        error: 'INVALID_INPUT', 
+        message: 'Le nom est obligatoire.' 
+      });
     }
 
     const user = await User.findByIdAndUpdate(
@@ -22,11 +26,15 @@ async function updateName(req, res, next) {
     );
 
     if (!user) {
-      return res.status(404).json({ error: 'USER_NOT_FOUND', message: 'Utilisateur introuvable.' });
+      return res.status(404).json({ 
+        success: false,
+        error: 'USER_NOT_FOUND', 
+        message: 'Utilisateur introuvable.' 
+      });
     }
 
     logger.info(`User ${user.email} updated name to: ${user.name}`);
-    res.json({ message: 'Nom mis à jour avec succès.', user });
+    res.json({ success: true, data: user, message: 'Nom mis à jour avec succès.' });
   } catch (err) {
     logger.error(`Error in updateName: ${err.message}`);
     next(err);
@@ -42,24 +50,40 @@ async function changePassword(req, res, next) {
     const { currentPassword, newPassword } = req.body;
 
     if (!currentPassword || !newPassword) {
-      return res.status(400).json({ error: 'MISSING_FIELDS', message: 'Tous les champs sont obligatoires.' });
+      return res.status(400).json({ 
+        success: false,
+        error: 'MISSING_FIELDS', 
+        message: 'Tous les champs sont obligatoires.' 
+      });
     }
 
     if (newPassword.length < 6) {
-      return res.status(400).json({ error: 'INVALID_PASSWORD', message: 'Le nouveau mot de passe doit faire au moins 6 caractères.' });
+      return res.status(400).json({ 
+        success: false,
+        error: 'INVALID_PASSWORD', 
+        message: 'Le nouveau mot de passe doit faire au moins 6 caractères.' 
+      });
     }
 
     // 1. Get user with password
     const user = await User.findById(req.user.id).select('+password');
     if (!user) {
-      return res.status(404).json({ error: 'USER_NOT_FOUND', message: 'Utilisateur introuvable.' });
+      return res.status(404).json({ 
+        success: false,
+        error: 'USER_NOT_FOUND', 
+        message: 'Utilisateur introuvable.' 
+      });
     }
 
     // 2. Check current password
     const isMatch = await user.comparePassword(currentPassword);
     if (!isMatch) {
       logger.warn(`Failed password change attempt for ${user.email}: incorrect current password`);
-      return res.status(401).json({ error: 'INCORRECT_PASSWORD', message: 'L\'ancien mot de passe est incorrect.' });
+      return res.status(401).json({ 
+        success: false,
+        error: 'INCORRECT_PASSWORD', 
+        message: 'L\'ancien mot de passe est incorrect.' 
+      });
     }
 
     // 3. Update password (pre-save hook in User model will hash it)
@@ -71,7 +95,10 @@ async function changePassword(req, res, next) {
     await user.save();
 
     logger.info(`User ${user.email} successfully changed their password.`);
-    res.json({ message: 'Mot de passe modifié avec succès. Veuillez vous reconnecter sur vos autres appareils.' });
+    res.json({ 
+      success: true,
+      message: 'Mot de passe modifié avec succès. Veuillez vous reconnecter sur vos autres appareils.' 
+    });
   } catch (err) {
     logger.error(`Error in changePassword: ${err.message}`);
     next(err);
@@ -87,13 +114,21 @@ async function updatePhone(req, res, next) {
     const { phone } = req.body;
     
     if (!phone || phone.trim().length === 0) {
-      return res.status(400).json({ error: 'INVALID_INPUT', message: 'Le numéro de téléphone est obligatoire.' });
+      return res.status(400).json({ 
+        success: false,
+        error: 'INVALID_INPUT', 
+        message: 'Le numéro de téléphone est obligatoire.' 
+      });
     }
 
     // Basic digits validation (8 to 15 digits)
     const phoneRegex = /^[0-9+\s-]{8,15}$/;
     if (!phoneRegex.test(phone.trim())) {
-      return res.status(400).json({ error: 'INVALID_FORMAT', message: 'Format de numéro invalide (ex: 0612345678).' });
+      return res.status(400).json({ 
+        success: false,
+        error: 'INVALID_FORMAT', 
+        message: 'Format de numéro invalide (ex: 0612345678).' 
+      });
     }
 
     const user = await User.findByIdAndUpdate(
@@ -103,11 +138,15 @@ async function updatePhone(req, res, next) {
     );
 
     if (!user) {
-      return res.status(404).json({ error: 'USER_NOT_FOUND', message: 'Utilisateur introuvable.' });
+      return res.status(404).json({ 
+        success: false,
+        error: 'USER_NOT_FOUND', 
+        message: 'Utilisateur introuvable.' 
+      });
     }
 
     logger.info(`User ${user.email} updated phone to: ${user.phone}`);
-    res.json({ message: 'Numéro de téléphone mis à jour.', user });
+    res.json({ success: true, data: user, message: 'Numéro de téléphone mis à jour.' });
   } catch (err) {
     logger.error(`Error in updatePhone: ${err.message}`);
     next(err);
@@ -124,7 +163,11 @@ async function updateProfile(req, res, next) {
     const user = await User.findById(req.user.id).select('+password');
 
     if (!user) {
-      return res.status(404).json({ error: 'USER_NOT_FOUND', message: 'Utilisateur introuvable.' });
+      return res.status(404).json({ 
+        success: false,
+        error: 'USER_NOT_FOUND', 
+        message: 'Utilisateur introuvable.' 
+      });
     }
 
     // 1. Update Basic Info
@@ -133,7 +176,11 @@ async function updateProfile(req, res, next) {
     if (phone) {
       const phoneRegex = /^[0-9+\s-]{8,15}$/;
       if (!phoneRegex.test(phone.trim())) {
-        return res.status(400).json({ error: 'INVALID_PHONE', message: 'Format de téléphone invalide.' });
+        return res.status(400).json({ 
+          success: false,
+          error: 'INVALID_PHONE', 
+          message: 'Format de téléphone invalide.' 
+        });
       }
       user.phone = phone.trim();
     }
@@ -141,7 +188,11 @@ async function updateProfile(req, res, next) {
     if (email) {
       const emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
       if (!emailRegex.test(email.trim())) {
-        return res.status(400).json({ error: 'INVALID_EMAIL', message: 'Email invalide.' });
+        return res.status(400).json({ 
+          success: false,
+          error: 'INVALID_EMAIL', 
+          message: 'Email invalide.' 
+        });
       }
       user.email = email.trim().toLowerCase();
     }
@@ -149,14 +200,26 @@ async function updateProfile(req, res, next) {
     // 2. Update Password if requested
     if (newPassword) {
       if (!currentPassword) {
-        return res.status(400).json({ error: 'MISSING_OLD_PASSWORD', message: 'L\'ancien mot de passe est requis pour changer de mot de passe.' });
+        return res.status(400).json({ 
+          success: false,
+          error: 'MISSING_OLD_PASSWORD', 
+          message: 'L\'ancien mot de passe est requis pour changer de mot de passe.' 
+        });
       }
       const isMatch = await user.comparePassword(currentPassword);
       if (!isMatch) {
-        return res.status(401).json({ error: 'INCORRECT_PASSWORD', message: 'L\'ancien mot de passe est incorrect.' });
+        return res.status(401).json({ 
+          success: false,
+          error: 'INCORRECT_PASSWORD', 
+          message: 'L\'ancien mot de passe est incorrect.' 
+        });
       }
       if (newPassword.length < 6) {
-        return res.status(400).json({ error: 'SHORT_PASSWORD', message: '6 caractères minimum pour le mot de passe.' });
+        return res.status(400).json({ 
+          success: false,
+          error: 'SHORT_PASSWORD', 
+          message: '6 caractères minimum pour le mot de passe.' 
+        });
       }
       user.password = newPassword;
       user.refresh_tokens = []; // Revoke other sessions on password change
@@ -176,10 +239,14 @@ async function updateProfile(req, res, next) {
     delete userObj.password;
 
     logger.info(`Profile updated for user: ${user.email}`);
-    res.json({ message: 'Profil mis à jour avec succès.', user: userObj });
+    res.json({ success: true, data: userObj, message: 'Profil mis à jour avec succès.' });
   } catch (err) {
     if (err.code === 11000) {
-      return res.status(400).json({ error: 'EMAIL_EXISTS', message: 'Cet email est déjà utilisé.' });
+      return res.status(400).json({ 
+        success: false,
+        error: 'EMAIL_EXISTS', 
+        message: 'Cet email est déjà utilisé.' 
+      });
     }
     logger.error(`Error in updateProfile: ${err.message}`);
     next(err);
@@ -196,7 +263,11 @@ async function updateFarm(req, res, next) {
     
     const user = await User.findById(req.user.id);
     if (!user) {
-      return res.status(404).json({ error: 'USER_NOT_FOUND', message: 'Utilisateur introuvable.' });
+      return res.status(404).json({ 
+        success: false,
+        error: 'USER_NOT_FOUND', 
+        message: 'Utilisateur introuvable.' 
+      });
     }
 
     if (latitude !== undefined) user.farm_latitude = latitude;
@@ -209,7 +280,7 @@ async function updateFarm(req, res, next) {
     delete userObj.password;
 
     logger.info(`Farm updated for user: ${user.email}`);
-    res.json({ message: 'Ferme mise à jour avec succès.', user: userObj });
+    res.json({ success: true, data: userObj, message: 'Ferme mise à jour avec succès.' });
   } catch (err) {
     logger.error(`Error in updateFarm: ${err.message}`);
     next(err);
@@ -220,7 +291,7 @@ async function updateFarm(req, res, next) {
  * Diagnostic ping
  */
 async function ping(req, res) {
-  res.json({ message: 'User Router is active!', timestamp: new Date() });
+  res.json({ success: true, message: 'User Router is active!', timestamp: new Date() });
 }
 
 module.exports = {
