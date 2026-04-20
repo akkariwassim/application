@@ -60,79 +60,60 @@ function offsetCoord(lat, lon, dLatM, dLonM) {
 }
 
 /**
- * Conservative Deterministic Circular Spread
- *
- * Rules:
- *  - Only animals DIRECTLY within collisionRadiusM of each other (or zone center) are grouped.
- *  - NO transitive union-find chaining — prevents cascade that pushed markers 60m away.
- *  - Zone center pin is treated as an immovable occupied anchor.
- *  - Visual offset is capped at collisionRadiusM × 1.5 (never large).
- *  - Deterministic: index in the group → fixed angle, same result every render.
- *
- * @param {array}  animals          - raw animals from store
- * @param {number} collisionRadiusM - overlap threshold in metres
- * @param {array}  reservedSlots    - [{lat,lon}] positions that are already occupied (e.g. zone pins)
+ * Lightweight Grid-based Clustering
+ * Groups markers into cells based on the zoom level.
  */
-function spreadMarkers(animals, collisionRadiusM = 10, reservedSlots = []) {
-  if (!animals.length) return [];
-
-  // Clone with visual coords starting at real GPS
-  const out = animals.map(m => ({
-    ...m,
-    _vLat:  parseFloat(m.latitude),
-    _vLon:  parseFloat(m.longitude),
-    _moved: false,
-  }));
-
-  const MAX_SPREAD = collisionRadiusM * 1.5; // visual offset cap
-  const assigned   = new Array(out.length).fill(false);
-
-  for (let i = 0; i < out.length; i++) {
-    if (assigned[i]) continue;
-
-    // ── Check if this animal overlaps a reserved slot (zone center pin) ────
-    const overlapsReserved = reservedSlots.some(s =>
-      haversineDist(parseFloat(animals[i].latitude), parseFloat(animals[i].longitude), s.lat, s.lon) < collisionRadiusM
-    );
-
-    // ── Find direct neighbours (NOT transitive) ────────────────────────────
-    const group = [i];
-    assigned[i] = true;
-    for (let j = i + 1; j < out.length; j++) {
-      if (!assigned[j] &&
-          haversineDist(
-            parseFloat(animals[i].latitude), parseFloat(animals[i].longitude),
-            parseFloat(animals[j].latitude), parseFloat(animals[j].longitude)
-          ) < collisionRadiusM
-      ) {
-        group.push(j);
-        assigned[j] = true;
+function getClusters(animals, region, clusterRadius = 40) {
+  if (!animals.length || !region) return [];
+  
+  // 1. Convert clusterRadius from screen pixels to GPS coordinates approx
+  const latPerPixel = region.latitudeDelta / Dimensions.get('window').height;
+  const lonPerPixel = region.longitudeDelta / Dimensions.get('window').width;
+  
+  const clusterSizeLat = clusterRadius * latPerPixel;
+  const clusterSizeLon = clusterRadius * lonPerPixel;
+  
+  const clusters = [];
+  const processed = new Set();
+  
+  for (let i = 0; i < animals.length; i++) {
+    if (processed.has(i)) continue;
+    
+    const a = animals[i];
+    const group = [a];
+    processed.add(i);
+    
+    // Find neighbors in the same grid cell
+    for (let j = i + 1; j < animals.length; j++) {
+      if (processed.has(j)) continue;
+      const b = animals[j];
+      
+      const dLat = Math.abs(parseFloat(a.latitude) - parseFloat(b.latitude));
+      const dLon = Math.abs(parseFloat(a.longitude) - parseFloat(b.longitude));
+      
+      if (dLat < clusterSizeLat && dLon < clusterSizeLon) {
+        group.push(b);
+        processed.add(j);
       }
     }
-
-    // ── Skip if no conflicts ───────────────────────────────────────────────
-    if (group.length === 1 && !overlapsReserved) continue;
-
-    // ── Compute centroid of the group’s TRUE positions ────────────────────
-    const cLat = group.reduce((s, k) => s + parseFloat(animals[k].latitude), 0) / group.length;
-    const cLon = group.reduce((s, k) => s + parseFloat(animals[k].longitude), 0) / group.length;
-
-    // ── Spread in a circle starting from North, equal angular spacing ─────
-    const n       = group.length + (overlapsReserved ? 1 : 0); // +1 slot for the reserved pin
-    const offset  = overlapsReserved ? 1 : 0;                   // skip slot 0 (reserved for zone pin)
-    group.forEach((animalIdx, pos) => {
-      const slotAngle = (2 * Math.PI * (pos + offset)) / n - Math.PI / 2; // northward start
-      const { latitude, longitude } = offsetCoord(cLat, cLon,
-        MAX_SPREAD * Math.cos(slotAngle),
-        MAX_SPREAD * Math.sin(slotAngle)
-      );
-      out[animalIdx]._vLat  = latitude;
-      out[animalIdx]._vLon  = longitude;
-      out[animalIdx]._moved = true;
-    });
+    
+    if (group.length > 1) {
+      // Create Cluster
+      const avgLat = group.reduce((s, x) => s + parseFloat(x.latitude), 0) / group.length;
+      const avgLon = group.reduce((s, x) => s + parseFloat(x.longitude), 0) / group.length;
+      clusters.push({
+        id: `cluster-${i}`,
+        isCluster: true,
+        count: group.length,
+        latitude: avgLat,
+        longitude: avgLon,
+        animals: group
+      });
+    } else {
+      clusters.push({ ...a, isCluster: false });
+    }
   }
-
-  return out;
+  return clusters;
 }
 
 // ═════════════════════════════════════════════════════════════════════════════
@@ -189,8 +170,10 @@ export default function MapScreen() {
     const filtered = selectedAnimal?.isZone
       ? animals.filter(a => String(a.current_zone_id || '') === String(selectedAnimal.id || ''))
       : animals;
-    return spreadMarkers(filtered, spreadRadiusM, reservedSlots);
-  }, [animals, selectedAnimal?.id, selectedAnimal?.isZone, spreadRadiusM, reservedSlots]);
+    
+    // Custom grid clustering
+    return getClusters(filtered, currentRegion, 35); 
+  }, [animals, selectedAnimal?.id, selectedAnimal?.isZone, currentRegion]);
 
   // ── GPS tracking ────────────────────────────────────────────────────────
   const startTracking = async () => {
@@ -392,34 +375,52 @@ export default function MapScreen() {
           </Marker>
         )}
 
-        {/* ── Animal Markers (spread) ── */}
-        {visibleAnimals.map(animal => {
-          const isSelAnimal = !selectedAnimal?.isZone && selectedAnimal?.id === animal.id;
-          const color = STATUS_COLOR[animal.status] || STATUS_COLOR.offline;
-          const typeIcon = animal.type === 'equine' ? 'horse-variant'
-            : animal.type === 'bovine' ? 'cow'
-            : animal.type === 'ovine' ? 'sheep' : 'paw';
+        {/* ── Clusters & Markers ── */}
+        {visibleAnimals.map(item => {
+          if (item.isCluster) {
+            return (
+              <Marker
+                key={item.id}
+                coordinate={{ latitude: item.latitude, longitude: item.longitude }}
+                onPress={() => {
+                  mapRef.current?.animateToRegion({
+                    latitude: item.latitude,
+                    longitude: item.longitude,
+                    latitudeDelta: (currentRegion?.latitudeDelta || 0.02) / 4,
+                    longitudeDelta: (currentRegion?.longitudeDelta || 0.02) / 4,
+                  }, 600);
+                }}
+              >
+                <View style={styles.clusterMarker}>
+                  <View style={styles.clusterInner}>
+                    <Text style={styles.clusterText}>{item.count}</Text>
+                  </View>
+                </View>
+              </Marker>
+            );
+          }
+
+          const isSelAnimal = !selectedAnimal?.isZone && selectedAnimal?.id === item.id;
+          const color = STATUS_COLOR[item.status] || STATUS_COLOR.offline;
+          const typeIcon = item.type === 'equine' ? 'horse-variant'
+            : item.type === 'bovine' ? 'cow'
+            : item.type === 'ovine' ? 'sheep' : 'paw';
 
           return (
             <Marker
-              key={`anim-${animal.id}`}
-              coordinate={{ latitude: animal._vLat, longitude: animal._vLon }}
+              key={`anim-${item.id}`}
+              coordinate={{ latitude: parseFloat(item.latitude), longitude: parseFloat(item.longitude) }}
               anchor={{ x: 0.5, y: 0.5 }}
               tracksViewChanges={false}
               zIndex={isSelAnimal ? 50 : 10}
-              onPress={() => setSelectedAnimal({ ...animal, isZone: false })}
+              onPress={() => setSelectedAnimal({ ...item, isZone: false })}
             >
               <View style={[
                 styles.animalPin,
                 { borderColor: color },
                 isSelAnimal && styles.animalPinSelected,
               ]}>
-                {/* Spread indicator dot */}
-                {animal._spread && (
-                  <View style={[styles.spreadDot, { backgroundColor: color }]} />
-                )}
                 <MaterialCommunityIcons name={typeIcon} size={17} color={color} />
-                {/* Selected glow ring */}
                 {isSelAnimal && <View style={[styles.animalGlow, { borderColor: color }]} />}
               </View>
             </Marker>
@@ -606,6 +607,21 @@ const styles = StyleSheet.create({
   },
   topBtnClear: { borderColor: `${COLORS.gold}55` },
   topBtnText: { color: COLORS.text, fontSize: 12, fontWeight: '700' },
+  
+  // Clusters
+  clusterMarker: {
+    width: 40, height: 40, borderRadius: 20,
+    backgroundColor: 'rgba(99, 102, 241, 0.4)',
+    alignItems: 'center', justifyContent: 'center',
+    borderWidth: 1, borderColor: 'rgba(99, 102, 241, 0.6)',
+  },
+  clusterInner: {
+    width: 30, height: 30, borderRadius: 15,
+    backgroundColor: COLORS.primary,
+    alignItems: 'center', justifyContent: 'center',
+    elevation: 4, shadowColor: '#000', shadowOpacity: 0.3, shadowRadius: 3, shadowOffset: { width: 0, height: 2 },
+  },
+  clusterText: { color: '#fff', fontSize: 13, fontWeight: '800' },
 
   // Zone pin
   zonePinWrapper: { width: 130, height: 64, alignItems: 'center', justifyContent: 'center' },

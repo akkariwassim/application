@@ -2,6 +2,7 @@
 
 const Animal = require('../models/Animal');
 const Zone   = require('../models/Zone');
+const Device = require('../models/Device');
 
 /**
  * Generate a random point guaranteed to be inside a polygon.
@@ -79,11 +80,76 @@ async function getRandomPointInZone(zoneId) {
 
 /**
  * GET /api/animals
+ * Supports: pagination, search, sorting, and filtering
  */
 async function getAnimals(req, res, next) {
   try {
-    const animals = await Animal.find({ user_id: req.user.id });
-    res.json(animals);
+    const { 
+      page = 1, 
+      limit = 20, 
+      search = '', 
+      status, 
+      type, 
+      zone_id,
+      sortBy = 'created_at',
+      sortOrder = 'desc'
+    } = req.query;
+
+    const query = { user_id: req.user.id };
+
+    // ── Filters ───────────────────────────────────────────────────
+    if (status) query.status = status;
+    if (type)   query.type = type;
+    if (zone_id) query.current_zone_id = zone_id;
+
+    // ── Search ────────────────────────────────────────────────────
+    if (search) {
+      query.$or = [
+        { name: { $regex: search, $options: 'i' } },
+        { device_id: { $regex: search, $options: 'i' } },
+        { rfid_tag: { $regex: search, $options: 'i' } }
+      ];
+    }
+
+    const skip = (parseInt(page) - 1) * parseInt(limit);
+    const limitInt = parseInt(limit);
+
+    const [animals, total, stats] = await Promise.all([
+      Animal.find(query)
+        .sort({ [sortBy]: sortOrder === 'asc' ? 1 : -1 })
+        .skip(skip)
+        .limit(limitInt),
+      Animal.countDocuments(query),
+      // Aggregate stats for the user
+      Animal.aggregate([
+        { $match: { user_id: req.user.id } },
+        { $group: { 
+          _id: "$status", 
+          count: { $sum: 1 } 
+        }}
+      ])
+    ]);
+
+    // Format stats into a clean object
+    const statsObj = { total, safe: 0, warning: 0, danger: 0, offline: 0 };
+    stats.forEach(s => {
+      if (s._id) statsObj[s._id] = s.count;
+    });
+
+    res.json({
+      success: true,
+      data: {
+        animals,
+        stats: statsObj,
+        pagination: {
+          total,
+          page: parseInt(page),
+          limit: limitInt,
+          pages: Math.ceil(total / limitInt),
+          hasMore: skip + animals.length < total
+        }
+      }
+    });
   } catch (err) {
     next(err);
   }
@@ -96,8 +162,12 @@ async function getAnimal(req, res, next) {
   try {
     const { id } = req.params;
     const animal = await Animal.findOne({ _id: id, user_id: req.user.id });
-    if (!animal) return res.status(404).json({ error: 'Animal not found' });
-    res.json(animal);
+    if (!animal) return res.status(404).json({ 
+      success: false,
+      error: 'ANIMAL_NOT_FOUND',
+      message: 'Animal non trouvé.' 
+    });
+    res.json({ success: true, data: animal });
   } catch (err) {
     next(err);
   }
@@ -108,9 +178,9 @@ async function getAnimal(req, res, next) {
  */
 async function createAnimal(req, res, next) {
   try {
-    const { name, type, breed, latitude, longitude, 
+    const { name, type, breed, age, latitude, longitude, 
             weightKg, birthDate, rfidTag, deviceId, 
-            colorHex, notes, currentZoneId, current_zone_id } = req.body;
+            colorHex, notes, avatarUrl, currentZoneId, current_zone_id } = req.body;
 
     const zoneId = currentZoneId || current_zone_id || null;
 
@@ -133,24 +203,51 @@ async function createAnimal(req, res, next) {
       name,
       type,
       breed,
+      age: parseInt(age) || 0,
       weight_kg: weightKg,
       birth_date: birthDate,
-      // Convert empty strings to null to avoid duplicate-key conflicts on sparse index
       rfid_tag:  rfidTag  && rfidTag.trim()  ? rfidTag.trim()  : null,
       device_id: deviceId && deviceId.trim() ? deviceId.trim() : null,
       color_hex: colorHex || '#4CAF50',
       notes,
+      avatar_url: avatarUrl,
       latitude:  finalLat,
       longitude: finalLon,
       current_zone_id: zoneId,
       status: 'safe',
       last_seen: new Date()
     });
+
+    // ── Sync Device Status ──
+    if (animal.device_id) {
+      await Device.findOneAndUpdate(
+        { device_id: animal.device_id },
+        { status: 'assigned', assigned_to_animal_id: animal._id }
+      );
+    }
     
-    res.status(201).json(animal);
+    res.status(201).json({ success: true, data: animal });
   } catch (err) {
     if (err.code === 11000) {
-      return res.status(400).json({ error: 'DUPLICATE_DEVICE', message: 'Ce device_id ou rfid_tag est déjà utilisé par un autre animal.' });
+      // ── Identify the exact clashing field from the MongoDB error ──
+      const conflictQuery = err.keyValue ? { ...err.keyValue } : null;
+      
+      let existing = null;
+      if (conflictQuery) {
+        existing = await Animal.findOne(conflictQuery).lean();
+      }
+
+      const conflictMsg = existing 
+        ? `L'animal "${existing.name}" utilise déjà cet ID/RFID.`
+        : 'Ce device_id ou rfid_tag est déjà utilisé par un autre animal.';
+
+      return res.status(400).json({ 
+        success: false,
+        error: 'DUPLICATE_DEVICE', 
+        message: conflictMsg,
+        field: Object.keys(err.keyValue || {})[0],
+        existingAnimal: existing ? { id: existing.id || existing._id, name: existing.name } : null
+      });
     }
     next(err);
   }
@@ -170,6 +267,10 @@ async function updateAnimal(req, res, next) {
     if (updates.rfidTag) { updates.rfid_tag = updates.rfidTag; delete updates.rfidTag; }
     if (updates.deviceId) { updates.device_id = updates.deviceId; delete updates.deviceId; }
     if (updates.colorHex) { updates.color_hex = updates.colorHex; delete updates.colorHex; }
+    if (updates.avatarUrl) { updates.avatar_url = updates.avatarUrl; delete updates.avatarUrl; }
+    if (updates.heartRate) { updates.heart_rate = updates.heartRate; delete updates.heartRate; }
+    if (updates.batteryLevel) { updates.battery_level = updates.batteryLevel; delete updates.batteryLevel; }
+    if (updates.signalStrength) { updates.signal_strength = updates.signalStrength; delete updates.signalStrength; }
     
     if (updates.currentZoneId) { 
       updates.current_zone_id = updates.currentZoneId; 
@@ -177,7 +278,11 @@ async function updateAnimal(req, res, next) {
     }
 
     const existing = await Animal.findOne({ _id: id, user_id: req.user.id });
-    if (!existing) return res.status(404).json({ error: 'Animal not found' });
+    if (!existing) return res.status(404).json({ 
+      success: false, 
+      error: 'ANIMAL_NOT_FOUND',
+      message: 'Animal non trouvé.'
+    });
 
     const currentLat = updates.latitude !== undefined ? updates.latitude : existing.latitude;
     const currentLon = updates.longitude !== undefined ? updates.longitude : existing.longitude;
@@ -198,8 +303,12 @@ async function updateAnimal(req, res, next) {
       { new: true, runValidators: true }
     );
     
-    if (!animal) return res.status(404).json({ error: 'Animal not found' });
-    res.json(animal);
+    if (!animal) return res.status(404).json({ 
+      success: false,
+      error: 'ANIMAL_NOT_FOUND',
+      message: 'Animal non trouvé.'
+    });
+    res.json({ success: true, data: animal });
   } catch (err) {
     next(err);
   }
@@ -211,9 +320,23 @@ async function updateAnimal(req, res, next) {
 async function deleteAnimal(req, res, next) {
   try {
     const { id } = req.params;
-    const result = await Animal.deleteOne({ _id: id, user_id: req.user.id });
-    if (result.deletedCount === 0) return res.status(404).json({ error: 'Animal not found' });
-    res.json({ message: 'Animal deleted successfully' });
+    const animal = await Animal.findOne({ _id: id, user_id: req.user.id });
+    if (!animal) return res.status(404).json({ 
+      success: false,
+      error: 'ANIMAL_NOT_FOUND',
+      message: 'Animal non trouvé.'
+    });
+
+    // ── Release Device Status ──
+    if (animal.device_id) {
+      await Device.findOneAndUpdate(
+        { device_id: animal.device_id },
+        { status: 'free', assigned_to_animal_id: null }
+      );
+    }
+
+    await Animal.deleteOne({ _id: id });
+    res.json({ success: true, message: 'Animal deleted successfully and device released.' });
   } catch (err) {
     next(err);
   }
@@ -227,10 +350,10 @@ async function getZone(req, res, next) {
   try {
     const { id } = req.params;
     const animal = await Animal.findOne({ _id: id, user_id: req.user.id });
-    if (!animal || !animal.current_zone_id) return res.json(null);
+    if (!animal || !animal.current_zone_id) return res.json({ success: true, data: null });
     
     const zone = await Zone.findById(animal.current_zone_id);
-    res.json(zone);
+    res.json({ success: true, data: zone });
   } catch (err) {
     next(err);
   }
@@ -251,8 +374,45 @@ async function setZone(req, res, next) {
       { new: true }
     );
     
-    if (!animal) return res.status(404).json({ error: 'Animal not found' });
-    res.json(animal);
+    if (!animal) return res.status(404).json({ 
+      success: false,
+      error: 'ANIMAL_NOT_FOUND',
+      message: 'Animal non trouvé.'
+    });
+    res.json({ success: true, data: animal });
+  } catch (err) {
+    next(err);
+  }
+}
+
+/**
+ * POST /api/animals/bulk
+ */
+async function bulkCreateAnimals(req, res, next) {
+  try {
+    const { animals } = req.body;
+    const userId = req.user.id;
+    const results = { imported: 0, skipped: 0, errors: [] };
+
+    for (const data of animals) {
+      try {
+        await Animal.create({
+          user_id: userId,
+          name: data.name,
+          type: data.type || 'other',
+          rfid_tag: data.rfidTag || data.rfid_tag || null,
+          device_id: data.deviceId || data.device_id || null,
+          status: 'safe',
+          last_seen: new Date()
+        });
+        results.imported++;
+      } catch (err) {
+        results.skipped++;
+        results.errors.push({ name: data.name, error: err.message });
+      }
+    }
+
+    res.json({ success: true, data: results });
   } catch (err) {
     next(err);
   }
@@ -265,5 +425,6 @@ module.exports = {
   updateAnimal,
   deleteAnimal,
   getZone,
-  setZone
+  setZone,
+  bulkCreateAnimals
 };

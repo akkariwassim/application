@@ -7,29 +7,36 @@ const logger = require('../utils/logger');
  * Configure MongoDB connection using Mongoose.
  */
 const connectDB = async () => {
+  const options = {
+    serverSelectionTimeoutMS: 5000,
+    autoIndex: true,
+    maxPoolSize: 10,
+    socketTimeoutMS: 45000,
+  };
+
   try {
-    const conn = await mongoose.connect(process.env.MONGODB_URI, {
-      serverSelectionTimeoutMS: 5000,
-      autoIndex: true,
-    });
-
-    logger.info(`MongoDB Connected: ${conn.connection.host}`);
-    
-    // Handle unexpected events after connection
-    mongoose.connection.on('error', (err) => {
-      logger.error(`MongoDB connection error: ${err}`);
-    });
-
-    mongoose.connection.on('disconnected', () => {
-      logger.warn('MongoDB disconnected');
-    });
-
+    const conn = await mongoose.connect(process.env.MONGODB_URI, options);
+    logger.info(`✅ MongoDB Connected: ${conn.connection.host}`);
   } catch (error) {
-    logger.error('CRITICAL: Error connecting to MongoDB!');
+    logger.error('❌ CRITICAL: Error connecting to MongoDB!');
     logger.error(`Message: ${error.message}`);
-    logger.error(`Connection URI: ${process.env.MONGODB_URI ? 'Defined' : 'UNDEFINED'}`);
-    process.exit(1);
+    // Don't exit immediately, let mongoose handle initial connection retries if configured
+    // but here we want to fail fast on start if URI is wrong.
+    throw error; 
   }
+
+  // ── Connection Event Listeners ────────────────────────────────
+  mongoose.connection.on('error', (err) => {
+    logger.error(`[MongoDB Error]: ${err}`);
+  });
+
+  mongoose.connection.on('disconnected', () => {
+    logger.warn('⚠️ MongoDB disconnected. Attempting to reconnect...');
+  });
+
+  mongoose.connection.on('reconnected', () => {
+    logger.info('✅ MongoDB reconnected.');
+  });
 };
 
 module.exports = connectDB;

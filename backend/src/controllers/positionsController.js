@@ -5,6 +5,7 @@ const SensorData      = require('../models/SensorData');
 const Geofence        = require('../models/Geofence');
 const Alert           = require('../models/Alert');
 const geofenceService = require('../services/geofenceService');
+const aiService       = require('../services/aiService');
 const socketConfig    = require('../config/socket');
 const logger          = require('../utils/logger');
 
@@ -31,10 +32,30 @@ async function submitPosition(req, res, next) {
       { new: true }
     );
     
-    if (!animal) return res.status(404).json({ error: 'Animal not found' });
+    if (!animal) return res.status(404).json({ 
+      success: false,
+      error: 'ANIMAL_NOT_FOUND',
+      message: 'Animal non trouvé.' 
+    });
+
+    // 2. Save Historical SensorData
+    const sensorData = await SensorData.create({
+      animal_id: animalId,
+      user_id: req.user.id,
+      latitude,
+      longitude,
+      temperature: temperature || 38.5,
+      activity: activity || 50,
+      timestamp: new Date()
+    });
+
+    // 2b. Trigger AI Prediction (Asynchronous)
+    aiService.processAIPrediction(animal, sensorData).catch(err => {
+      logger.error(`Async AI processing failed: ${err.message}`);
+    });
     
     // 3. Broadcast update via WebSocket
-    socketConfig.emitPositionUpdate(animalId, { 
+    socketConfig.emitPositionUpdate(req.user.id, animalId, { 
       latitude, 
       longitude, 
       temperature: animal.temperature, 
@@ -96,7 +117,7 @@ async function submitPosition(req, res, next) {
       logger.error(`Geofence calculation error: ${geoErr.message}`);
     }
 
-    res.json({ message: 'Position updated successfully', animal });
+    res.json({ success: true, data: { message: 'Position mise à jour.', animal } });
   } catch (err) {
     next(err);
   }
@@ -113,7 +134,7 @@ async function getHistory(req, res, next) {
       user_id: req.user.id 
     }).sort({ timestamp: -1 }).limit(100);
     
-    res.json(history);
+    res.json({ success: true, data: history });
   } catch (err) {
     next(err);
   }
@@ -130,8 +151,12 @@ async function getLatest(req, res, next) {
       user_id: req.user.id 
     }).sort({ timestamp: -1 });
     
-    if (!latest) return res.status(404).json({ error: 'No history found' });
-    res.json(latest);
+    if (!latest) return res.status(404).json({ 
+      success: false,
+      error: 'NO_HISTORY',
+      message: 'Aucun historique trouvé.' 
+    });
+    res.json({ success: true, data: latest });
   } catch (err) {
     next(err);
   }

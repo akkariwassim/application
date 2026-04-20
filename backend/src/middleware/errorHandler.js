@@ -24,7 +24,9 @@ function errorHandler(err, req, res, next) {
   });
 
   res.status(status).json({
-    error:   message,
+    success: false,
+    error:   err.code || 'INTERNAL_ERROR',
+    message: message,
     ...(process.env.NODE_ENV !== 'production' && { stack: err.stack })
   });
 }

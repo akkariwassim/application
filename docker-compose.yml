@@ -14,11 +14,7 @@ services:
     volumes:
       - db_data:/var/lib/mysql
     healthcheck:
-<<<<<<< HEAD
-      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-prootpass" ]
-=======
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-prootpass"]
->>>>>>> 440470a6bb27bacf6886edd154bcb792cdea0e3a
       interval: 10s
       timeout: 5s
       retries: 5
@@ -53,11 +49,8 @@ services:
     environment:
       NODE_ENV: production
       PORT: 3000
-<<<<<<< HEAD
-      MONGODB_URI: ${MONGODB_URI:-mongodb+srv://wassim:Wassimakkari1@smartfence.7zypd8b.mongodb.net/smart_fence?appName=smartfence}
-=======
       MONGODB_URI: mongodb://mongodb:27017/smart_fence
->>>>>>> 440470a6bb27bacf6886edd154bcb792cdea0e3a
+      AI_SERVICE_URL: http://ai-service:8000
       DB_HOST: db
       DB_PORT: 3306
       DB_NAME: smart_fence
@@ -73,6 +66,18 @@ services:
       - "3000:3000"
     volumes:
       - backend_logs:/app/logs
+
+  # ── AI Microservice (Python FastAPI) ─────────────────────────
+  ai-service:
+    build:
+      context: ./ai-service
+      dockerfile: Dockerfile
+    container_name: smart_fence_ai
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - PORT=8000
 
 volumes:
   db_data:

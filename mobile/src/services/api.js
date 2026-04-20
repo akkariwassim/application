@@ -4,11 +4,7 @@ import Constants from 'expo-constants';
 
 // ── Robust Dynamic host detection ───────────────────────────────
 const getBaseUrl = () => {
-  // 1. Explicit override from app.json / extra
-  if (Constants.expoConfig?.extra?.API_URL) return Constants.expoConfig.extra.API_URL;
-  if (Constants.manifest?.extra?.API_URL) return Constants.manifest.extra.API_URL;
-
-  // 2. Try to find the host machine IP from Expo Packager
+  // 1. Try to find the host machine IP from Expo Packager (MANDATORY for physical devices)
   const hostUri = Constants.expoConfig?.hostUri || 
                   Constants.manifest?.debuggerHost || 
                   Constants.manifest2?.extra?.expoGo?.packagerOpts?.hostType;
@@ -21,6 +17,10 @@ const getBaseUrl = () => {
       return url;
     }
   }
+
+  // 2. Explicit override from app.json / extra (Fallback)
+  if (Constants.expoConfig?.extra?.API_URL) return Constants.expoConfig.extra.API_URL;
+  if (Constants.manifest?.extra?.API_URL) return Constants.manifest.extra.API_URL;
 
   // 3. Last resort fallbacks
   console.warn('[API] Could not detect host IP, using defaults');
@@ -70,7 +70,13 @@ function processQueue(error, token = null) {
 }
 
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    // If the backend followed the { success: true, data: ... } standard, unwrap it
+    if (response.data && response.data.success === true && response.data.data !== undefined) {
+      return { ...response, data: response.data.data };
+    }
+    return response;
+  },
   async (error) => {
     const originalRequest = error.config;
 
@@ -93,9 +99,12 @@ api.interceptors.response.use(
         const refreshToken = await SecureStore.getItemAsync('refreshToken');
         if (!refreshToken) throw new Error('No refresh token');
 
-        const { data } = await axios.post(`${API_URL}/api/auth/refresh`, {
+        const { data: wrapper } = await axios.post(`${API_URL}/api/auth/refresh`, {
           refreshToken,
         });
+
+        // Handle standardized wrapper if present
+        const data = (wrapper.success && wrapper.data) ? wrapper.data : wrapper;
 
         await SecureStore.setItemAsync('accessToken', data.accessToken);
         await SecureStore.setItemAsync('refreshToken', data.refreshToken);
@@ -117,10 +126,11 @@ api.interceptors.response.use(
     }
 
     if (error.response) {
-      // ── Mute expected 404 on session check (initial load) ─────
+      // ── Mute expected 404s (initial session check or new animal without AI data) ──
       const isMe404 = error.config.url.includes('/auth/me') && error.response.status === 404;
+      const isAI404 = error.config.url.includes('/ai/animal/') && error.response.status === 404;
 
-      if (!isMe404) {
+      if (!isMe404 && !isAI404) {
         console.error(`[API Error] ${error.config.method?.toUpperCase()} ${error.config.url} - Status: ${error.response.status}`);
         console.error('Data:', JSON.stringify(error.response.data, null, 2));
       }

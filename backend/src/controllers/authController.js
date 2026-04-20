@@ -34,6 +34,7 @@ async function register(req, res, next) {
     if (existing) {
       logger.warn(`Registration failed: Email already taken - ${email}`);
       return res.status(400).json({ 
+        success: false,
         error: 'EMAIL_TAKEN', 
         message: 'Cet e-mail est déjà utilisé par un autre compte.' 
       });
@@ -60,12 +61,23 @@ async function register(req, res, next) {
     logger.info(`✅ New user registered and logged in: ${email}`);
     
     res.status(201).json({ 
-      user, 
-      accessToken, 
-      refreshToken 
+      success: true,
+      data: {
+        user, 
+        accessToken, 
+        refreshToken 
+      }
     });
   } catch (err) {
-    logger.error(`Error in registration: ${err.message}`);
+    logger.error(`❌ Registration failed for ${req.body.email}: ${err.message}`);
+    // If it's a Mongoose validation error, provide more detail
+    if (err.name === 'ValidationError') {
+      return res.status(400).json({ 
+        success: false,
+        error: 'VALIDATION_ERROR', 
+        message: Object.values(err.errors).map(e => e.message).join(', ') 
+      });
+    }
     next(err);
   }
 }
@@ -82,6 +94,7 @@ async function login(req, res, next) {
     if (!user) {
       logger.warn(`Login failed: User not found - ${email}`);
       return res.status(401).json({ 
+        success: false,
         error: 'INVALID_CREDENTIALS', 
         message: 'Aucun compte trouvé avec cet e-mail.' 
       });
@@ -91,6 +104,7 @@ async function login(req, res, next) {
     if (!isMatch) {
       logger.warn(`Login failed: Incorrect password - ${email}`);
       return res.status(401).json({ 
+        success: false,
         error: 'INVALID_CREDENTIALS', 
         message: 'E-mail ou mot de passe incorrect.' 
       });
@@ -99,6 +113,7 @@ async function login(req, res, next) {
     if (!user.is_active) {
       logger.warn(`Login failed: Account disabled - ${email}`);
       return res.status(403).json({ 
+        success: false,
         error: 'ACCOUNT_DISABLED', 
         message: 'Votre compte est désactivé. Veuillez contacter l\'administrateur.' 
       });
@@ -122,9 +137,12 @@ async function login(req, res, next) {
     logger.info(`✅ User logged in successfully: ${email}`);
     
     res.json({ 
-      user, 
-      accessToken, 
-      refreshToken 
+      success: true,
+      data: {
+        user, 
+        accessToken, 
+        refreshToken 
+      }
     });
   } catch (err) {
     logger.error(`Error in login: ${err.message}`);
@@ -138,8 +156,12 @@ async function login(req, res, next) {
 async function getMe(req, res, next) {
   try {
     const user = await User.findById(req.user.id);
-    if (!user) return res.status(404).json({ error: 'User not found' });
-    res.json(user);
+    if (!user) return res.status(404).json({ 
+      success: false,
+      error: 'USER_NOT_FOUND',
+      message: 'Utilisateur non trouvé.' 
+    });
+    res.json({ success: true, data: user });
   } catch (err) {
     next(err);
   }
@@ -152,7 +174,11 @@ async function refreshToken(req, res, next) {
   try {
     const { refreshToken: incomingToken } = req.body;
     if (!incomingToken) {
-      return res.status(400).json({ error: 'TOKEN_REQUIRED', message: 'Token de rafraîchissement manquant.' });
+      return res.status(400).json({ 
+        success: false,
+        error: 'TOKEN_REQUIRED', 
+        message: 'Token de rafraîchissement manquant.' 
+      });
     }
 
     const decoded = jwt.verify(incomingToken, process.env.JWT_REFRESH_SECRET);
@@ -160,7 +186,11 @@ async function refreshToken(req, res, next) {
 
     if (!user || !user.refresh_tokens.find(t => t.token === incomingToken)) {
       logger.warn(`Refresh failed: Token invalid or user not found - ${decoded.id}`);
-      return res.status(401).json({ error: 'INVALID_TOKEN', message: 'Session expirée ou invalide.' });
+      return res.status(401).json({ 
+        success: false,
+        error: 'INVALID_TOKEN', 
+        message: 'Session expirée ou invalide.' 
+      });
     }
 
     // Generate new pair
@@ -178,7 +208,11 @@ async function refreshToken(req, res, next) {
     res.json(tokens);
   } catch (err) {
     logger.error(`Error in refreshToken: ${err.message}`);
-    res.status(401).json({ error: 'INVALID_TOKEN', message: 'Session expirée.' });
+    res.status(401).json({ 
+      success: false,
+      error: 'INVALID_TOKEN', 
+      message: 'Session expirée.' 
+    });
   }
 }
 
@@ -195,7 +229,7 @@ async function logout(req, res, next) {
       );
     }
     logger.info('User logged out');
-    res.json({ message: 'Logged out successfully' });
+    res.json({ success: true, message: 'Logged out successfully' });
   } catch (err) {
     logger.error(`Error in logout: ${err.message}`);
     next(err);
