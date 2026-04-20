@@ -3,6 +3,7 @@
 const Animal = require('../models/Animal');
 const Zone   = require('../models/Zone');
 const Device = require('../models/Device');
+const socketConfig = require('../config/socket');
 
 /**
  * Generate a random point guaranteed to be inside a polygon.
@@ -206,22 +207,22 @@ async function createAnimal(req, res, next) {
     }
 
     // 2. Data Construction (Omit empty strings to satisfy sparse index)
-    const animalData = {
+    const animal = await Animal.create({
       user_id: req.user.id,
       name,
       type,
       breed,
-      age: parseInt(age) || 0,
-      weight_kg: weightKg,
+      age: (age && !isNaN(parseInt(age))) ? parseInt(age) : 0,
+      weight_kg: (weightKg && !isNaN(parseFloat(weightKg))) ? parseFloat(weightKg) : null,
       birth_date: birthDate,
-      rfid_tag:  rfidTag  && rfidTag.trim()  ? rfidTag.trim()  : null,
-      device_id: deviceId && deviceId.trim() ? deviceId.trim() : null,
+      rfid_tag:  rfidTag  && rfidTag.trim()  ? rfidTag.trim()  : undefined,
+      device_id: deviceId && deviceId.trim() ? deviceId.trim() : undefined,
       color_hex: colorHex || '#4CAF50',
       notes,
       avatar_url: avatarUrl,
-      latitude:  finalLat,
-      longitude: finalLon,
-      current_zone_id: zoneId,
+      latitude:  parseFloat(latitude) || 0,
+      longitude: parseFloat(longitude) || 0,
+      current_zone_id: currentZoneId || current_zone_id || null,
       status: 'safe',
       last_seen: new Date()
     });
@@ -460,48 +461,10 @@ async function triggerAction(req, res, next) {
     res.json({ 
       success: true, 
       data: { 
-        message: `Commande ${type} envoyée (${state ? 'ON' : 'OFF'})`,
+        message: `Action ${type} envoyée (${state ? 'ON' : 'OFF'})`,
         animal 
       } 
     });
-  } catch (err) {
-    next(err);
-  }
-}
-
-/**
- * POST /api/animals/:id/action
- * Trigger a real hardware actuator (buzzer, led, relay)
- */
-async function triggerAction(req, res, next) {
-  try {
-    const { id } = req.params;
-    const { type, state } = req.body; // type: 'buzzer'|'led'|'relay', state: boolean
-
-    if (!['buzzer', 'led', 'relay'].includes(type)) {
-      return res.status(400).json({ error: 'INVALID_ACTION', message: 'Action type must be buzzer, led, or relay' });
-    }
-
-    const animal = await Animal.findOneAndUpdate(
-      { _id: id, user_id: req.user.id },
-      { $set: { [`actuators.${type}`]: !!state } },
-      { new: true }
-    );
-
-    if (!animal) return res.status(404).json({ error: 'Animal not found' });
-
-    // Broadcast update to Farmer app
-    socketConfig.emitPositionUpdate(req.user.id, id, { actuators: animal.actuators });
-
-    // BROADCAST to hardware!
-    const io = socketConfig.getIO();
-    io.to(`animal:${id}`).emit('actuator-command', { 
-      type, 
-      state: !!state,
-      animalId: id 
-    });
-
-    res.json({ message: `Action ${type} sent to hardware`, actuators: animal.actuators });
   } catch (err) {
     next(err);
   }

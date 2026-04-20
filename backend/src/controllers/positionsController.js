@@ -71,33 +71,12 @@ async function submitPosition(req, res, next) {
       timestamp: animal.last_seen
     });
 
-    // 4. Geofence Check & Alerting
+    // 4. Geofence & Alert Monitoring
     try {
-      const activeZone = await Zone.findByAnimal(animalId, req.user.id);
-      if (activeZone && activeZone.is_active) {
-        let coords = [];
-        if (activeZone.type === 'polygon' && activeZone.polygon_coords) {
-          coords = typeof activeZone.polygon_coords === 'string' 
-            ? JSON.parse(activeZone.polygon_coords) 
-            : activeZone.polygon_coords;
-        }
-
-    if (shouldSave) {
-      await SensorData.create({
-        animal_id: animalId,
-        user_id: req.user.id,
-        latitude,
-        longitude,
-        temperature: animal.temperature,
-        heart_rate:  animal.heart_rate,
-        activity:    animal.activity,
-        timestamp:   animal.last_sync
-      });
-      
-      // Update tracking state for next throttling check
-      animal.last_sync_history = new Date();
-      animal.last_lat_history  = latitude;
-      animal.last_lon_history  = longitude;
+      const { processZoneMonitoring } = require('../services/alertService');
+      await processZoneMonitoring(animal, { latitude, longitude });
+    } catch (alertErr) {
+      logger.error(`Alert monitoring failed for animal ${animalId}: ${alertErr.message}`);
     }
 
     res.json({ success: true, data: { message: 'Position mise à jour.', animal } });
