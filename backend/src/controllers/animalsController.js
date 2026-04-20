@@ -418,6 +418,52 @@ async function bulkCreateAnimals(req, res, next) {
   }
 }
 
+/**
+ * POST /api/animals/:id/action
+ * Triggers hardware actions (buzzer, LED, relay) via WebSocket.
+ */
+async function triggerAction(req, res, next) {
+  try {
+    const { id } = req.params;
+    const { type, state } = req.body;
+
+    const animal = await Animal.findOne({ _id: id, user_id: req.user.id });
+    if (!animal) return res.status(404).json({
+      success: false,
+      error: 'ANIMAL_NOT_FOUND',
+      message: 'Animal non trouvé.'
+    });
+
+    // 1. Persist state in DB (optional but Good for UI feedback)
+    if (animal.actuators) {
+      animal.actuators[type] = state;
+      animal.markModified('actuators');
+      await animal.save();
+    }
+
+    // 2. Broadcast Command via WebSocket
+    const socketConfig = require('../config/socket');
+    const io = socketConfig.getIO();
+    
+    // Emit to animal specific room which devices or monitoring apps are listening to
+    io.to(`animal:${id}`).emit('hardware-command', { 
+      animalId: id,
+      type, // 'buzzer', 'led', 'relay'
+      state 
+    });
+
+    res.json({ 
+      success: true, 
+      data: { 
+        message: `Commande ${type} envoyée (${state ? 'ON' : 'OFF'})`,
+        animal 
+      } 
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
 module.exports = {
   getAnimals,
   getAnimal,
@@ -426,5 +472,6 @@ module.exports = {
   deleteAnimal,
   getZone,
   setZone,
-  bulkCreateAnimals
+  bulkCreateAnimals,
+  triggerAction
 };

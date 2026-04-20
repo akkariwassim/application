@@ -2,7 +2,7 @@
 
 const Animal          = require('../models/Animal');
 const SensorData      = require('../models/SensorData');
-const Geofence        = require('../models/Geofence');
+const Zone            = require('../models/Zone');
 const Alert           = require('../models/Alert');
 const geofenceService = require('../services/geofenceService');
 const aiService       = require('../services/aiService');
@@ -65,7 +65,7 @@ async function submitPosition(req, res, next) {
 
     // 4. Geofence Check & Alerting
     try {
-      const activeZone = await Geofence.findByAnimal(animalId, req.user.id);
+      const activeZone = await Zone.findByAnimal(animalId, req.user.id);
       if (activeZone && activeZone.is_active) {
         let coords = [];
         if (activeZone.type === 'polygon' && activeZone.polygon_coords) {

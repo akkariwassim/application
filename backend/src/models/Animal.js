@@ -85,6 +85,11 @@ const animalSchema = new mongoose.Schema({
     type: Number,
     default: 100,
   },
+  actuators: {
+    buzzer: { type: Boolean, default: false },
+    led: { type: Boolean, default: false },
+    relay: { type: Boolean, default: false },
+  },
   age: Number,
   notes: String,
   avatar_url: String,
