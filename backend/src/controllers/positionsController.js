@@ -82,22 +82,32 @@ async function submitPosition(req, res, next) {
             : activeZone.polygon_coords;
         }
 
-    if (shouldSave) {
-      await SensorData.create({
-        animal_id: animalId,
-        user_id: req.user.id,
-        latitude,
-        longitude,
-        temperature: animal.temperature,
-        heart_rate:  animal.heart_rate,
-        activity:    animal.activity,
-        timestamp:   animal.last_sync
-      });
-      
-      // Update tracking state for next throttling check
-      animal.last_sync_history = new Date();
-      animal.last_lat_history  = latitude;
-      animal.last_lon_history  = longitude;
+        const isInside = geofenceService.checkInside(
+          { lat: latitude, lng: longitude },
+          activeZone.type,
+          activeZone.radius,
+          coords,
+          activeZone.location ? activeZone.location.coordinates : null
+        );
+
+        if (!isInside) {
+          await Alert.create({
+            animal_id: animalId,
+            user_id: req.user.id,
+            type: 'exit',
+            zone_id: activeZone._id,
+            message: `L'animal ${animal.name} a quitté sa zone "${activeZone.name}"!`
+          });
+          socketConfig.emitAlert(req.user.id, {
+            type: 'exit',
+            animalId,
+            animalName: animal.name,
+            message: `Alerte: ${animal.name} hors zone!`
+          });
+        }
+      }
+    } catch (gErr) {
+      logger.error(`Geofence evaluation failed: ${gErr.message}`);
     }
 
     res.json({ success: true, data: { message: 'Position mise à jour.', animal } });
