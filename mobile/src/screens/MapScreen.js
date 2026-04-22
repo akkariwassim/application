@@ -6,7 +6,7 @@ import {
 } from 'react-native';
 import MapView from 'react-native-map-clustering'; // Clustered Map
 import { Marker, Polygon, Polyline, PROVIDER_GOOGLE } from 'react-native-maps';
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as Location from 'expo-location';
 import { getDistance } from 'geolib';
@@ -50,29 +50,8 @@ const MemoizedAnimalMarker = React.memo(({ animal, onPress }) => {
 
 const { width } = Dimensions.get('window');
 
-// ── Design Tokens ─────────────────────────────────────────────────────────────
-const STATUS_COLOR = {
-  safe:    '#22C55E',
-  warning: '#F59E0B',
-  danger:  '#EF4444',
-  offline: '#64748B',
-};
-
-const COLORS = {
-  primary:    '#6366F1',
-  primaryDim: 'rgba(99,102,241,0.18)',
-  background: '#0A0F1E',
-  surface:    '#131929',
-  card:       '#1A2540',
-  text:       '#F1F5F9',
-  subtext:    '#94A3B8',
-  muted:      '#334155',
-  danger:     '#EF4444',
-  success:    '#22C55E',
-  warn:       '#F59E0B',
-  border:     'rgba(255,255,255,0.07)',
-  gold:       '#FBBF24',
-};
+// Use STATUS_COLOR from theme.COLORS.status
+const STATUS_COLOR = COLORS.status;
 
 // ── Haversine distance in metres (fast inline) ────────────────────────────────
 function haversineDist(lat1, lon1, lat2, lon2) {

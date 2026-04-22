@@ -29,10 +29,10 @@ async function submitPosition(req, res, next) {
     if (latitude !== undefined)  updatePayload.latitude  = latitude;
     if (longitude !== undefined) updatePayload.longitude = longitude;
     if (temperature !== undefined) updatePayload.temperature = temperature;
-    if (heart_rate !== undefined)   updatePayload.heart_rate   = heart_rate;
-    if (battery_level !== undefined) updatePayload.battery_level = battery_level;
-    if (gps_signal !== undefined)    updatePayload.gps_signal    = gps_signal;
-    if (activity !== undefined)      updatePayload.activity      = activity;
+    if (heart_rate !== undefined)     updatePayload.heart_rate     = heart_rate;
+    if (battery_level !== undefined)  updatePayload.battery_level  = battery_level;
+    if (gps_signal !== undefined)     updatePayload.signal_strength = gps_signal;
+    if (activity !== undefined)       updatePayload.activity       = activity;
 
     const animal = await Animal.findOneAndUpdate(
       { _id: animalId, user_id: req.user.id },
@@ -52,8 +52,11 @@ async function submitPosition(req, res, next) {
       user_id: req.user.id,
       latitude,
       longitude,
-      temperature: temperature || 38.5,
-      activity: activity || 50,
+      temperature: temperature || animal.temperature || 38.5,
+      heart_rate: heart_rate || animal.heart_rate,
+      battery_level: battery_level || animal.battery_level,
+      gps_signal: gps_signal || animal.signal_strength,
+      activity: activity || animal.activity || 50,
       timestamp: new Date()
     });
 
@@ -67,37 +70,19 @@ async function submitPosition(req, res, next) {
       latitude, 
       longitude, 
       temperature: animal.temperature, 
+      heart_rate: animal.heart_rate,
+      battery_level: animal.battery_level,
+      signal_strength: animal.signal_strength,
       activity: animal.activity,
       timestamp: animal.last_seen
     });
 
-    // 4. Geofence Check & Alerting
+    // 4. Geofence & Alert Monitoring
     try {
-      const activeZone = await Zone.findByAnimal(animalId, req.user.id);
-      if (activeZone && activeZone.is_active) {
-        let coords = [];
-        if (activeZone.type === 'polygon' && activeZone.polygon_coords) {
-          coords = typeof activeZone.polygon_coords === 'string' 
-            ? JSON.parse(activeZone.polygon_coords) 
-            : activeZone.polygon_coords;
-        }
-
-    if (shouldSave) {
-      await SensorData.create({
-        animal_id: animalId,
-        user_id: req.user.id,
-        latitude,
-        longitude,
-        temperature: animal.temperature,
-        heart_rate:  animal.heart_rate,
-        activity:    animal.activity,
-        timestamp:   animal.last_sync
-      });
-      
-      // Update tracking state for next throttling check
-      animal.last_sync_history = new Date();
-      animal.last_lat_history  = latitude;
-      animal.last_lon_history  = longitude;
+      const { processZoneMonitoring } = require('../services/alertService');
+      await processZoneMonitoring(animal, { latitude, longitude });
+    } catch (alertErr) {
+      logger.error(`Alert monitoring failed for animal ${animalId}: ${alertErr.message}`);
     }
 
     res.json({ success: true, data: { message: 'Position mise à jour.', animal } });

@@ -3,6 +3,7 @@
 const Animal = require('../models/Animal');
 const Zone   = require('../models/Zone');
 const Device = require('../models/Device');
+const socketConfig = require('../config/socket');
 
 /**
  * Generate a random point guaranteed to be inside a polygon.
@@ -206,6 +207,19 @@ async function createAnimal(req, res, next) {
     }
 
     // 2. Data Construction (Omit empty strings to satisfy sparse index)
+    const zoneId = currentZoneId || current_zone_id;
+    let finalLat = latitude || 0;
+    let finalLon = longitude || 0;
+
+    // Auto-place inside zone if at 0,0
+    if (zoneId && isAtZero(finalLat, finalLon)) {
+      const point = await getRandomPointInZone(zoneId);
+      if (point) {
+        finalLat = point.latitude;
+        finalLon = point.longitude;
+      }
+    }
+
     const animalData = {
       user_id: req.user.id,
       name,
@@ -224,7 +238,9 @@ async function createAnimal(req, res, next) {
       current_zone_id: zoneId,
       status: 'safe',
       last_seen: new Date()
-    });
+    };
+
+    const animal = await Animal.create(animalData);
 
     // ── Sync Device Status ──
     if (animal.device_id) {
@@ -432,52 +448,6 @@ async function triggerAction(req, res, next) {
     const { id } = req.params;
     const { type, state } = req.body;
 
-    const animal = await Animal.findOne({ _id: id, user_id: req.user.id });
-    if (!animal) return res.status(404).json({
-      success: false,
-      error: 'ANIMAL_NOT_FOUND',
-      message: 'Animal non trouvé.'
-    });
-
-    // 1. Persist state in DB (optional but Good for UI feedback)
-    if (animal.actuators) {
-      animal.actuators[type] = state;
-      animal.markModified('actuators');
-      await animal.save();
-    }
-
-    // 2. Broadcast Command via WebSocket
-    const socketConfig = require('../config/socket');
-    const io = socketConfig.getIO();
-    
-    // Emit to animal specific room which devices or monitoring apps are listening to
-    io.to(`animal:${id}`).emit('hardware-command', { 
-      animalId: id,
-      type, // 'buzzer', 'led', 'relay'
-      state 
-    });
-
-    res.json({ 
-      success: true, 
-      data: { 
-        message: `Commande ${type} envoyée (${state ? 'ON' : 'OFF'})`,
-        animal 
-      } 
-    });
-  } catch (err) {
-    next(err);
-  }
-}
-
-/**
- * POST /api/animals/:id/action
- * Trigger a real hardware actuator (buzzer, led, relay)
- */
-async function triggerAction(req, res, next) {
-  try {
-    const { id } = req.params;
-    const { type, state } = req.body; // type: 'buzzer'|'led'|'relay', state: boolean
-
     if (!['buzzer', 'led', 'relay'].includes(type)) {
       return res.status(400).json({ error: 'INVALID_ACTION', message: 'Action type must be buzzer, led, or relay' });
     }
@@ -488,20 +458,30 @@ async function triggerAction(req, res, next) {
       { new: true }
     );
 
-    if (!animal) return res.status(404).json({ error: 'Animal not found' });
+    if (!animal) return res.status(404).json({
+      success: false,
+      error: 'ANIMAL_NOT_FOUND',
+      message: 'Animal non trouvé.'
+    });
 
     // Broadcast update to Farmer app
     socketConfig.emitPositionUpdate(req.user.id, id, { actuators: animal.actuators });
 
     // BROADCAST to hardware!
     const io = socketConfig.getIO();
-    io.to(`animal:${id}`).emit('actuator-command', { 
+    io.to(`animal:${id}`).emit('hardware-command', { 
+      animalId: id,
       type, 
-      state: !!state,
-      animalId: id 
+      state: !!state 
     });
 
-    res.json({ message: `Action ${type} sent to hardware`, actuators: animal.actuators });
+    res.json({ 
+      success: true, 
+      data: { 
+        message: `Commande ${type} envoyée (${state ? 'ON' : 'OFF'})`,
+        actuators: animal.actuators 
+      } 
+    });
   } catch (err) {
     next(err);
   }
