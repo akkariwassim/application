@@ -20,10 +20,10 @@ async function createGeofenceAlert({ animalId, userId, latitude, longitude, dist
     // Deduplication: check if an active geofence alert exists in the last 15 mins
     const fifteenMinsAgo = new Date(Date.now() - 15 * 60 * 1000);
     const recent = await Alert.findOne({
-      animalId,
+      animal_id: animalId,
       type: 'geofence_exit',
       status: 'active',
-      createdAt: { $gt: fifteenMinsAgo }
+      created_at: { $gt: fifteenMinsAgo }
     });
 
     if (recent) return null;
@@ -34,9 +34,9 @@ async function createGeofenceAlert({ animalId, userId, latitude, longitude, dist
       : `L'animal a quitté ${zoneLabel} (clôture polygonale).`;
 
     const alert = await Alert.create({
-      animalId,
-      userId,
-      zoneId,
+      animal_id: animalId,
+      user_id: userId,
+      zone_id: zoneId,
       type:      'geofence_exit',
       severity:  'critical',
       message,
@@ -78,17 +78,17 @@ async function createHealthAlert({ animalId, userId, type, severity, message, la
     // Deduplication: check if similar active alert exists in the last 30 mins
     const thirtyMinsAgo = new Date(Date.now() - 30 * 60 * 1000);
     const recent = await Alert.findOne({
-      animalId,
+      animal_id: animalId,
       type,
       status: 'active',
-      createdAt: { $gt: thirtyMinsAgo }
+      created_at: { $gt: thirtyMinsAgo }
     });
 
     if (recent) return null;
 
     const alert = await Alert.create({
-      animalId,
-      userId,
+      animal_id: animalId,
+      user_id: userId,
       type,
       severity,
       message,
@@ -136,18 +136,17 @@ async function markAnimalSafe(animalId, userId) {
  * Checks all user zones for transitions and breaches via Mongoose.
  */
 async function processZoneMonitoring(animal, currentPos) {
-  const { _id: animalId, userId, currentZoneId: lastZoneId } = animal;
+  const { _id: animalId, user_id: userId, current_zone_id: assignedZoneId } = animal;
   const { latitude, longitude } = currentPos;
 
   try {
-    // 1. Fetch all zones for this user
-    const zones = await Zone.find({ userId, isActive: true }).sort({ priorityLevel: -1 });
+    // 1. Fetch all zones for this user to find current position
+    const allZones = await Zone.find({ user_id: userId, is_active: true });
     let matchedZone = null;
 
-    // 2. Find which zone the animal is currently in
-    for (const zone of zones) {
+    for (const zone of allZones) {
       const { breached } = checkBreach(latitude, longitude, zone);
-      if (!breached) { // !breached means INSIDE
+      if (!breached) { 
         matchedZone = zone;
         break; 
       }
@@ -155,23 +154,18 @@ async function processZoneMonitoring(animal, currentPos) {
 
     const matchedId = matchedZone ? matchedZone._id : null;
 
-    // 3. Handle Transitions (Entry/Exit)
-    if (String(matchedId) !== String(lastZoneId)) {
-      if (lastZoneId) {
-        logger.info(`🚶 Animal ${animalId} exited zone ${lastZoneId}`);
-      }
-      if (matchedId) {
-        logger.info(`🚩 Animal ${animalId} entered zone ${matchedId} (${matchedZone.name})`);
-      }
-      await Animal.findByIdAndUpdate(animalId, { $set: { currentZoneId: matchedId } });
+    // 2. Handle Entry/Exit logging (Non-destructive to assignedZoneId)
+    // We can use a separate field or just log it for now
+    if (matchedId && String(matchedId) !== String(assignedZoneId)) {
+       // Optional: Log crossing into a different zone
     }
 
-    // 4. Breach Detection for assigned primary zone
-    // If there is a currentZoneId assigned to animal, check it specifically
-    if (animal.currentZoneId) {
-      const primaryZone = await Zone.findById(animal.currentZoneId);
+    // 3. Mandatory Breach Detection for the ASSIGNED zone
+    if (assignedZoneId) {
+      const primaryZone = await Zone.findById(assignedZoneId);
       if (primaryZone) {
         const { breached, distanceM } = checkBreach(latitude, longitude, primaryZone);
+        
         if (breached) {
           await createGeofenceAlert({
             animalId, userId, 
@@ -181,6 +175,7 @@ async function processZoneMonitoring(animal, currentPos) {
             zoneName: primaryZone.name
           });
         } else if (animal.status === 'out_of_zone' || animal.status === 'warning') {
+          // Animal returned to its assigned zone
           await markAnimalSafe(animalId, userId);
         }
       }
