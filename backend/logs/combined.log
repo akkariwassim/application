@@ -4525,3 +4525,39 @@
 2026-04-20 15:19:45 [info]: ✅ MongoDB Connected: ac-lokdmj8-shard-00-00.7zypd8b.mongodb.net
 2026-04-20 15:19:45 [info]: 🚀 Server running on http://localhost:3000
 2026-04-20 15:19:45 [info]:    Environment: development
+<<<<<<< Updated upstream
+=======
+2026-04-22 15:24:15 [info]: ✅ MongoDB Connected: ac-lokdmj8-shard-00-00.7zypd8b.mongodb.net
+2026-04-22 15:24:15 [info]: 🚀 Server running on http://localhost:3000
+2026-04-22 15:24:15 [info]:    Environment: development
+2026-04-22 15:27:24 [info]: Incoming Request: POST /api/auth/login
+2026-04-22 15:27:25 [info]: ✅ User logged in successfully: akkariwassim11@gmail.com
+2026-04-22 15:27:25 [info]: Incoming Request: GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-04-22 15:27:29 [info]: Socket connected: _4ZgrZOBvKm2hJPHAAAB (user 69e0f6ec4be9f34aaa8e2d6a)
+2026-04-22 15:27:31 [info]: Incoming Request: GET /api/geofences
+2026-04-22 15:27:48 [info]: Incoming Request: GET /api/geofences
+2026-04-22 15:27:53 [info]: Incoming Request: GET /api/alerts?status=active
+2026-04-22 15:27:53 [info]: Incoming Request: GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-04-22 15:27:55 [info]: Incoming Request: GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-04-22 15:27:56 [info]: Incoming Request: GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-04-22 15:27:58 [info]: Incoming Request: GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-04-22 15:27:58 [info]: Incoming Request: GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-04-22 15:28:00 [info]: Incoming Request: GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-04-22 15:32:46 [info]: ✅ MongoDB Connected: ac-lokdmj8-shard-00-00.7zypd8b.mongodb.net
+2026-04-22 15:32:46 [info]: 🚀 Server running on http://localhost:3000
+2026-04-22 15:32:46 [info]:    Environment: development
+2026-04-22 15:42:12 [info]: Incoming Request: GET /api/auth/me
+2026-04-22 15:42:12 [info]: Incoming Request: GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-04-22 15:42:12 [info]: Incoming Request: GET /api/geofences
+2026-04-22 15:42:12 [info]: Socket connected: URjJ80pTA2TlNyaYAAAB (user 69e0f6ec4be9f34aaa8e2d6a)
+2026-04-22 15:42:22 [info]: Incoming Request: GET /api/geofences
+2026-04-22 15:42:24 [info]: Incoming Request: GET /api/alerts?status=active
+2026-04-22 15:42:24 [info]: Incoming Request: GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-04-22 15:42:24 [info]: Incoming Request: GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-04-22 15:42:26 [info]: Incoming Request: GET /api/alerts?status=active
+2026-04-22 15:42:26 [info]: Incoming Request: POST /api/auth/refresh
+2026-04-22 15:42:26 [info]: Incoming Request: GET /api/alerts?status=active
+2026-04-22 15:42:28 [info]: Incoming Request: GET /api/alerts?status=resolved
+2026-04-22 15:42:29 [info]: Incoming Request: GET /api/alerts?
+2026-04-22 15:45:26 [info]: Socket disconnected: URjJ80pTA2TlNyaYAAAB — transport close
+>>>>>>> Stashed changes
