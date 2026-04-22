@@ -83,41 +83,45 @@ async function submitPosition(req, res, next) {
       await processZoneMonitoring(animal, { latitude, longitude });
     } catch (alertErr) {
       logger.error(`Alert monitoring failed for animal ${animalId}: ${alertErr.message}`);
-      const activeZone = await Zone.findByAnimal(animalId, req.user.id);
-      if (activeZone && activeZone.is_active) {
-        let coords = [];
-        if (activeZone.type === 'polygon' && activeZone.polygon_coords) {
-          coords = typeof activeZone.polygon_coords === 'string' 
-            ? JSON.parse(activeZone.polygon_coords) 
-            : activeZone.polygon_coords;
-        }
+      
+      // Fallback geofence logic if alertService fails
+      try {
+        const activeZone = await Zone.findByAnimal(animalId, req.user.id);
+        if (activeZone && activeZone.is_active) {
+          let coords = [];
+          if (activeZone.type === 'polygon' && activeZone.polygon_coords) {
+            coords = typeof activeZone.polygon_coords === 'string' 
+              ? JSON.parse(activeZone.polygon_coords) 
+              : activeZone.polygon_coords;
+          }
 
-        const isInside = geofenceService.checkInside(
-          { lat: latitude, lng: longitude },
-          activeZone.type,
-          activeZone.radius,
-          coords,
-          activeZone.location ? activeZone.location.coordinates : null
-        );
+          const isInside = geofenceService.checkInside(
+            { lat: latitude, lng: longitude },
+            activeZone.type,
+            activeZone.radius,
+            coords,
+            activeZone.location ? activeZone.location.coordinates : null
+          );
 
-        if (!isInside) {
-          await Alert.create({
-            animal_id: animalId,
-            user_id: req.user.id,
-            type: 'exit',
-            zone_id: activeZone._id,
-            message: `L'animal ${animal.name} a quitté sa zone "${activeZone.name}"!`
-          });
-          socketConfig.emitAlert(req.user.id, {
-            type: 'exit',
-            animalId,
-            animalName: animal.name,
-            message: `Alerte: ${animal.name} hors zone!`
-          });
+          if (!isInside) {
+            await Alert.create({
+              animal_id: animalId,
+              user_id: req.user.id,
+              type: 'exit',
+              zone_id: activeZone._id,
+              message: `L'animal ${animal.name} a quitté sa zone "${activeZone.name}"!`
+            });
+            socketConfig.emitAlert(req.user.id, {
+              type: 'exit',
+              animalId,
+              animalName: animal.name,
+              message: `Alerte: ${animal.name} hors zone!`
+            });
+          }
         }
+      } catch (gErr) {
+        logger.error(`Fallback geofence evaluation failed: ${gErr.message}`);
       }
-    } catch (gErr) {
-      logger.error(`Geofence evaluation failed: ${gErr.message}`);
     }
 
     res.json({ success: true, data: { message: 'Position mise à jour.', animal } });
