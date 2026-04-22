@@ -4,7 +4,7 @@ import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS, SHADOWS, SPACING, BORDER_RADIUS } from '../../config/theme';
 
 /**
- * Professional HUD for Live Map
+ * Premium HUD for Live Map
  * Features: Follow Toggle, Recenter, Map Type Selector, and Quick Filters
  */
 const MapControls = ({
@@ -21,48 +21,70 @@ const MapControls = ({
 }) => {
   return (
     <View style={styles.container}>
-      {/* ── Top Bar Controls ── */}
+      {/* ── Top Bar Controls (Glassmorphism inspired) ── */}
       <View style={styles.topBar}>
         <TouchableOpacity 
           style={[styles.btn, (followUser || (selectedAnimal && !selectedAnimal.manualMove)) && styles.btnActive]} 
           onPress={onToggleFollow}
+          activeOpacity={0.7}
         >
-          <Ionicons 
-            name={selectedAnimal ? "paw" : (followUser ? "navigate" : "navigate-outline")} 
-            size={20} 
-            color={(followUser || selectedAnimal) ? COLORS.white : COLORS.primary} 
-          />
+          <View style={[styles.btnIconBg, (followUser || selectedAnimal) && styles.btnIconBgActive]}>
+            <Ionicons 
+              name={selectedAnimal ? "paw" : (followUser ? "navigate" : "navigate-outline")} 
+              size={18} 
+              color={(followUser || selectedAnimal) ? COLORS.white : COLORS.primary} 
+            />
+          </View>
           <Text style={[styles.btnText, (followUser || selectedAnimal) && styles.btnTextActive]}>
-            {selectedAnimal ? `Suivi : ${selectedAnimal.name}` : (followUser ? 'Moi' : 'OFF')}
+            {selectedAnimal ? `${selectedAnimal.name}` : (followUser ? 'Suivi ON' : 'Libre')}
           </Text>
         </TouchableOpacity>
 
+        <View style={styles.divider} />
+
         <View style={styles.liveIndicator}>
           <View style={[styles.liveDot, { backgroundColor: socketConnected ? COLORS.success : COLORS.danger }]} />
-          <Text style={styles.liveText}>{socketConnected ? 'LIVE' : 'DISCONNECT'}</Text>
+          <Text style={styles.liveText}>{socketConnected ? 'DIRECT' : 'OFFLINE'}</Text>
         </View>
 
-        <TouchableOpacity style={styles.btn} onPress={onToggleMapType}>
-          <MaterialCommunityIcons 
-            name={mapType === 'hybrid' ? 'map' : 'earth'} 
-            size={20} 
-            color={COLORS.primary} 
-          />
-          <Text style={styles.btnText}>{mapType === 'hybrid' ? 'Sat' : 'Map'}</Text>
+        <View style={styles.divider} />
+
+        <TouchableOpacity style={styles.btn} onPress={onToggleMapType} activeOpacity={0.7}>
+          <View style={styles.btnIconBg}>
+            <MaterialCommunityIcons 
+              name={mapType === 'hybrid' ? 'layers-outline' : 'earth'} 
+              size={18} 
+              color={COLORS.primary} 
+            />
+          </View>
+          <Text style={styles.btnText}>{mapType === 'hybrid' ? 'Sat.' : 'Plan'}</Text>
         </TouchableOpacity>
       </View>
 
       {/* ── Floating Action Buttons (Bottom Right) ── */}
       <View style={styles.fabCol}>
-        <TouchableOpacity style={styles.fabSmall} onPress={onResetMap}>
+        <TouchableOpacity 
+          style={styles.fabSmall} 
+          onPress={onToggleZones} 
+          activeOpacity={0.8}
+        >
+          <Ionicons name="layers" size={20} color={COLORS.white} />
+        </TouchableOpacity>
+
+        <TouchableOpacity 
+          style={styles.fabSmall} 
+          onPress={onResetMap} 
+          activeOpacity={0.8}
+        >
           <Ionicons name="refresh" size={20} color={COLORS.white} />
         </TouchableOpacity>
 
         <TouchableOpacity 
-          style={[styles.fabMain, followUser && { backgroundColor: COLORS.success }]} 
+          style={[styles.fabMain, followUser && styles.fabMainActive]} 
           onPress={onRecenter}
+          activeOpacity={0.8}
         >
-          <Ionicons name="locate" size={32} color={COLORS.white} />
+          <Ionicons name="locate" size={28} color={COLORS.white} />
         </TouchableOpacity>
       </View>
     </View>
@@ -76,64 +98,86 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    paddingHorizontal: SPACING.md,
-    pointerEvents: 'box-none', // Allow touches to pass through to map
+    paddingHorizontal: 16,
+    pointerEvents: 'box-none',
   },
   topBar: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginTop: Platform.OS === 'ios' ? 60 : 40,
-    backgroundColor: 'rgba(10, 15, 30, 0.7)',
-    borderRadius: BORDER_RADIUS.lg,
-    padding: 8,
+    marginTop: Platform.OS === 'ios' ? 64 : 44,
+    backgroundColor: 'rgba(10, 15, 30, 0.85)',
+    borderRadius: 20,
+    padding: 6,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
+    borderColor: 'rgba(255, 255, 255, 0.08)',
     ...SHADOWS.soft,
   },
   btn: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: BORDER_RADIUS.md,
-    backgroundColor: 'transparent',
+    paddingRight: 12,
+    paddingLeft: 4,
+    paddingVertical: 4,
+    borderRadius: 16,
+    gap: 8,
   },
   btnActive: {
+    backgroundColor: 'rgba(99, 102, 241, 0.1)',
+  },
+  btnIconBg: {
+    width: 32,
+    height: 32,
+    borderRadius: 12,
+    backgroundColor: 'rgba(255, 255, 255, 0.03)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  btnIconBgActive: {
     backgroundColor: COLORS.primary,
   },
   btnText: {
-    color: COLORS.primary,
+    color: COLORS.textMuted,
     fontSize: 12,
     fontWeight: '700',
-    marginLeft: 6,
   },
   btnTextActive: {
     color: COLORS.white,
   },
+  divider: {
+    width: 1,
+    height: 20,
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+  },
   fabCol: {
     position: 'absolute',
-    bottom: 120, // Leave room for detail sheet
-    right: SPACING.lg,
-    gap: 16,
+    bottom: 120,
+    right: 16,
+    gap: 12,
     alignItems: 'center',
   },
   fabMain: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
-    backgroundColor: COLORS.primary,
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: COLORS.surface,
     alignItems: 'center',
     justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: COLORS.border,
     ...SHADOWS.hard,
   },
+  fabMainActive: {
+    backgroundColor: COLORS.primary,
+    borderColor: COLORS.white,
+  },
   fabSmall: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: 'rgba(10, 15, 30, 0.8)',
+    width: 46,
+    height: 46,
+    borderRadius: 23,
+    backgroundColor: 'rgba(10, 15, 30, 0.9)',
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.1)',
+    borderColor: 'rgba(255,255,255,0.08)',
     alignItems: 'center',
     justifyContent: 'center',
     ...SHADOWS.soft,
@@ -142,10 +186,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    paddingHorizontal: 10,
-    backgroundColor: 'rgba(255,255,255,0.05)',
-    borderRadius: 20,
-    height: 28,
+    paddingHorizontal: 8,
   },
   liveDot: {
     width: 6,
@@ -153,10 +194,10 @@ const styles = StyleSheet.create({
     borderRadius: 3,
   },
   liveText: {
-    color: COLORS.white,
+    color: COLORS.textDim,
     fontSize: 9,
     fontWeight: '900',
-    letterSpacing: 1,
+    letterSpacing: 0.5,
   },
 });
 

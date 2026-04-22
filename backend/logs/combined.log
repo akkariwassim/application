@@ -4561,3 +4561,47 @@
 2026-04-22 15:42:29 [info]: Incoming Request: GET /api/alerts?
 2026-04-22 15:45:26 [info]: Socket disconnected: URjJ80pTA2TlNyaYAAAB — transport close
 >>>>>>> Stashed changes
+2026-04-22 15:57:58 [info]: ✅ MongoDB Connected: ac-lokdmj8-shard-00-00.7zypd8b.mongodb.net
+2026-04-22 15:57:58 [info]: 🚀 Server running on http://localhost:3000
+2026-04-22 15:57:58 [info]:    Environment: development
+2026-04-22 15:58:02 [info]: ✅ MongoDB Connected: ac-lokdmj8-shard-00-00.7zypd8b.mongodb.net
+2026-04-22 15:58:43 [info]: ✅ MongoDB Connected: ac-lokdmj8-shard-00-00.7zypd8b.mongodb.net
+2026-04-22 15:58:43 [info]: 🚀 Server running on http://localhost:3000
+2026-04-22 15:58:43 [info]:    Environment: development
+2026-04-22 15:59:17 [info]: Incoming Request: GET /api/auth/me
+2026-04-22 15:59:17 [info]: Incoming Request: POST /api/auth/refresh
+2026-04-22 15:59:17 [info]: Incoming Request: GET /api/auth/me
+2026-04-22 15:59:18 [info]: Incoming Request: GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-04-22 15:59:18 [info]: Incoming Request: GET /api/geofences
+2026-04-22 15:59:18 [info]: Socket connected: O3FsbxfDdaKnQjCYAAAD (user 69e0f6ec4be9f34aaa8e2d6a)
+2026-04-22 15:59:20 [info]: Incoming Request: GET /api/geofences
+2026-04-22 15:59:22 [info]: Incoming Request: GET /api/alerts?status=active
+2026-04-22 15:59:23 [info]: Incoming Request: GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-04-22 15:59:23 [info]: Incoming Request: GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-04-22 16:01:25 [info]: Incoming Request: GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-04-22 16:01:25 [info]: Incoming Request: GET /api/geofences
+2026-04-22 16:01:45 [info]: Incoming Request: GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-04-22 16:01:45 [info]: Incoming Request: GET /api/geofences
+2026-04-22 16:02:00 [info]: Socket disconnected: O3FsbxfDdaKnQjCYAAAD — client namespace disconnect
+2026-04-22 16:02:02 [info]: Incoming Request: GET /api/auth/me
+2026-04-22 16:02:02 [info]: Incoming Request: GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-04-22 16:02:02 [info]: Incoming Request: GET /api/geofences
+2026-04-22 16:02:02 [info]: Socket connected: 3Gwl4DF7c2XVnZvPAAAF (user 69e0f6ec4be9f34aaa8e2d6a)
+2026-04-22 16:02:20 [info]: Incoming Request: GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-04-22 16:02:20 [info]: Incoming Request: GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-04-22 16:06:28 [info]: Socket disconnected: 3Gwl4DF7c2XVnZvPAAAF — client namespace disconnect
+2026-04-22 16:13:29 [info]: ✅ MongoDB Connected: ac-lokdmj8-shard-00-00.7zypd8b.mongodb.net
+2026-04-22 16:13:29 [info]: 🚀 Server running on http://localhost:3000
+2026-04-22 16:13:29 [info]:    Environment: development
+2026-04-22 16:14:33 [info]: ✅ MongoDB Connected: ac-lokdmj8-shard-00-00.7zypd8b.mongodb.net
+2026-04-22 16:14:55 [info]: ✅ MongoDB Connected: ac-lokdmj8-shard-00-00.7zypd8b.mongodb.net
+2026-04-22 16:14:55 [info]: 🚀 Server running on http://localhost:3000
+2026-04-22 16:14:55 [info]:    Environment: development
+2026-04-22 16:15:10 [info]: ✅ MongoDB Connected: ac-lokdmj8-shard-00-00.7zypd8b.mongodb.net
+2026-04-22 16:15:31 [info]: ✅ MongoDB Connected: ac-lokdmj8-shard-00-00.7zypd8b.mongodb.net
+2026-04-22 16:15:38 [info]: Incoming Request: GET /api/auth/me
+2026-04-22 16:15:38 [info]: Incoming Request: POST /api/auth/refresh
+2026-04-22 16:15:38 [info]: Incoming Request: GET /api/auth/me
+2026-04-22 16:15:38 [info]: Incoming Request: GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-04-22 16:15:38 [info]: Incoming Request: GET /api/geofences
+2026-04-22 16:15:39 [info]: Socket connected: uNjlci7kQ3nc1V3MAAAB (user 69e0f6ec4be9f34aaa8e2d6a)
