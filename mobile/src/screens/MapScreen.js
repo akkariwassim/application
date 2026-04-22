@@ -6,7 +6,7 @@ import {
 } from 'react-native';
 import MapView from 'react-native-map-clustering'; // Clustered Map
 import { Marker, Polygon, Polyline, PROVIDER_GOOGLE } from 'react-native-maps';
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as Location from 'expo-location';
 import { getDistance } from 'geolib';
@@ -15,7 +15,7 @@ import useGeofenceStore from '../store/geofenceStore';
 import useAuthStore from '../store/authStore';
 import { isPointInPolygon } from '../utils/geoUtils';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
-import theme, { COLORS, SHADOWS, SPACING, BORDER_RADIUS, TYPOGRAPHY } from '../config/theme';
+import theme, { SHADOWS, SPACING, BORDER_RADIUS, TYPOGRAPHY } from '../config/theme';
 import AnimalMarker from '../components/AnimalMarker';
 import MapControls from '../components/MapUI/MapControls';
 
@@ -72,6 +72,7 @@ const COLORS = {
   warn:       '#F59E0B',
   border:     'rgba(255,255,255,0.07)',
   gold:       '#FBBF24',
+  status: STATUS_COLOR // Map to status colors defined above
 };
 
 // ── Haversine distance in metres (fast inline) ────────────────────────────────
@@ -169,6 +170,8 @@ function safeParseCoords(coordsData) {
   }
 }
 
+const MAP_FALLBACK = { latitude: 33.8869, longitude: 9.5375 }; // Tunisia Center
+
 export default function MapScreen({ route }) {
   const insets     = useSafeAreaInsets();
   const navigation = useNavigation();
@@ -181,6 +184,7 @@ export default function MapScreen({ route }) {
   const [selectedAnimal,  setSelectedAnimal]  = useState(null);
   const [showZonesList,   setShowZonesList]   = useState(false);
   const [userLocation,    setUserLocation]    = useState(null);
+  const [markerLoc,       setMarkerLoc]       = useState(null); // Smoothed position for display
   const [currentRegion,   setCurrentRegion]   = useState(null);
   
   // ── Spiderfy State ──
@@ -275,42 +279,68 @@ export default function MapScreen({ route }) {
 
       // Initial Lock with 4s internal race to prevent hanging
       const initial = await Promise.race([
-        Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced }),
+        Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.High }),
         new Promise((_, reject) => setTimeout(() => reject(new Error('GPS Timeout')), 4000))
       ]).catch(() => null);
 
+      let finalLoc = null;
+
       if (initial) {
-        const initialLoc = { latitude: initial.coords.latitude, longitude: initial.coords.longitude };
-        setUserLocation(initialLoc);
-        setHasLocation(true);
+        finalLoc = { latitude: initial.coords.latitude, longitude: initial.coords.longitude };
       } else {
-        // Fallback: Use first geofence center if GPS is slow
-        if (geofences.length > 0) {
+        // Fallback Order: 1. Farm Center (if in user profile) | 2. First Geofence | 3. Tunisia
+        if (user?.farm_latitude && user?.farm_longitude) {
+          finalLoc = { latitude: parseFloat(user.farm_latitude), longitude: parseFloat(user.farm_longitude) };
+        } else if (geofences.length > 0) {
           const first = geofences[0];
           const coords = safeParseCoords(first.polygon_coords);
-          if (coords.length > 0) {
-            setUserLocation(coords[0]);
-          }
+          if (coords.length > 0) finalLoc = coords[0];
         }
+
+        if (!finalLoc) finalLoc = MAP_FALLBACK;
       }
+
+      setUserLocation(finalLoc);
+      setMarkerLoc(finalLoc);
+      setHasLocation(true); // Unlock UI
 
       clearTimeout(initializationTimeout);
       setMapState(MAP_STATES.READY);
       
-      // Watch with throttling: only update if distance > 5m
+      // Watch with throttling: only update if distance > 3m and high accuracy
       cleanupTracking();
       locationSub.current = await Location.watchPositionAsync(
         { 
-          accuracy: Location.Accuracy.Balanced, 
-          timeInterval: 5000, 
-          distanceInterval: 10 
+          accuracy: Location.Accuracy.High, 
+          timeInterval: 3000, // 3s update frequency
+          distanceInterval: 5  // 5m distance threshold to reduce jitter
         },
         loc => {
+          // Filter out low accuracy updates
+          if (loc.coords.accuracy > 50) return; 
+
           const newLoc = { latitude: loc.coords.latitude, longitude: loc.coords.longitude };
+          
           setUserLocation(prev => {
-            if (!prev) return newLoc;
+            if (!prev) {
+              setMarkerLoc(newLoc);
+              return newLoc;
+            }
+            
             const dist = getDistance(prev, newLoc);
-            if (dist < 10) return prev;
+            // Threshold to prevent jittering while stationary
+            if (dist < 4) return prev;
+            
+            // Linear transition for marker smoothing
+            setMarkerLoc(prevMarker => {
+              if (!prevMarker) return newLoc;
+              // Simple 50% smoothing for a "weighted slide" effect
+              return {
+                latitude: prevMarker.latitude + (newLoc.latitude - prevMarker.latitude) * 0.6,
+                longitude: prevMarker.longitude + (newLoc.longitude - prevMarker.longitude) * 0.6,
+              };
+            });
+            
             return newLoc;
           });
         }
@@ -349,11 +379,13 @@ export default function MapScreen({ route }) {
     } 
     // Type 2: Follow User
     else if (followUser && userLocation && !selectedAnimal) {
-      mapRef.current.animateToRegion({
-        ...userLocation,
-        latitudeDelta: 0.005,
-        longitudeDelta: 0.005,
-      }, 1000);
+      mapRef.current.animateCamera({
+        center: { latitude: userLocation.latitude, longitude: userLocation.longitude },
+        pitch: 40,
+        heading: 0,
+        altitude: 800,
+        zoom: 17.5
+      }, { duration: 1200 });
     }
   }, [userLocation, animals, followUser, selectedAnimal?.id]);
 
@@ -379,11 +411,14 @@ export default function MapScreen({ route }) {
   const recenterOnUser = (manual = true) => {
     if (!userLocation || !isMapReady || !mapRef.current) return;
     try {
-      mapRef.current.animateToRegion({
-        ...userLocation,
-        latitudeDelta: 0.005,
-        longitudeDelta: 0.005,
-      }, manual ? 1000 : 700);
+      if (manual) setFollowUser(true);
+      mapRef.current.animateCamera({
+        center: { latitude: userLocation.latitude, longitude: userLocation.longitude },
+        pitch: 45,
+        heading: 0,
+        altitude: 1000,
+        zoom: 17,
+      }, { duration: 1000 });
     } catch (err) {
       console.warn('[MapScreen] Animation failed:', err);
     }
@@ -559,10 +594,7 @@ export default function MapScreen({ route }) {
           }
         }}
         onPress={clearSpiderfy}
-        onMapReady={() => {
-          mapReadyRef.current = true;
-          if (userLocation) recenterOnUser(false);
-        }}
+        onMapReady={handleMapReady}
         initialRegion={{ latitude: 35.038, longitude: 9.484, latitudeDelta: 0.02, longitudeDelta: 0.02 }}
         clusteringEnabled={!spiderfyData}
         clusterColor={COLORS.primary}
@@ -571,8 +603,15 @@ export default function MapScreen({ route }) {
       >
         {mapZones}
 
-        {userLocation && (
-          <Marker coordinate={userLocation} anchor={{ x: 0.5, y: 0.5 }} zIndex={1000}>
+        {markerLoc && (
+          <Marker 
+            coordinate={markerLoc} 
+            anchor={{ x: 0.5, y: 0.5 }} 
+            zIndex={1000}
+            flat={false}
+            tracksViewChanges={false}
+            cluster={false}
+          >
             <View style={styles.userDotContainer}>
               <Animated.View 
                 style={[
@@ -812,13 +851,21 @@ export default function MapScreen({ route }) {
         </TouchableOpacity>
       </Modal>
 
-      {(isLoading || !isMapReady || !hasLocation) && (
+      {((!isMapReady || !hasLocation) && mapState === MAP_STATES.INITIALIZING) && (
         <View style={styles.loading}>
           <ActivityIndicator size="large" color={COLORS.primary} />
           <Text style={{ color: COLORS.white, marginTop: 12, fontWeight: '700', textAlign: 'center' }}>
-            Initialisation du Moteur de Carte...{"\n"}
-            <Text style={{ color: COLORS.textMuted, fontSize: 10 }}>Vérification des signaux GPS et IOT</Text>
+            Chargement de la Carte...{"\n"}
+            <Text style={{ color: COLORS.textMuted, fontSize: 10 }}>Mode manuel activé si aucun signal IOT</Text>
           </Text>
+        </View>
+      )}
+
+      {/* ── Partial Signal Indicator (Non-blocking) ── */}
+      {isMapReady && !initialCentered && (
+        <View style={styles.partialHUD}>
+          <ActivityIndicator size="small" color={COLORS.warn} />
+          <Text style={styles.partialHUDText}>Signal GPS : Recherche en cours... (Mode Manuel)</Text>
         </View>
       )}
     </View>
@@ -901,7 +948,7 @@ const styles = StyleSheet.create({
   zonePinLabelText: { color: '#fff', fontSize: 9.5, fontWeight: '800', textTransform: 'uppercase', letterSpacing: 0.4 },
 
   // User dot
-  userOuter: { width: 32, height: 32, alignItems: 'center', justifyContent: 'center' },
+  userDotContainer: { width: 32, height: 32, alignItems: 'center', justifyContent: 'center' },
   userPulse: {
     position: 'absolute', width: 30, height: 30, borderRadius: 15,
     backgroundColor: `${COLORS.primary}66`,

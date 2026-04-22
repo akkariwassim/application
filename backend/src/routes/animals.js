@@ -23,9 +23,10 @@ router.post('/bulk', [
 // POST /api/animals
 router.post('/', [
   body('name').trim().notEmpty().withMessage('Name is required'),
-  body('type').isIn(['cow','sheep','goat','camel','horse','other']).withMessage('Invalid animal type'),
-  body('weightKg').optional().isFloat({ min: 0 }),
-  body('colorHex').optional().matches(/^#[0-9A-Fa-f]{6}$/).withMessage('Invalid hex color'),
+  body('type').isIn(['cow','sheep','goat','camel','horse','bovine','ovine','caprine','equine','other']).withMessage('Invalid animal type'),
+  body('weightKg').optional({ values: 'falsy' }).isFloat({ min: 0 }),
+  body('colorHex').optional({ values: 'falsy' }).matches(/^#[0-9A-Fa-f]{6}$/).withMessage('Invalid hex color'),
+  body('currentZoneId').optional({ values: 'falsy' }).isMongoId().withMessage('Invalid Zone ID format'),
   validate
 ], ctrl.createAnimal);
 
@@ -36,8 +37,8 @@ router.get('/:id', [idParam, validate], ctrl.getAnimal);
 router.put('/:id', [
   idParam,
   body('name').optional().trim().notEmpty(),
-  body('type').optional().isIn(['cow','sheep','goat','camel','horse','other']),
-  body('weightKg').optional().isFloat({ min: 0 }),
+  body('type').optional({ values: 'falsy' }).isIn(['cow','sheep','goat','camel','horse','bovine','ovine','caprine','equine','other']),
+  body('weightKg').optional({ values: 'falsy' }).isFloat({ min: 0 }),
   validate
 ], ctrl.updateAnimal);
 

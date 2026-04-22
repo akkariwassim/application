@@ -7,6 +7,12 @@ import { COLORS, SHADOWS, SPACING, BORDER_RADIUS } from '../../config/theme';
  * Professional HUD for Live Map
  * Features: Follow Toggle, Recenter, Map Type Selector, and Quick Filters
  */
+const MapControls = ({
+  followUser,
+  onToggleFollow,
+  onRecenter,
+  mapType,
+  onToggleMapType,
   showZones,
   onToggleZones,
   onResetMap,

@@ -16,7 +16,7 @@ const animalSchema = new mongoose.Schema({
   type: {
     type: String,
     required: [true, 'Animal type is required'],
-    enum: ['cow', 'sheep', 'goat', 'camel', 'horse', 'other'],
+    enum: ['cow', 'sheep', 'goat', 'camel', 'horse', 'bovine', 'ovine', 'caprine', 'equine', 'other'],
     default: 'other',
   },
   breed: String,

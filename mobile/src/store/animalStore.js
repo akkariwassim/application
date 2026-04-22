@@ -128,6 +128,7 @@ const useAnimalStore = create((set, get) => ({
     } catch (err) {
       throw new Error(err.response?.data?.message || err.response?.data?.error || 'Failed to create animal');
     }
+  },
 
   updateAnimal: async (id, updates) => {
     try {
