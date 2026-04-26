@@ -82,6 +82,23 @@ const zoneSchema = new mongoose.Schema({
     match: [/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/, 'Please provide a valid hex color'],
   },
   area_sqm: Number,
+  status: {
+    type: String,
+    enum: ['safe', 'warning', 'danger'],
+    default: 'safe',
+  },
+  status_color: {
+    type: String,
+    default: '#22C55E', // Green
+  },
+  status_reason: {
+    type: String,
+    default: 'Conditions normales',
+  },
+  last_status_update: {
+    type: Date,
+    default: Date.now,
+  }
 }, {
   timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' },
   toJSON: { 

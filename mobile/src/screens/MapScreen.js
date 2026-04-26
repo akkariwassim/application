@@ -17,7 +17,6 @@ import { isPointInPolygon } from '../utils/geoUtils';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import theme, { COLORS, SHADOWS, SPACING, BORDER_RADIUS, TYPOGRAPHY } from '../config/theme';
 import AnimalMarker from '../components/AnimalMarker';
-import AnimatedAnimalMarker from '../components/AnimatedAnimalMarker';
 import MapControls from '../components/MapUI/MapControls';
 
 // ── Map State Machine Types ──
@@ -138,16 +137,6 @@ export default function MapScreen({ route }) {
   const [isMapReady, setIsMapReady]     = useState(false);
   const [hasLocation, setHasLocation]   = useState(false);
 
-  // Premium Features State
-  const [routeHistory, setRouteHistory] = useState([]);
-  const [showHistory, setShowHistory]   = useState(false);
-  const [historyDays, setHistoryDays]   = useState(1);
-  const [filterMode, setFilterMode]     = useState('all'); // all, active, danger
-  const [searchQuery, setSearchQuery]   = useState('');
-  const [playbackIndex, setPlaybackIndex] = useState(-1);
-  const [isPlaybackPlaying, setIsPlaybackPlaying] = useState(false);
-  const [showFilterModal, setShowFilterModal] = useState(false);
-
   const locationSub = useRef(null);
   const mapReadyRef = useRef(false);
 
@@ -171,67 +160,12 @@ export default function MapScreen({ route }) {
     }
   };
 
-  const { fetchHistory } = useAnimalStore();
-
-  // Playback Engine
-  useEffect(() => {
-    let interval;
-    if (isPlaybackPlaying && routeHistory.length > 0) {
-      interval = setInterval(() => {
-        setPlaybackIndex(prev => {
-          if (prev >= routeHistory.length - 1) {
-            setIsPlaybackPlaying(false);
-            return prev;
-          }
-          return prev + 1;
-        });
-      }, 500); // Step every 0.5s
-    }
-    return () => clearInterval(interval);
-  }, [isPlaybackPlaying, routeHistory.length]);
-
-  useEffect(() => {
-    if (selectedAnimal && !selectedAnimal.isZone && showHistory) {
-      const loadHistory = async () => {
-        const history = await fetchHistory(selectedAnimal.id, historyDays);
-        const coords = history.map(h => ({
-          latitude: h.location.coordinates[1],
-          longitude: h.location.coordinates[0],
-          timestamp: h.timestamp
-        }));
-        setRouteHistory(coords);
-        setPlaybackIndex(0);
-      };
-      loadHistory();
-    } else {
-      setRouteHistory([]);
-      setPlaybackIndex(-1);
-      setIsPlaybackPlaying(false);
-    }
-  }, [selectedAnimal?.id, showHistory, historyDays]);
-
   const visibleAnimals = useMemo(() => {
-    let filtered = animals;
-
-    // 1. Filter by search
-    if (searchQuery) {
-      filtered = filtered.filter(a => a.name.toLowerCase().includes(searchQuery.toLowerCase()));
-    }
-
-    // 2. Filter by status/mode
-    if (filterMode === 'active') {
-      filtered = filtered.filter(a => a.status === 'safe' || a.status === 'warning');
-    } else if (filterMode === 'danger') {
-      filtered = filtered.filter(a => a.status === 'danger');
-    }
-
-    // 3. Filter by zone if focused
-    if (selectedAnimal?.isZone) {
-      filtered = filtered.filter(a => String(a.current_zone_id || '') === String(selectedAnimal.id || ''));
-    }
-
+    const filtered = selectedAnimal?.isZone
+      ? animals.filter(a => String(a.current_zone_id || '') === String(selectedAnimal.id || ''))
+      : animals;
     return getClusters(filtered, currentRegion, 35); 
-  }, [animals, selectedAnimal?.id, selectedAnimal?.isZone, currentRegion, searchQuery, filterMode]);
+  }, [animals, selectedAnimal?.id, selectedAnimal?.isZone, currentRegion]);
 
   const startTracking = async () => {
     try {
@@ -298,14 +232,6 @@ export default function MapScreen({ route }) {
     mapRef.current.animateCamera({ center: { latitude: userLocation.latitude, longitude: userLocation.longitude }, pitch: 45, zoom: 17 }, { duration: 1200 });
   };
 
-  const recenterAllAnimals = () => {
-    if (!animals.length || !mapRef.current) return;
-    setFollowUser(false);
-    setSelectedAnimal(null);
-    const coords = animals.map(a => ({ latitude: parseFloat(a.latitude), longitude: parseFloat(a.longitude) }));
-    mapRef.current.fitToCoordinates(coords, { edgePadding: { top: 100, right: 100, bottom: 300, left: 100 }, animated: true });
-  };
-
   const focusZone = (gf) => {
     setShowZonesList(false);
     const coords = safeParseCoords(gf.polygon_coords);
@@ -321,19 +247,40 @@ export default function MapScreen({ route }) {
       const coords = safeParseCoords(gf.polygon_coords);
       if (coords.length === 0) return null;
       const isSelected = selectedAnimal?.isZone && String(selectedAnimal.id) === String(gf.id || gf._id);
+      
+      // Use status color for visualization
+      const baseColor = gf.status_color || COLORS.primary;
+      
       return (
         <Polygon
           key={`zone-${gf.id || gf._id}`}
           coordinates={coords}
-          fillColor={isSelected ? `${COLORS.gold}22` : `${gf.fill_color || COLORS.primary}22`}
-          strokeColor={isSelected ? COLORS.gold : (gf.fill_color || COLORS.primary)}
-          strokeWidth={isSelected ? 3 : 2}
+          fillColor={isSelected ? `${COLORS.gold}33` : `${baseColor}22`}
+          strokeColor={isSelected ? COLORS.gold : baseColor}
+          strokeWidth={isSelected ? 4 : 2}
           onPress={() => focusZone(gf)}
           tappable={true}
         />
       );
     });
   }, [geofences, selectedAnimal?.id]);
+
+  const MapLegend = () => (
+    <View style={styles.legendContainer}>
+      <View style={styles.legendItem}>
+        <View style={[styles.legendDot, { backgroundColor: '#22C55E' }]} />
+        <Text style={styles.legendText}>Sécurisé</Text>
+      </View>
+      <View style={styles.legendItem}>
+        <View style={[styles.legendDot, { backgroundColor: '#F59E0B' }]} />
+        <Text style={styles.legendText}>Attention</Text>
+      </View>
+      <View style={styles.legendItem}>
+        <View style={[styles.legendDot, { backgroundColor: '#EF4444' }]} />
+        <Text style={styles.legendText}>Danger</Text>
+      </View>
+    </View>
+  );
 
   const renderLoading = () => (
     <View style={styles.fullscreenOverlay}>
@@ -356,17 +303,6 @@ export default function MapScreen({ route }) {
         initialRegion={{ latitude: 35.038, longitude: 9.484, latitudeDelta: 0.02, longitudeDelta: 0.02 }}
       >
         {mapZones}
-        
-        {/* Route History Layer */}
-        {showHistory && routeHistory.length > 1 && (
-          <Polyline 
-            coordinates={routeHistory}
-            strokeColor={COLORS.primary}
-            strokeWidth={3}
-            lineDashPattern={[5, 5]}
-          />
-        )}
-
         {markerLoc && (
           <Marker coordinate={markerLoc} anchor={{ x: 0.5, y: 0.5 }} zIndex={1000} cluster={false}>
             <View style={styles.userDotContainer}>
@@ -383,13 +319,14 @@ export default function MapScreen({ route }) {
               </Marker>
             );
           }
+          const color = STATUS_COLOR[item.status] || STATUS_COLOR.offline;
           const isSel = selectedAnimal?.id === item.id;
           return (
-            <AnimatedAnimalMarker 
-              key={item.id} 
-              animal={item} 
-              onPress={() => setSelectedAnimal({ ...item, isZone: false })} 
-            />
+            <Marker key={item.id} coordinate={{ latitude: parseFloat(item.latitude), longitude: parseFloat(item.longitude) }} anchor={{ x: 0.5, y: 0.5 }} onPress={() => setSelectedAnimal({ ...item, isZone: false })}>
+              <View style={[styles.animalPin, { borderColor: color }, isSel && styles.animalPinSelected]}>
+                <MaterialCommunityIcons name={item.type === 'equine' ? 'horse-variant' : item.type === 'bovine' ? 'cow' : 'sheep'} size={17} color={color} />
+              </View>
+            </Marker>
           );
         })}
       </MapView>
@@ -398,17 +335,15 @@ export default function MapScreen({ route }) {
         followUser={followUser}
         onToggleFollow={() => setFollowUser(!followUser)}
         onRecenter={() => recenterOnUser(true)}
-        onRecenterAll={recenterAllAnimals}
         mapType={mapType}
         onToggleMapType={() => setMapType(prev => prev === 'hybrid' ? 'standard' : 'hybrid')}
         onToggleZones={() => setShowZonesList(true)}
         onResetMap={() => startTracking()}
         selectedAnimal={selectedAnimal}
         socketConnected={socketConnected}
-        showHistory={showHistory}
-        onToggleHistory={() => setShowHistory(!showHistory)}
-        onOpenFilters={() => setShowFilterModal(true)}
       />
+
+      <MapLegend />
 
       {selectedAnimal && (
         <View style={[styles.detailSheet, { paddingBottom: insets.bottom + SPACING.md }]}>
@@ -419,9 +354,23 @@ export default function MapScreen({ route }) {
             </View>
             <View style={{ flex: 1 }}>
               <Text style={styles.detailTitle}>{selectedAnimal.name || 'Animal'}</Text>
-              <Text style={styles.detailSubtitle}>
-                {selectedAnimal.isZone ? `${(selectedAnimal.area_sqm / 10000).toFixed(2)} Ha · ${selectedAnimal.animalsInside} animaux` : `${selectedAnimal.type} · ${selectedAnimal.breed || 'Sans race'}`}
-              </Text>
+              {selectedAnimal.isZone ? (
+                <View style={styles.statusBadgeRow}>
+                  <View style={[styles.statusBadge, { backgroundColor: `${selectedAnimal.status_color || '#22C55E'}22`, borderColor: selectedAnimal.status_color || '#22C55E' }]}>
+                    <View style={[styles.statusDot, { backgroundColor: selectedAnimal.status_color || '#22C55E' }]} />
+                    <Text style={[styles.statusText, { color: selectedAnimal.status_color || '#22C55E' }]}>
+                      {selectedAnimal.status?.toUpperCase() || 'SAFE'}
+                    </Text>
+                  </View>
+                  <Text style={styles.statusReason} numberOfLines={1}>
+                    {selectedAnimal.status_reason || 'Conditions normales'}
+                  </Text>
+                </View>
+              ) : (
+                <Text style={styles.detailSubtitle}>
+                  {`${selectedAnimal.type} · ${selectedAnimal.breed || 'Sans race'}`}
+                </Text>
+              )}
             </View>
             <TouchableOpacity 
               style={styles.detailActionBtn} 
@@ -443,53 +392,6 @@ export default function MapScreen({ route }) {
           )}
         </View>
       )}
-
-      {/* -- Playback HUD -- */}
-      {showHistory && routeHistory.length > 0 && (
-        <View style={[styles.playbackHud, { bottom: selectedAnimal ? 250 : 120 }]}>
-           <View style={styles.playbackRow}>
-             <TouchableOpacity style={styles.playBtn} onPress={() => setIsPlaybackPlaying(!isPlaybackPlaying)}>
-               <Ionicons name={isPlaybackPlaying ? "pause" : "play"} size={24} color={COLORS.white} />
-             </TouchableOpacity>
-             <View style={{ flex: 1 }}>
-               <Text style={styles.playbackTime}>
-                 {playbackIndex >= 0 ? new Date(routeHistory[playbackIndex].timestamp).toLocaleTimeString() : '--:--'}
-               </Text>
-               <View style={styles.playbackBar}>
-                 <View style={[styles.playbackProgress, { width: `${(playbackIndex + 1) / routeHistory.length * 100}%` }]} />
-               </View>
-             </View>
-             <TouchableOpacity onPress={() => setShowHistory(false)}>
-               <Ionicons name="close-circle" size={24} color={COLORS.textDim} />
-             </TouchableOpacity>
-           </View>
-        </View>
-      )}
-
-      {/* -- Filter Modal -- */}
-      <Modal visible={showFilterModal} transparent animationType="fade">
-        <TouchableOpacity style={styles.modalOverlay} activeOpacity={1} onPress={() => setShowFilterModal(false)}>
-          <View style={styles.filterModalContent}>
-            <Text style={styles.modalTitle}>Filtrer les Animaux</Text>
-            <View style={styles.filterGrid}>
-              {[
-                { id: 'all', label: 'Tous', icon: 'apps' },
-                { id: 'active', label: 'Actifs', icon: 'pulse' },
-                { id: 'danger', label: 'En Danger', icon: 'warning' },
-              ].map(f => (
-                <TouchableOpacity 
-                  key={f.id} 
-                  style={[styles.filterCard, filterMode === f.id && styles.filterCardActive]}
-                  onPress={() => { setFilterMode(f.id); setShowFilterModal(false); }}
-                >
-                  <Ionicons name={f.icon} size={20} color={filterMode === f.id ? COLORS.white : COLORS.primary} />
-                  <Text style={[styles.filterLabel, filterMode === f.id && styles.textWhite]}>{f.label}</Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-          </View>
-        </TouchableOpacity>
-      </Modal>
 
       <Modal visible={showZonesList} transparent animationType="slide" onRequestClose={() => setShowZonesList(false)}>
         <TouchableOpacity style={styles.modalOverlay} activeOpacity={1} onPress={() => setShowZonesList(false)}>
@@ -569,18 +471,64 @@ const styles = StyleSheet.create({
   zoneDot: { width: 10, height: 10, borderRadius: 5, marginRight: 16 },
   zoneMiniName: { color: COLORS.white, fontSize: 15, fontWeight: '700' },
   zoneMiniSub: { color: COLORS.textDim, fontSize: 11, marginTop: 2 },
-
-  // Premium Features Styles
-  playbackHud: { position: 'absolute', left: 20, right: 20, backgroundColor: COLORS.card, borderRadius: 20, padding: 16, borderWidth: 1, borderColor: COLORS.border, ...SHADOWS.hard },
-  playbackRow: { flexDirection: 'row', alignItems: 'center', gap: 15 },
-  playBtn: { width: 44, height: 44, borderRadius: 22, backgroundColor: COLORS.primary, alignItems: 'center', justifyContent: 'center' },
-  playbackTime: { color: COLORS.white, fontSize: 13, fontWeight: '700', marginBottom: 5 },
-  playbackBar: { height: 4, backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: 2, overflow: 'hidden' },
-  playbackProgress: { height: '100%', backgroundColor: COLORS.primary },
-  
-  filterModalContent: { backgroundColor: COLORS.card, margin: 20, borderRadius: 25, padding: 24, borderWidth: 1, borderColor: COLORS.border, ...SHADOWS.hard },
-  filterGrid: { flexDirection: 'row', gap: 12, marginTop: 20 },
-  filterCard: { flex: 1, backgroundColor: COLORS.surface, borderRadius: 16, padding: 15, alignItems: 'center', borderWidth: 1, borderColor: COLORS.border },
-  filterCardActive: { backgroundColor: COLORS.primary, borderColor: COLORS.white },
-  filterLabel: { color: COLORS.textMuted, fontSize: 12, fontWeight: '700', marginTop: 8 },
+  legendContainer: {
+    position: 'absolute',
+    top: 130, // Below top bar
+    left: 20,
+    backgroundColor: 'rgba(10, 15, 30, 0.9)',
+    borderRadius: 16,
+    padding: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
+    gap: 10,
+    ...SHADOWS.hard
+  },
+  legendItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10
+  },
+  legendDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.2)'
+  },
+  legendText: {
+    color: COLORS.text,
+    fontSize: 10,
+    fontWeight: '800',
+    letterSpacing: 0.5,
+    textTransform: 'uppercase'
+  },
+  statusBadgeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginTop: 4
+  },
+  statusBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 6,
+    borderWidth: 1,
+    gap: 4
+  },
+  statusDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3
+  },
+  statusText: {
+    fontSize: 10,
+    fontWeight: '800'
+  },
+  statusReason: {
+    color: COLORS.textDim,
+    fontSize: 11,
+    flex: 1
+  }
 });

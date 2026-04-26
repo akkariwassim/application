@@ -3,6 +3,7 @@
 const Alert           = require('../models/Alert');
 const Zone            = require('../models/Zone');
 const geofenceService = require('../services/geofenceService');
+const alertService    = require('../services/alertService');
 const socketConfig    = require('../config/socket');
 const logger          = require('../utils/logger');
 
@@ -94,26 +95,18 @@ class MonitorService {
       healthAlerts.push({ type: 'low_gps_signal', severity: 'low', msg: `Signal GPS instable` });
     }
 
-    // 2. Alert Processing with Deduplication
+    // 2. Alert Processing with Centralized Alert Service
     for (const hAlert of healthAlerts) {
       try {
-        const existing = await Alert.findOne({ 
-          animal_id: animal.id, 
-          type: hAlert.type, 
-          status: 'active' 
+        await alertService.createHealthAlert({
+          animalId: animal.id,
+          userId: animal.user_id,
+          type: hAlert.type,
+          severity: hAlert.severity,
+          message: `🩺 ${animal.name}: ${hAlert.msg}`,
+          latitude: location.latitude,
+          longitude: location.longitude
         });
-
-        if (!existing) {
-          const alert = await Alert.create({
-            animal_id: animal.id,
-            user_id: animal.user_id,
-            type: hAlert.type,
-            severity: hAlert.severity,
-            message: `🩺 ${animal.name}: ${hAlert.msg}`,
-            location: { type: 'Point', coordinates: [location.longitude, location.latitude] }
-          });
-          socketConfig.emitAlert(animal.user_id, animal.id, alert);
-        }
       } catch (err) {
         logger.error(`[MonitorService] Vital Check Error: ${err.message}`);
       }

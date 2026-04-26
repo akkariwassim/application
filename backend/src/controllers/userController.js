@@ -34,7 +34,7 @@ async function updateName(req, res, next) {
     }
 
     logger.info(`User ${user.email} updated name to: ${user.name}`);
-    res.json({ success: true, data: user, message: 'Nom mis à jour avec succès.' });
+    res.json({ success: true, data: { user: user.toObject(), message: 'Nom mis à jour avec succès.' } });
   } catch (err) {
     logger.error(`Error in updateName: ${err.message}`);
     next(err);
@@ -97,7 +97,7 @@ async function changePassword(req, res, next) {
     logger.info(`User ${user.email} successfully changed their password.`);
     res.json({ 
       success: true,
-      message: 'Mot de passe modifié avec succès. Veuillez vous reconnecter sur vos autres appareils.' 
+      data: { message: 'Mot de passe modifié avec succès. Veuillez vous reconnecter sur vos autres appareils.' } 
     });
   } catch (err) {
     logger.error(`Error in changePassword: ${err.message}`);
@@ -146,7 +146,7 @@ async function updatePhone(req, res, next) {
     }
 
     logger.info(`User ${user.email} updated phone to: ${user.phone}`);
-    res.json({ success: true, data: user, message: 'Numéro de téléphone mis à jour.' });
+    res.json({ success: true, data: { user: user.toObject(), message: 'Numéro de téléphone mis à jour.' } });
   } catch (err) {
     logger.error(`Error in updatePhone: ${err.message}`);
     next(err);
@@ -239,7 +239,7 @@ async function updateProfile(req, res, next) {
     delete userObj.password;
 
     logger.info(`Profile updated for user: ${user.email}`);
-    res.json({ success: true, data: userObj, message: 'Profil mis à jour avec succès.' });
+    res.json({ success: true, data: { user: userObj, message: 'Profil mis à jour avec succès.' } });
   } catch (err) {
     if (err.code === 11000) {
       return res.status(400).json({ 
@@ -280,7 +280,7 @@ async function updateFarm(req, res, next) {
     delete userObj.password;
 
     logger.info(`Farm updated for user: ${user.email}`);
-    res.json({ success: true, data: userObj, message: 'Ferme mise à jour avec succès.' });
+    res.json({ success: true, data: { user: userObj, message: 'Ferme mise à jour avec succès.' } });
   } catch (err) {
     logger.error(`Error in updateFarm: ${err.message}`);
     next(err);

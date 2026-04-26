@@ -42,6 +42,7 @@ export async function connectSocket({
   onPositionUpdate,
   onAlertTriggered,
   onStatusChange,
+  onZoneStatusChange,
 }) {
   if (socket?.connected) {
     if (onConnect) onConnect();
@@ -87,6 +88,12 @@ export async function connectSocket({
   if (onStatusChange) {
     socket.on('animal-status-change', (data) => {
       onStatusChange(data);
+    });
+  }
+
+  if (onZoneStatusChange) {
+    socket.on('zone-status-change', (data) => {
+      onZoneStatusChange(data);
     });
   }
 

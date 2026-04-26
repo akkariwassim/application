@@ -103,7 +103,7 @@ async function deleteDevice(req, res, next) {
     }
 
     await device.deleteOne();
-    res.json({ success: true, message: 'Terminal retiré de la flotte.' });
+    res.json({ success: true, data: { message: 'Terminal retiré de la flotte.' } });
   } catch (err) {
     next(err);
   }

@@ -4,6 +4,8 @@ const Animal = require('../models/Animal');
 const Zone   = require('../models/Zone');
 const Device = require('../models/Device');
 const socketConfig = require('../config/socket');
+const zoneMonitorService = require('../services/zoneMonitorService');
+const logger = require('../utils/logger');
 
 /**
  * Generate a random point guaranteed to be inside a polygon.
@@ -317,6 +319,15 @@ async function updateAnimal(req, res, next) {
       error: 'ANIMAL_NOT_FOUND',
       message: 'Animal non trouvé.'
     });
+
+    // Trigger zone evaluation
+    if (animal.current_zone_id) {
+      zoneMonitorService.evaluateZone(animal.current_zone_id).catch(err => logger.error(`Zone evaluation failed: ${err.message}`));
+    }
+    if (existing.current_zone_id && String(existing.current_zone_id) !== String(animal.current_zone_id)) {
+      zoneMonitorService.evaluateZone(existing.current_zone_id).catch(err => logger.error(`Old zone evaluation failed: ${err.message}`));
+    }
+
     res.json({ success: true, data: animal });
   } catch (err) {
     next(err);
@@ -345,7 +356,7 @@ async function deleteAnimal(req, res, next) {
     }
 
     await Animal.deleteOne({ _id: id });
-    res.json({ success: true, message: 'Animal deleted successfully and device released.' });
+    res.json({ success: true, data: { message: 'Animal deleted successfully and device released.' } });
   } catch (err) {
     next(err);
   }

@@ -137,7 +137,7 @@ const useSimulationStore = create((set, get) => ({
       speed:       rand(scenario.speed[0], scenario.speed[1]).toFixed(1),
       battery_level: animal.battery_level || 85,
       status:      scenario.status,
-      timestamp:   new Date()
+      timestamp:   new Date().toISOString()
     };
 
     // 2. Logic: Move animal if running or escaped
@@ -197,7 +197,7 @@ const useSimulationStore = create((set, get) => ({
         severity,
         message,
         status: 'new',
-        created_at: new Date(),
+        created_at: new Date().toISOString(),
         ...metadata
       });
 
