@@ -11,13 +11,17 @@ const MapControls = ({
   followUser,
   onToggleFollow,
   onRecenter,
+  onRecenterAll,
   mapType,
   onToggleMapType,
   showZones,
   onToggleZones,
   onResetMap,
   selectedAnimal,
-  socketConnected = true
+  socketConnected = true,
+  showHistory,
+  onToggleHistory,
+  onOpenFilters
 }) => {
   return (
     <View style={styles.container}>
@@ -64,6 +68,22 @@ const MapControls = ({
       {/* ── Floating Action Buttons (Bottom Right) ── */}
       <View style={styles.fabCol}>
         <TouchableOpacity 
+          style={[styles.fabSmall, showHistory && styles.fabActive]} 
+          onPress={onToggleHistory} 
+          activeOpacity={0.8}
+        >
+          <Ionicons name="trail-sign-outline" size={20} color={COLORS.white} />
+        </TouchableOpacity>
+
+        <TouchableOpacity 
+          style={styles.fabSmall} 
+          onPress={onOpenFilters} 
+          activeOpacity={0.8}
+        >
+          <Ionicons name="options-outline" size={20} color={COLORS.white} />
+        </TouchableOpacity>
+
+        <TouchableOpacity 
           style={styles.fabSmall} 
           onPress={onToggleZones} 
           activeOpacity={0.8}
@@ -72,16 +92,10 @@ const MapControls = ({
         </TouchableOpacity>
 
         <TouchableOpacity 
-          style={styles.fabSmall} 
-          onPress={onResetMap} 
-          activeOpacity={0.8}
-        >
-          <Ionicons name="refresh" size={20} color={COLORS.white} />
-        </TouchableOpacity>
-
-        <TouchableOpacity 
           style={[styles.fabMain, followUser && styles.fabMainActive]} 
           onPress={onRecenter}
+          onLongPress={onRecenterAll}
+          delayLongPress={500}
           activeOpacity={0.8}
         >
           <Ionicons name="locate" size={28} color={COLORS.white} />
@@ -181,6 +195,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     ...SHADOWS.soft,
+  },
+  fabActive: {
+    backgroundColor: COLORS.primary,
+    borderColor: COLORS.white,
   },
   liveIndicator: {
     flexDirection: 'row',

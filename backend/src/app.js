@@ -23,6 +23,7 @@ const geofencesRoutes = require('./routes/geofences');
 const userRoutes      = require('./routes/user');
 const devicesRoutes    = require('./routes/devices');
 const aiRoutes         = require('./routes/ai');
+const statsRoutes      = require('./routes/stats');
 
 // Middleware
 const errorHandler   = require('./middleware/errorHandler');
@@ -92,6 +93,7 @@ app.use('/api/geofences', geofencesRoutes);
 app.use('/api/user',      userRoutes);
 app.use('/api/devices',   devicesRoutes);
 app.use('/api/ai',        aiRoutes);
+app.use('/api/stats',     statsRoutes);
 
 // ── 404 handler ────────────────────────────────────────────────
 app.use((req, res) => {

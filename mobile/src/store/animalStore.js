@@ -105,6 +105,16 @@ const useAnimalStore = create((set, get) => ({
     }
   },
 
+  fetchHistory: async (id, days = 1) => {
+    try {
+      const { data } = await api.get(`/positions/${id}/history`, { params: { days } });
+      return data;
+    } catch (err) {
+      console.error('Failed to fetch history:', err.message);
+      return [];
+    }
+  },
+
   fetchAIAnalysis: async (animalId) => {
     set({ selectedAnimalAI: null });
     try {

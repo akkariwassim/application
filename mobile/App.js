@@ -32,6 +32,7 @@ import AnimalViewScreen from './src/screens/AnimalViewScreen';
 import AlertDetailScreen from './src/screens/AlertDetailScreen';
 import AnimalSettingsScreen from './src/screens/AnimalSettingsScreen';
 import SimulationScreen from './src/screens/SimulationScreen';
+import StatisticsScreen from './src/screens/StatisticsScreen';
 
 import useSimulationStore from './src/store/simulationStore';
 
@@ -184,6 +185,7 @@ function MainNavigator() {
             Zones:      focused ? 'layers'       : 'layers-outline',
             Alerts:     focused ? 'notifications': 'notifications-outline',
             Animals:    focused ? 'paw'          : 'paw-outline',
+            Stats:      focused ? 'bar-chart'    : 'bar-chart-outline',
             Simulation: focused ? 'flask'        : 'flask-outline',
             Profile:    focused ? 'person'       : 'person-outline',
           };
@@ -205,6 +207,7 @@ function MainNavigator() {
     >
       <Tab.Screen name="Map"     component={MapScreen}      options={{ title: '🛡 Live Zone', headerShown: false }} />
       <Tab.Screen name="Zones"   component={ZonesStack} options={{ title: '🛡 Zones' }} />
+      <Tab.Screen name="Stats"   component={StatisticsScreen} options={{ title: '📊 Stats' }} />
       <Tab.Screen name="Alerts"  component={AlertsScreen} options={{
         title: 'Alerts',
         tabBarBadge: unreadCount > 0 ? unreadCount : undefined,
