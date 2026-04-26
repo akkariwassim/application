@@ -193,9 +193,10 @@ const useAnimalStore = create((set, get) => ({
   triggerAction: async (animalId, type, state) => {
     try {
       const { data } = await api.post(`/animals/${animalId}/action`, { type, state });
+      const updatedAnimal = data.animal;
       set((stateOld) => ({
-        animals: stateOld.animals.map((a) => (a.id === animalId ? { ...a, actuators: data.actuators } : a)),
-        selectedAnimal: stateOld.selectedAnimal?.id === animalId ? { ...stateOld.selectedAnimal, actuators: data.actuators } : stateOld.selectedAnimal,
+        animals: stateOld.animals.map((a) => (a.id === animalId ? { ...a, actuators: updatedAnimal.actuators } : a)),
+        selectedAnimal: stateOld.selectedAnimal?.id === animalId ? { ...stateOld.selectedAnimal, actuators: updatedAnimal.actuators } : stateOld.selectedAnimal,
       }));
       return data;
     } catch (err) {

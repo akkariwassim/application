@@ -4605,3 +4605,29 @@
 2026-04-22 16:15:38 [info]: Incoming Request: GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
 2026-04-22 16:15:38 [info]: Incoming Request: GET /api/geofences
 2026-04-22 16:15:39 [info]: Socket connected: uNjlci7kQ3nc1V3MAAAB (user 69e0f6ec4be9f34aaa8e2d6a)
+2026-04-26 21:02:26 [info]: ✅ MongoDB Connected: ac-lokdmj8-shard-00-00.7zypd8b.mongodb.net
+2026-04-26 21:02:26 [info]: 🚀 Server running on http://localhost:3000
+2026-04-26 21:02:26 [info]:    Environment: development
+2026-04-26 21:02:32 [info]: Incoming Request: GET /api/health
+2026-04-26 21:02:32 [info]: Incoming Request: POST /api/auth/login
+2026-04-26 21:02:32 [warn]: Login failed: User not found - invalid@test.com
+2026-04-26 21:02:32 [info]: Incoming Request: POST /api/auth/register
+2026-04-26 21:04:20 [info]: ✅ MongoDB Connected: ac-lokdmj8-shard-00-00.7zypd8b.mongodb.net
+2026-04-26 21:04:20 [info]: 🚀 Server running on http://localhost:3000
+2026-04-26 21:04:20 [info]:    Environment: development
+2026-04-26 21:05:31 [info]: Incoming Request: GET /api/auth/me
+2026-04-26 21:05:31 [info]: Incoming Request: POST /api/auth/refresh
+2026-04-26 21:05:31 [warn]: Refresh failed: Token invalid or user not found - 69e9e9a4cb85ed4bdb318e7e
+2026-04-26 21:05:38 [info]: Incoming Request: POST /api/auth/login
+2026-04-26 21:05:38 [warn]: Login failed: User not found - akkarithamer@gmail.com
+2026-04-26 21:05:56 [info]: Incoming Request: POST /api/auth/login
+2026-04-26 21:05:56 [warn]: Login failed: User not found - akkarithamer@gmail.com
+2026-04-26 21:06:17 [info]: Incoming Request: POST /api/auth/login
+2026-04-26 21:06:18 [info]: ✅ User logged in successfully: akkariwassim11@gmail.com
+2026-04-26 21:06:18 [info]: Incoming Request: GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-04-26 21:06:18 [info]: Incoming Request: GET /api/geofences
+2026-04-26 21:06:18 [info]: Socket connected: nrrduyLQnot7Hej6AAAB (user 69e0f6ec4be9f34aaa8e2d6a)
+2026-04-26 21:06:24 [info]: Incoming Request: GET /api/geofences
+2026-04-26 21:06:27 [info]: Incoming Request: GET /api/alerts?status=active
+2026-04-26 21:06:27 [info]: Incoming Request: GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-04-26 21:06:27 [info]: Incoming Request: GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20

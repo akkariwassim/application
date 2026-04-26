@@ -345,7 +345,7 @@ async function deleteAnimal(req, res, next) {
     }
 
     await Animal.deleteOne({ _id: id });
-    res.json({ success: true, message: 'Animal deleted successfully and device released.' });
+    res.json({ success: true, data: { message: 'Animal deleted successfully and device released.' } });
   } catch (err) {
     next(err);
   }

@@ -98,7 +98,7 @@ async function deleteAlert(req, res, next) {
       error: 'ALERT_NOT_FOUND',
       message: 'Alerte non trouvée.'
     });
-    res.json({ success: true, message: 'Alerte supprimée avec succès.' });
+    res.json({ success: true, data: { message: 'Alerte supprimée avec succès.' } });
   } catch (err) {
     next(err);
   }
