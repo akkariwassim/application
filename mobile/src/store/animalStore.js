@@ -3,6 +3,8 @@ import api from '../services/api';
 
 const useAnimalStore = create((set, get) => ({
   animals: [],
+  socketConnected: false,
+  setSocketConnected: (connected) => set({ socketConnected: connected }),
   selectedAnimal: null,
   selectedAnimalAI: null,
   isLoading: false,

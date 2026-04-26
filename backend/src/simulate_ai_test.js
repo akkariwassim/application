@@ -1,5 +1,6 @@
 'use strict';
 
+require('dotenv').config();
 const mongoose = require('mongoose');
 const axios = require('axios');
 const jwt = require('jsonwebtoken');
@@ -12,7 +13,7 @@ async function simulate() {
   try {
     console.log('🚀 Starting Live AI Simulation with AUTH Header...');
     
-    const mongoUri = process.env.MONGODB_URI || 'mongodb://smart_fence_mongodb:27017/smart_shepherd_db';
+    const mongoUri = process.env.MONGODB_URI;
     await mongoose.connect(mongoUri);
     console.log('✅ Connected to Database');
 
@@ -81,6 +82,7 @@ async function simulate() {
       longitude: lon,
       temperature: 41.5, // Fever
       heart_rate: 130, // High BPM
+      activity: 5, // Very low activity (laying down/critical)
       battery_level: 92
     });
 
