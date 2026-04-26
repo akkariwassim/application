@@ -30,17 +30,23 @@ const API_URL = getBaseUrl() || 'http://localhost:3000';
 let socket = null;
 
 /**
- * Initialize and connect Socket.io client.
+ * @param {function} onConnect          - callback()
+ * @param {function} onDisconnect       - callback()
  * @param {function} onPositionUpdate   - callback({ animalId, latitude, longitude, ... })
  * @param {function} onAlertTriggered   - callback({ animalId, type, severity, message })
  * @param {function} onStatusChange     - callback({ animalId, status })
  */
 export async function connectSocket({
+  onConnect,
+  onDisconnect,
   onPositionUpdate,
   onAlertTriggered,
   onStatusChange,
 }) {
-  if (socket?.connected) return socket;
+  if (socket?.connected) {
+    if (onConnect) onConnect();
+    return socket;
+  }
 
   const token = await SecureStore.getItemAsync('accessToken');
 
@@ -54,10 +60,12 @@ export async function connectSocket({
 
   socket.on('connect', () => {
     console.log('[Socket] Connected:', socket.id);
+    if (onConnect) onConnect();
   });
 
   socket.on('disconnect', (reason) => {
     console.warn('[Socket] Disconnected:', reason);
+    if (onDisconnect) onDisconnect();
   });
 
   socket.on('connect_error', (err) => {

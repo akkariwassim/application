@@ -10,7 +10,7 @@ router.use(authenticate);
 
 // GET /api/alerts
 router.get('/', [
-  query('severity').optional().isIn(['info','warning','critical']),
+  query('severity').optional().isIn(['low','medium','high','critical']),
   query('status').optional().isIn(['active','acknowledged','resolved','archived']),
   query('limit').optional().isInt({ min: 1, max: 200 }),
   validate

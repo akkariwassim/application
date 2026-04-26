@@ -274,3 +274,50 @@
 2026-04-16 19:42:51 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
 2026-04-16 19:42:51 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
 2026-04-16 19:42:51 [error]: Geofence calculation error: connect ECONNREFUSED 127.0.0.1:3306
+2026-04-22 16:41:04 [error]: Failed to create geofence alert:
+2026-04-22 16:41:04 [error]: Error in processZoneMonitoring for animal 69e3c3edc0fe7f100abc355b:
+2026-04-23 10:05:21 [error]: ❌ CRITICAL: Error connecting to MongoDB!
+2026-04-23 10:23:15 [error]: MongoServerSelectionError: connect ETIMEDOUT 65.62.2.180:27017
+    at Topology.selectServer (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\mongodb\lib\sdam\topology.js:347:38)
+    at async tryOperation (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\mongodb\lib\operations\execute_operation.js:150:18)
+    at async executeOperation (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\mongodb\lib\operations\execute_operation.js:80:16)
+    at async FindCursor._initialize (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\mongodb\lib\cursor\find_cursor.js:62:26)
+    at async FindCursor.cursorInit (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:620:27)
+    at async FindCursor.fetchBatch (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:654:13)
+    at async FindCursor.next (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:326:17)
+    at async Collection.findOne (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\mongodb\lib\collection.js:313:24)
+    at async model.Query._findOne (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\mongoose\lib\query.js:2731:15)
+    at async model.Query.exec (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\mongoose\lib\query.js:4726:63)
+2026-04-23 10:23:22 [error]: MongoServerSelectionError: connect ETIMEDOUT 65.62.2.180:27017
+    at Topology.selectServer (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\mongodb\lib\sdam\topology.js:347:38)
+    at async tryOperation (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\mongodb\lib\operations\execute_operation.js:150:18)
+    at async executeOperation (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\mongodb\lib\operations\execute_operation.js:80:16)
+    at async FindCursor._initialize (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\mongodb\lib\cursor\find_cursor.js:62:26)
+    at async FindCursor.cursorInit (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:620:27)
+    at async FindCursor.fetchBatch (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:654:13)
+    at async FindCursor.next (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:326:17)
+    at async Collection.findOne (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\mongodb\lib\collection.js:313:24)
+    at async model.Query._findOne (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\mongoose\lib\query.js:2731:15)
+    at async model.Query.exec (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\mongoose\lib\query.js:4726:63)
+2026-04-23 10:23:29 [error]: MongoServerSelectionError: connect ETIMEDOUT 65.62.2.180:27017
+    at Topology.selectServer (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\mongodb\lib\sdam\topology.js:347:38)
+    at async tryOperation (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\mongodb\lib\operations\execute_operation.js:150:18)
+    at async executeOperation (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\mongodb\lib\operations\execute_operation.js:80:16)
+    at async FindCursor._initialize (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\mongodb\lib\cursor\find_cursor.js:62:26)
+    at async FindCursor.cursorInit (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:620:27)
+    at async FindCursor.fetchBatch (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:654:13)
+    at async FindCursor.next (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:326:17)
+    at async Collection.findOne (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\mongodb\lib\collection.js:313:24)
+    at async model.Query._findOne (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\mongoose\lib\query.js:2731:15)
+    at async model.Query.exec (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\mongoose\lib\query.js:4726:63)
+2026-04-23 10:23:37 [error]: MongoServerSelectionError: connect ETIMEDOUT 65.62.2.180:27017
+    at Topology.selectServer (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\mongodb\lib\sdam\topology.js:347:38)
+    at async tryOperation (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\mongodb\lib\operations\execute_operation.js:150:18)
+    at async executeOperation (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\mongodb\lib\operations\execute_operation.js:80:16)
+    at async FindCursor._initialize (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\mongodb\lib\cursor\find_cursor.js:62:26)
+    at async FindCursor.cursorInit (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:620:27)
+    at async FindCursor.fetchBatch (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:654:13)
+    at async FindCursor.next (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:326:17)
+    at async Collection.findOne (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\mongodb\lib\collection.js:313:24)
+    at async model.Query._findOne (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\mongoose\lib\query.js:2731:15)
+    at async model.Query.exec (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\mongoose\lib\query.js:4726:63)
