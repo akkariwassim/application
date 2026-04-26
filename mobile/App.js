@@ -14,6 +14,7 @@ initErrorLogger();
 import useAuthStore from './src/store/authStore';
 import useAlertStore from './src/store/alertStore';
 import useAnimalStore from './src/store/animalStore';
+import useGeofenceStore from './src/store/geofenceStore';
 import { connectSocket, disconnectSocket } from './src/services/socketService';
 
 // Screens
@@ -150,8 +151,11 @@ function ZonesStack() {
 function MainNavigator() {
   const unreadCount        = useAlertStore((s) => s.unreadCount);
   const updateAnimalStatus = useAnimalStore((s) => s.updateAnimalStatus);
+  const updateZoneStatus   = useGeofenceStore((s) => s.updateZoneStatus);
   const isSimulationMode   = useSimulationStore((s) => s.isSimulationMode);
   const setSocketConnected = useAnimalStore((s) => s.setSocketConnected);
+  const updateAnimalPos    = useAnimalStore((s) => s.updateAnimalPosition);
+  const addAlert           = useAlertStore((s) => s.addAlert);
 
   useEffect(() => {
     if (isSimulationMode) {
@@ -166,6 +170,7 @@ function MainNavigator() {
       onPositionUpdate: (data) => updateAnimalPos(data.animalId, data),
       onAlertTriggered: (data) => addAlert(data),
       onStatusChange:   (data) => updateAnimalStatus(data.animalId, data.status),
+      onZoneStatusChange: (data) => updateZoneStatus(data),
     });
     return () => disconnectSocket();
   }, [isSimulationMode]);

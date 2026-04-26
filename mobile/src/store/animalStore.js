@@ -225,7 +225,7 @@ const useAnimalStore = create((set, get) => ({
               battery_level: positionData.batteryLevel || positionData.battery_level,
               signal_strength: positionData.signalStrength || positionData.signal_strength,
               activity: positionData.activity,
-              last_seen: positionData.timestamp || new Date() 
+              last_seen: (positionData.timestamp ? new Date(positionData.timestamp) : new Date()).toISOString()
             }
           : a
       ),
@@ -247,7 +247,7 @@ const useAnimalStore = create((set, get) => ({
           battery_level: up.batteryLevel || up.battery_level,
           signal_strength: up.signalStrength || up.signal_strength,
           activity: up.activity,
-          last_seen: up.timestamp || new Date()
+          last_seen: (up.timestamp ? new Date(up.timestamp) : new Date()).toISOString()
         };
       })
     }));

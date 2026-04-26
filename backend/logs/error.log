@@ -321,3 +321,4 @@
     at async Collection.findOne (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\mongodb\lib\collection.js:313:24)
     at async model.Query._findOne (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\mongoose\lib\query.js:2731:15)
     at async model.Query.exec (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\mongoose\lib\query.js:4726:63)
+2026-04-26 21:27:07 [error]: [ZoneMonitorService] Error evaluating zone 69ee74c59753872c84c75a6e: Cast to Number failed for value "new ObjectId('69ee74c59753872c84c75a6e')" (type ObjectId) at path "geofence_id" for model "Alert"

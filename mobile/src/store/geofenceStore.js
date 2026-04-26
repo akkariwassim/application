@@ -62,6 +62,26 @@ const useGeofenceStore = create((set, get) => ({
       throw err;
     }
   },
+
+  /**
+   * Called by WebSocket to update a specific zone's status in real-time.
+   */
+  updateZoneStatus: (data) => {
+    const { zoneId, status, color, reason, timestamp } = data;
+    set((state) => ({
+      geofences: state.geofences.map((gf) => 
+        (gf.id === zoneId || gf._id === zoneId)
+          ? { 
+              ...gf, 
+              status, 
+              status_color: color, 
+              status_reason: reason, 
+              last_status_update: timestamp 
+            }
+          : gf
+      ),
+    }));
+  },
 }));
 
 export default useGeofenceStore;
