@@ -211,7 +211,7 @@ async function deleteGeofence(req, res, next) {
       error: 'ZONE_NOT_FOUND',
       message: 'Zone non trouvée.'
     });
-    res.json({ success: true, message: 'Zone supprimée avec succès.' });
+    res.json({ success: true, data: { message: 'Zone supprimée avec succès.' } });
   } catch (err) {
     next(err);
   }

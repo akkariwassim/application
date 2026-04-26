@@ -71,6 +71,11 @@ const alertSchema = new mongoose.Schema({
   toObject: { virtuals: true }
 });
 
+alertSchema.index({ user_id: 1, created_at: -1 });
+alertSchema.index({ user_id: 1, status: 1 });
+alertSchema.index({ user_id: 1, severity: 1 });
+alertSchema.index({ animal_id: 1, created_at: -1 });
+
 const Alert = mongoose.model('Alert', alertSchema);
 
 module.exports = Alert;
