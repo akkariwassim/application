@@ -30,6 +30,9 @@ import ZonesListScreen from './src/screens/ZonesListScreen';
 import AnimalViewScreen from './src/screens/AnimalViewScreen';
 import AlertDetailScreen from './src/screens/AlertDetailScreen';
 import AnimalSettingsScreen from './src/screens/AnimalSettingsScreen';
+import SimulationScreen from './src/screens/SimulationScreen';
+
+import useSimulationStore from './src/store/simulationStore';
 
 const Tab   = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -146,29 +149,38 @@ function ZonesStack() {
 // ── Main Tab Navigator ────────────────────────────────────────
 function MainNavigator() {
   const unreadCount        = useAlertStore((s) => s.unreadCount);
-  const addAlert           = useAlertStore((s) => s.addAlert);
-  const updateAnimalPos    = useAnimalStore((s) => s.updateAnimalPosition);
   const updateAnimalStatus = useAnimalStore((s) => s.updateAnimalStatus);
+  const isSimulationMode   = useSimulationStore((s) => s.isSimulationMode);
+  const setSocketConnected = useAnimalStore((s) => s.setSocketConnected);
 
   useEffect(() => {
+    if (isSimulationMode) {
+      setSocketConnected(true); // Virtual socket is always "connected"
+      disconnectSocket();
+      return;
+    }
+
     connectSocket({
+      onConnect: () => setSocketConnected(true),
+      onDisconnect: () => setSocketConnected(false),
       onPositionUpdate: (data) => updateAnimalPos(data.animalId, data),
       onAlertTriggered: (data) => addAlert(data),
       onStatusChange:   (data) => updateAnimalStatus(data.animalId, data.status),
     });
     return () => disconnectSocket();
-  }, []);
+  }, [isSimulationMode]);
 
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
         tabBarIcon: ({ focused, color, size }) => {
           const icons = {
-            Map:     focused ? 'map'          : 'map-outline',
-            Zones:   focused ? 'layers'       : 'layers-outline',
-            Alerts:  focused ? 'notifications': 'notifications-outline',
-            Animals: focused ? 'paw'          : 'paw-outline',
-            Profile: focused ? 'person'       : 'person-outline',
+            Map:        focused ? 'map'          : 'map-outline',
+            Zones:      focused ? 'layers'       : 'layers-outline',
+            Alerts:     focused ? 'notifications': 'notifications-outline',
+            Animals:    focused ? 'paw'          : 'paw-outline',
+            Simulation: focused ? 'flask'        : 'flask-outline',
+            Profile:    focused ? 'person'       : 'person-outline',
           };
           return <Ionicons name={icons[route.name]} size={size} color={color} />;
         },
@@ -186,7 +198,7 @@ function MainNavigator() {
         headerTitleStyle: { fontWeight: '700' },
       })}
     >
-      <Tab.Screen name="Map"     component={MapScreen}      options={{ title: '🗺 Live Map', headerShown: false }} />
+      <Tab.Screen name="Map"     component={MapScreen}      options={{ title: '🛡 Live Zone', headerShown: false }} />
       <Tab.Screen name="Zones"   component={ZonesStack} options={{ title: '🛡 Zones' }} />
       <Tab.Screen name="Alerts"  component={AlertsScreen} options={{
         title: 'Alerts',
@@ -194,6 +206,7 @@ function MainNavigator() {
         tabBarBadgeStyle: { backgroundColor: COLORS.danger },
       }} />
       <Tab.Screen name="Animals" component={AnimalsStack} options={{ title: 'Animals', headerShown: false }} />
+      <Tab.Screen name="Simulation" component={SimulationScreen} options={{ title: '🔬 Simulation', headerShown: false }} />
       <Tab.Screen name="Profile" component={ProfileScreen} options={{ title: 'Profile' }} />
     </Tab.Navigator>
   );

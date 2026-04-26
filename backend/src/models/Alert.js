@@ -22,7 +22,8 @@ const alertSchema = new mongoose.Schema({
     enum: [
       'geofence_breach', 'high_temperature', 'abnormal_heart_rate', 
       'low_battery', 'no_movement', 'device_offline', 
-      'low_gps_signal', 'sensor_failure', 'exit', 'entry'
+      'low_gps_signal', 'sensor_failure', 'exit', 'entry',
+      'health_critical', 'health_attention', 'geofence_exit', 'geofence_entry'
     ],
   },
   severity: {

@@ -121,7 +121,7 @@ export default function MapScreen({ route }) {
   const navigation = useNavigation();
   const mapRef     = useRef(null);
 
-  const { animals, fetchAnimals, isLoading } = useAnimalStore();
+  const { animals, fetchAnimals, isLoading, socketConnected } = useAnimalStore();
   const { geofences, fetchGeofences }        = useGeofenceStore();
   const { user }                             = useAuthStore();
 
@@ -319,6 +319,7 @@ export default function MapScreen({ route }) {
         onToggleZones={() => setShowZonesList(true)}
         onResetMap={() => startTracking()}
         selectedAnimal={selectedAnimal}
+        socketConnected={socketConnected}
       />
 
       {selectedAnimal && (
@@ -334,7 +335,13 @@ export default function MapScreen({ route }) {
                 {selectedAnimal.isZone ? `${(selectedAnimal.area_sqm / 10000).toFixed(2)} Ha · ${selectedAnimal.animalsInside} animaux` : `${selectedAnimal.type} · ${selectedAnimal.breed || 'Sans race'}`}
               </Text>
             </View>
-            <TouchableOpacity style={styles.detailActionBtn} onPress={() => selectedAnimal.isZone ? navigation.navigate('ZonesList') : navigation.navigate('Animals', { screen: 'AnimalDetail', params: { animal: selectedAnimal } })}>
+            <TouchableOpacity 
+              style={styles.detailActionBtn} 
+              onPress={() => selectedAnimal.isZone 
+                ? navigation.navigate('Zones', { screen: 'ZonesList' }) 
+                : navigation.navigate('Animals', { screen: 'AnimalDetail', params: { animal: selectedAnimal } })
+              }
+            >
               <Text style={styles.detailActionText}>Détails</Text>
               <Ionicons name="chevron-forward" size={16} color={COLORS.primary} />
             </TouchableOpacity>
@@ -356,7 +363,16 @@ export default function MapScreen({ route }) {
               <View style={styles.sheetHandle} />
               <View style={styles.modalTitleRow}>
                 <View><Text style={styles.modalTitle}>Zones & Parcelles</Text><Text style={styles.modalSubtitle}>{geofences.length} périmètres configurés</Text></View>
-                <TouchableOpacity style={styles.addZoneBtn} onPress={() => { setShowZonesList(false); navigation.navigate('Geofence'); }}><Ionicons name="add" size={20} color={COLORS.white} /><Text style={styles.addZoneBtnText}>Ajouter</Text></TouchableOpacity>
+                <TouchableOpacity 
+                  style={styles.addZoneBtn} 
+                  onPress={() => { 
+                    setShowZonesList(false); 
+                    navigation.navigate('Zones', { screen: 'Geofence' }); 
+                  }}
+                >
+                  <Ionicons name="add" size={20} color={COLORS.white} />
+                  <Text style={styles.addZoneBtnText}>Ajouter</Text>
+                </TouchableOpacity>
               </View>
             </View>
             <FlatList

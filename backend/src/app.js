@@ -1,4 +1,5 @@
-'use strict';
+'use strict'; // Triggering restart after .env change
+
 
 const express        = require('express');
 const http           = require('http');
