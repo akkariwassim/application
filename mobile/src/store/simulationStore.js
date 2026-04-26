@@ -3,6 +3,7 @@ import useAnimalStore from './animalStore';
 import useAlertStore from './alertStore';
 import useGeofenceStore from './geofenceStore';
 import { isPointInPolygon } from '../utils/geoUtils';
+import api from '../services/api';
 
 const SCENARIOS = {
   normal: {
@@ -136,7 +137,7 @@ const useSimulationStore = create((set, get) => ({
       speed:       rand(scenario.speed[0], scenario.speed[1]).toFixed(1),
       battery_level: animal.battery_level || 85,
       status:      scenario.status,
-      timestamp:   new Date()
+      timestamp:   new Date().toISOString()
     };
 
     // 2. Logic: Move animal if running or escaped
@@ -165,7 +166,13 @@ const useSimulationStore = create((set, get) => ({
     useAnimalStore.getState().updateAnimalPosition(selectedAnimalId, newData);
     useAnimalStore.getState().updateAnimalStatus(selectedAnimalId, newData.status);
 
-    // 5. SMART ALERT SYSTEM
+    // 5. Sync with Backend (Professional Data Logging)
+    api.post('/positions', {
+      ...newData,
+      gps_signal: 100 // Simulation is always perfect GPS
+    }).catch(e => console.warn('[Sim] Sync failed:', e.message));
+
+    // 6. SMART ALERT SYSTEM
     get().checkAlerts(newData, animal);
 
     set({ simulatedData: newData });
@@ -190,7 +197,7 @@ const useSimulationStore = create((set, get) => ({
         severity,
         message,
         status: 'new',
-        created_at: new Date(),
+        created_at: new Date().toISOString(),
         ...metadata
       });
 

@@ -46,22 +46,16 @@ async function submitPosition(req, res, next) {
       message: 'Animal non trouvé.' 
     });
 
-    // 2. Save Historical SensorData
-    const sensorData = await SensorData.create({
-      animal_id: animalId,
-      user_id: req.user.id,
-      latitude,
-      longitude,
-      temperature: temperature || animal.temperature || 38.5,
-      heart_rate: heart_rate || animal.heart_rate,
-      battery_level: battery_level || animal.battery_level,
-      gps_signal: gps_signal || animal.signal_strength,
-      activity: activity || animal.activity || 50,
-      timestamp: new Date()
-    });
+    // 2. Log Historical Data (Movement & Health)
+    const statsService = require('../services/statsService');
+    statsService.logMetrics(animal, {
+      latitude, longitude, temperature, heart_rate, activity, battery_level, gps_signal
+    }).catch(err => logger.error(`Stats logging failed: ${err.message}`));
 
     // 2b. Trigger AI Prediction (Asynchronous)
-    aiService.processAIPrediction(animal, sensorData).catch(err => {
+    aiService.processAIPrediction(animal, { 
+      latitude, longitude, temperature, heart_rate, activity 
+    }).catch(err => {
       logger.error(`Async AI processing failed: ${err.message}`);
     });
     
@@ -136,10 +130,17 @@ async function submitPosition(req, res, next) {
 async function getHistory(req, res, next) {
   try {
     const { animalId } = req.params;
-    const history = await SensorData.find({ 
+    const { days = 1 } = req.query;
+    
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - parseInt(days));
+
+    const MovementHistory = require('../models/MovementHistory');
+    const history = await MovementHistory.find({ 
       animal_id: animalId, 
-      user_id: req.user.id 
-    }).sort({ timestamp: -1 }).limit(100);
+      user_id: req.user.id,
+      timestamp: { $gte: startDate }
+    }).sort({ timestamp: 1 });
     
     res.json({ success: true, data: history });
   } catch (err) {

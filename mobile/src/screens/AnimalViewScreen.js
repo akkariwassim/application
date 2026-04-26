@@ -176,7 +176,11 @@ export default function AnimalViewScreen({ route, navigation }) {
               <Ionicons name="thermometer" size={20} color={COLORS.warning} />
               <Text style={styles.widgetLabel}>Body Temp</Text>
             </View>
-            <Text style={styles.widgetValue}>{animal.temperature ? parseFloat(animal.temperature).toFixed(1) : '--'} <Text style={styles.unit}>°C</Text></Text>
+            <Text style={styles.widgetValue}>
+              {typeof animal.temperature === 'number' ? animal.temperature.toFixed(1) : 
+               (animal.temperature && !isNaN(parseFloat(animal.temperature)) ? parseFloat(animal.temperature).toFixed(1) : '--')}
+              <Text style={styles.unit}>°C</Text>
+            </Text>
             <View style={[styles.widgetStatus, { backgroundColor: COLORS.safe + '22' }]}>
               <Text style={[styles.widgetStatusText, { color: COLORS.safe }]}>Normal</Text>
             </View>

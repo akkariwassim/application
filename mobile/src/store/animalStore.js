@@ -105,6 +105,16 @@ const useAnimalStore = create((set, get) => ({
     }
   },
 
+  fetchHistory: async (id, days = 1) => {
+    try {
+      const { data } = await api.get(`/positions/${id}/history`, { params: { days } });
+      return data;
+    } catch (err) {
+      console.error('Failed to fetch history:', err.message);
+      return [];
+    }
+  },
+
   fetchAIAnalysis: async (animalId) => {
     set({ selectedAnimalAI: null });
     try {
@@ -195,9 +205,10 @@ const useAnimalStore = create((set, get) => ({
   triggerAction: async (animalId, type, state) => {
     try {
       const { data } = await api.post(`/animals/${animalId}/action`, { type, state });
+      const updatedAnimal = data.animal;
       set((stateOld) => ({
-        animals: stateOld.animals.map((a) => (a.id === animalId ? { ...a, actuators: data.actuators } : a)),
-        selectedAnimal: stateOld.selectedAnimal?.id === animalId ? { ...stateOld.selectedAnimal, actuators: data.actuators } : stateOld.selectedAnimal,
+        animals: stateOld.animals.map((a) => (a.id === animalId ? { ...a, actuators: updatedAnimal.actuators } : a)),
+        selectedAnimal: stateOld.selectedAnimal?.id === animalId ? { ...stateOld.selectedAnimal, actuators: updatedAnimal.actuators } : stateOld.selectedAnimal,
       }));
       return data;
     } catch (err) {
@@ -225,7 +236,7 @@ const useAnimalStore = create((set, get) => ({
               battery_level: positionData.batteryLevel || positionData.battery_level,
               signal_strength: positionData.signalStrength || positionData.signal_strength,
               activity: positionData.activity,
-              last_seen: positionData.timestamp || new Date() 
+              last_seen: (positionData.timestamp ? new Date(positionData.timestamp) : new Date()).toISOString()
             }
           : a
       ),
@@ -247,7 +258,7 @@ const useAnimalStore = create((set, get) => ({
           battery_level: up.batteryLevel || up.battery_level,
           signal_strength: up.signalStrength || up.signal_strength,
           activity: up.activity,
-          last_seen: up.timestamp || new Date()
+          last_seen: (up.timestamp ? new Date(up.timestamp) : new Date()).toISOString()
         };
       })
     }));

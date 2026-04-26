@@ -14,6 +14,7 @@ initErrorLogger();
 import useAuthStore from './src/store/authStore';
 import useAlertStore from './src/store/alertStore';
 import useAnimalStore from './src/store/animalStore';
+import useGeofenceStore from './src/store/geofenceStore';
 import { connectSocket, disconnectSocket } from './src/services/socketService';
 
 // Screens
@@ -31,6 +32,7 @@ import AnimalViewScreen from './src/screens/AnimalViewScreen';
 import AlertDetailScreen from './src/screens/AlertDetailScreen';
 import AnimalSettingsScreen from './src/screens/AnimalSettingsScreen';
 import SimulationScreen from './src/screens/SimulationScreen';
+import StatisticsScreen from './src/screens/StatisticsScreen';
 
 import useSimulationStore from './src/store/simulationStore';
 
@@ -150,8 +152,11 @@ function ZonesStack() {
 function MainNavigator() {
   const unreadCount        = useAlertStore((s) => s.unreadCount);
   const updateAnimalStatus = useAnimalStore((s) => s.updateAnimalStatus);
+  const updateZoneStatus   = useGeofenceStore((s) => s.updateZoneStatus);
   const isSimulationMode   = useSimulationStore((s) => s.isSimulationMode);
   const setSocketConnected = useAnimalStore((s) => s.setSocketConnected);
+  const updateAnimalPos    = useAnimalStore((s) => s.updateAnimalPosition);
+  const addAlert           = useAlertStore((s) => s.addAlert);
 
   useEffect(() => {
     if (isSimulationMode) {
@@ -166,6 +171,7 @@ function MainNavigator() {
       onPositionUpdate: (data) => updateAnimalPos(data.animalId, data),
       onAlertTriggered: (data) => addAlert(data),
       onStatusChange:   (data) => updateAnimalStatus(data.animalId, data.status),
+      onZoneStatusChange: (data) => updateZoneStatus(data),
     });
     return () => disconnectSocket();
   }, [isSimulationMode]);
@@ -179,6 +185,7 @@ function MainNavigator() {
             Zones:      focused ? 'layers'       : 'layers-outline',
             Alerts:     focused ? 'notifications': 'notifications-outline',
             Animals:    focused ? 'paw'          : 'paw-outline',
+            Stats:      focused ? 'bar-chart'    : 'bar-chart-outline',
             Simulation: focused ? 'flask'        : 'flask-outline',
             Profile:    focused ? 'person'       : 'person-outline',
           };
@@ -200,6 +207,7 @@ function MainNavigator() {
     >
       <Tab.Screen name="Map"     component={MapScreen}      options={{ title: '🛡 Live Zone', headerShown: false }} />
       <Tab.Screen name="Zones"   component={ZonesStack} options={{ title: '🛡 Zones' }} />
+      <Tab.Screen name="Stats"   component={StatisticsScreen} options={{ title: '📊 Stats' }} />
       <Tab.Screen name="Alerts"  component={AlertsScreen} options={{
         title: 'Alerts',
         tabBarBadge: unreadCount > 0 ? unreadCount : undefined,

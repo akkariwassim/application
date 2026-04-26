@@ -205,7 +205,7 @@ async function refreshToken(req, res, next) {
     await user.save();
 
     logger.debug(`Session refreshed for user: ${user.email}`);
-    res.json(tokens);
+    res.json({ success: true, data: tokens });
   } catch (err) {
     logger.error(`Error in refreshToken: ${err.message}`);
     res.status(401).json({ 
@@ -229,10 +229,93 @@ async function logout(req, res, next) {
       );
     }
     logger.info('User logged out');
-    res.json({ success: true, message: 'Logged out successfully' });
+    res.json({ success: true, data: { message: 'Logged out successfully' } });
   } catch (err) {
     logger.error(`Error in logout: ${err.message}`);
     next(err);
+  }
+}
+
+/**
+ * POST /api/auth/forgot-password
+ * Sends a password reset link (simulated)
+ */
+async function forgotPassword(req, res, next) {
+  try {
+    const { email } = req.body;
+    const user = await User.findOne({ email });
+    
+    if (!user) {
+      // Don't reveal if user exists for security
+      return res.json({ 
+        success: true, 
+        data: { message: 'Si cet e-mail existe dans notre système, un lien de réinitialisation sera envoyé.' } 
+      });
+    }
+
+    // Generate a simple token (in production use crypto.randomBytes)
+    const resetToken = jwt.sign(
+      { id: user._id, purpose: 'password_reset' }, 
+      process.env.JWT_SECRET, 
+      { expiresIn: '1h' }
+    );
+
+    // TODO: Send real email
+    logger.info(`[SIMULATION] Password reset email for ${email}:`);
+    logger.info(`[SIMULATION] Link: http://localhost:3000/reset-password?token=${resetToken}`);
+
+    res.json({ 
+      success: true, 
+      data: { message: 'Si cet e-mail existe dans notre système, un lien de réinitialisation sera envoyé.' } 
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
+/**
+ * POST /api/auth/reset-password
+ * Updates password using a reset token
+ */
+async function resetPassword(req, res, next) {
+  try {
+    const { token, newPassword } = req.body;
+    
+    if (!token || !newPassword) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'MISSING_FIELDS', 
+        message: 'Token et nouveau mot de passe requis.' 
+      });
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    if (decoded.purpose !== 'password_reset') {
+      throw new Error('Invalid token purpose');
+    }
+
+    const user = await User.findById(decoded.id);
+    if (!user) {
+      return res.status(404).json({ 
+        success: false, 
+        error: 'USER_NOT_FOUND', 
+        message: 'Utilisateur non trouvé.' 
+      });
+    }
+
+    user.password = newPassword;
+    user.refresh_tokens = []; // Log out from all devices
+    await user.save();
+
+    logger.info(`Password reset successful for user: ${user.email}`);
+    res.json({ success: true, data: { message: 'Mot de passe réinitialisé avec succès.' } });
+  } catch (err) {
+    logger.error(`Reset password failed: ${err.message}`);
+    res.status(401).json({ 
+      success: false, 
+      error: 'INVALID_TOKEN', 
+      message: 'Lien de réinitialisation invalide ou expiré.' 
+    });
   }
 }
 
@@ -241,5 +324,7 @@ module.exports = {
   login,
   getMe,
   refreshToken,
-  logout
+  logout,
+  forgotPassword,
+  resetPassword
 };
