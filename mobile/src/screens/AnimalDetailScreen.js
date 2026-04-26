@@ -312,7 +312,7 @@ export default function AnimalDetailScreen({ route, navigation }) {
                 icon="heart" color={bpmStatus.color} subValue={bpmStatus.label} pulse={!isSensorOffline}
               />
               <HealthWidget 
-                title="Temp" value={isSensorOffline ? '--' : (animal.temperature?.toFixed(1) || '--')} unit="°C" 
+                title="Temp" value={isSensorOffline ? '--' : (typeof animal.temperature === 'number' ? animal.temperature.toFixed(1) : '--')} unit="°C" 
                 icon="thermometer" color={COLORS.danger} subValue="Stable"
               />
               <HealthWidget 

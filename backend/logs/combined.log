@@ -4979,3 +4979,136 @@
 2026-04-23 11:09:35 [info]: ✅ MongoDB Connected: 127.0.0.1
 2026-04-23 11:09:35 [info]: 🚀 Server running on http://localhost:3000
 2026-04-23 11:09:35 [info]:    Environment: development
+2026-04-26 21:18:09 [info]: ✅ MongoDB Connected: 127.0.0.1
+2026-04-26 21:18:09 [info]: 🚀 Server running on http://localhost:3000
+2026-04-26 21:18:09 [info]:    Environment: development
+2026-04-26 21:19:06 [info]: ✅ MongoDB Connected: 127.0.0.1
+2026-04-26 21:19:06 [info]: 🚀 Server running on http://localhost:3000
+2026-04-26 21:19:06 [info]:    Environment: development
+2026-04-26 21:19:15 [info]: ✅ MongoDB Connected: 127.0.0.1
+2026-04-26 21:19:15 [info]: 🚀 Server running on http://localhost:3000
+2026-04-26 21:19:15 [info]:    Environment: development
+2026-04-26 21:19:28 [info]: ✅ MongoDB Connected: 127.0.0.1
+2026-04-26 21:19:28 [info]: 🚀 Server running on http://localhost:3000
+2026-04-26 21:19:28 [info]:    Environment: development
+2026-04-26 21:19:35 [info]: ✅ MongoDB Connected: 127.0.0.1
+2026-04-26 21:19:35 [info]: 🚀 Server running on http://localhost:3000
+2026-04-26 21:19:35 [info]:    Environment: development
+2026-04-26 21:21:01 [info]: ✅ MongoDB Connected: 127.0.0.1
+2026-04-26 21:21:01 [info]: 🚀 Server running on http://localhost:3000
+2026-04-26 21:21:01 [info]:    Environment: development
+2026-04-26 21:21:11 [info]: ✅ MongoDB Connected: 127.0.0.1
+2026-04-26 21:21:11 [info]: 🚀 Server running on http://localhost:3000
+2026-04-26 21:21:11 [info]:    Environment: development
+2026-04-26 21:21:27 [info]: ✅ MongoDB Connected: 127.0.0.1
+2026-04-26 21:21:27 [info]: 🚀 Server running on http://localhost:3000
+2026-04-26 21:21:27 [info]:    Environment: development
+2026-04-26 21:22:09 [info]: ✅ MongoDB Connected: 127.0.0.1
+2026-04-26 21:22:09 [info]: 🚀 Server running on http://localhost:3000
+2026-04-26 21:22:09 [info]:    Environment: development
+2026-04-26 21:22:16 [info]: ✅ MongoDB Connected: 127.0.0.1
+2026-04-26 21:22:16 [info]: 🚀 Server running on http://localhost:3000
+2026-04-26 21:22:16 [info]:    Environment: development
+2026-04-26 21:22:22 [info]: ✅ MongoDB Connected: 127.0.0.1
+2026-04-26 21:22:22 [info]: 🚀 Server running on http://localhost:3000
+2026-04-26 21:22:22 [info]:    Environment: development
+2026-04-26 21:23:24 [info]: Incoming Request: POST /api/auth/login
+2026-04-26 21:23:24 [warn]: Login failed: User not found - akkariwassim11@gmail.com
+2026-04-26 21:23:27 [info]: Incoming Request: POST /api/auth/login
+2026-04-26 21:23:27 [warn]: Login failed: User not found - akkariwassim11@gmail.com
+2026-04-26 21:23:36 [info]: Incoming Request: POST /api/auth/login
+2026-04-26 21:23:36 [warn]: Login failed: User not found - akkariwassim11@gmail.com
+2026-04-26 21:23:44 [info]: Incoming Request: POST /api/auth/login
+2026-04-26 21:23:44 [warn]: Login failed: User not found - akkariwassim11@gmail.com
+2026-04-26 21:24:01 [info]: Incoming Request: POST /api/auth/login
+2026-04-26 21:24:01 [warn]: Login failed: User not found - akkariwassim11@gmail.com
+2026-04-26 21:24:07 [info]: ✅ MongoDB Connected: 127.0.0.1
+2026-04-26 21:24:07 [info]: 🚀 Server running on http://localhost:3000
+2026-04-26 21:24:07 [info]:    Environment: development
+2026-04-26 21:24:20 [info]: Incoming Request: POST /api/auth/login
+2026-04-26 21:24:20 [warn]: Login failed: User not found - akkariwassim11@gmail.com
+2026-04-26 21:24:55 [info]: Incoming Request: POST /api/auth/login
+2026-04-26 21:24:55 [info]: ✅ User logged in successfully: wassimakkari6@gmail.com
+2026-04-26 21:24:55 [info]: Incoming Request: GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-04-26 21:24:55 [info]: Incoming Request: GET /api/geofences
+2026-04-26 21:24:55 [info]: Socket connected: Kg1xcalfj164KpBVAAAB (user 69d591c0d102e6ae9731dc62)
+2026-04-26 21:25:18 [info]: Incoming Request: GET /api/geofences
+2026-04-26 21:25:19 [info]: Incoming Request: GET /api/geofences
+2026-04-26 21:25:41 [info]: Incoming Request: POST /api/geofences
+2026-04-26 21:25:41 [info]: Incoming Request: GET /api/geofences
+2026-04-26 21:25:58 [info]: Incoming Request: GET /api/alerts?status=active
+2026-04-26 21:25:58 [info]: Incoming Request: GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-04-26 21:26:22 [info]: Socket disconnected: Kg1xcalfj164KpBVAAAB — client namespace disconnect
+2026-04-26 21:26:26 [info]: Socket connected: sd_riSAf1qmJ-BXFAAAD (user 69d591c0d102e6ae9731dc62)
+2026-04-26 21:26:28 [info]: Incoming Request: GET /api/geofences
+2026-04-26 21:26:28 [info]: Incoming Request: GET /api/devices?status=free
+2026-04-26 21:26:41 [info]: Incoming Request: POST /api/animals
+2026-04-26 21:26:57 [info]: Incoming Request: GET /api/geofences
+2026-04-26 21:26:57 [info]: Incoming Request: GET /api/devices?status=free
+2026-04-26 21:27:07 [info]: Incoming Request: PUT /api/animals/69ee75019753872c84c75a6f
+2026-04-26 21:27:07 [error]: [ZoneMonitorService] Error evaluating zone 69ee74c59753872c84c75a6e: Cast to Number failed for value "new ObjectId('69ee74c59753872c84c75a6e')" (type ObjectId) at path "geofence_id" for model "Alert"
+2026-04-26 21:27:22 [info]: Socket disconnected: sd_riSAf1qmJ-BXFAAAD — client namespace disconnect
+2026-04-26 21:28:14 [info]: ✅ MongoDB Connected: 127.0.0.1
+2026-04-26 21:28:14 [info]: 🚀 Server running on http://localhost:3000
+2026-04-26 21:28:14 [info]:    Environment: development
+2026-04-26 21:28:20 [info]: ✅ MongoDB Connected: 127.0.0.1
+2026-04-26 21:28:20 [info]: 🚀 Server running on http://localhost:3000
+2026-04-26 21:28:20 [info]:    Environment: development
+2026-04-26 21:28:47 [info]: Incoming Request: GET /api/geofences
+2026-04-26 21:28:47 [info]: Incoming Request: GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-04-26 21:30:57 [info]: Incoming Request: GET /api/auth/me
+2026-04-26 21:30:57 [info]: Incoming Request: GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-04-26 21:30:57 [info]: Incoming Request: GET /api/geofences
+2026-04-26 21:30:57 [info]: Socket connected: Ho9egEWOtaVKZaCFAAAB (user 69d591c0d102e6ae9731dc62)
+2026-04-26 21:32:21 [info]: Incoming Request: GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-04-26 21:32:21 [info]: Incoming Request: GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-04-26 21:32:22 [info]: Socket disconnected: Ho9egEWOtaVKZaCFAAAB — client namespace disconnect
+2026-04-26 21:32:25 [info]: Incoming Request: GET /api/geofences
+2026-04-26 21:34:04 [info]: Incoming Request: GET /api/auth/me
+2026-04-26 21:34:05 [info]: Incoming Request: GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-04-26 21:34:05 [info]: Incoming Request: GET /api/geofences
+2026-04-26 21:34:05 [info]: Socket connected: L1cPGH2uLb97EPnmAAAD (user 69d591c0d102e6ae9731dc62)
+2026-04-26 21:34:18 [info]: Socket disconnected: L1cPGH2uLb97EPnmAAAD — client namespace disconnect
+2026-04-26 21:34:25 [info]: Incoming Request: GET /api/geofences
+2026-04-26 21:34:25 [info]: Incoming Request: GET /api/devices?status=free
+2026-04-26 21:34:29 [info]: Incoming Request: POST /api/animals/69ee75019753872c84c75a6f/action
+2026-04-26 21:35:03 [info]: Incoming Request: GET /api/alerts?status=active
+2026-04-26 21:35:04 [info]: Incoming Request: GET /api/alerts?status=active
+2026-04-26 21:35:31 [info]: Incoming Request: GET /api/auth/me
+2026-04-26 21:35:31 [info]: Incoming Request: GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-04-26 21:35:31 [info]: Incoming Request: GET /api/geofences
+2026-04-26 21:35:31 [info]: Socket connected: xGyBt1Eh1ishxXuaAAAF (user 69d591c0d102e6ae9731dc62)
+2026-04-26 21:35:38 [info]: Socket disconnected: xGyBt1Eh1ishxXuaAAAF — client namespace disconnect
+2026-04-26 21:35:38 [info]: Incoming Request: GET /api/auth/me
+2026-04-26 21:35:38 [info]: Incoming Request: GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-04-26 21:35:38 [info]: Incoming Request: GET /api/geofences
+2026-04-26 21:35:38 [info]: Socket connected: GX9zci8I1ccR1aKOAAAH (user 69d591c0d102e6ae9731dc62)
+2026-04-26 21:35:55 [info]: Socket disconnected: GX9zci8I1ccR1aKOAAAH — client namespace disconnect
+2026-04-26 21:35:55 [info]: Incoming Request: GET /api/auth/me
+2026-04-26 21:35:55 [info]: Incoming Request: GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-04-26 21:35:55 [info]: Incoming Request: GET /api/geofences
+2026-04-26 21:35:55 [info]: Socket connected: FB8Gxc6Bwj3m9lZrAAAJ (user 69d591c0d102e6ae9731dc62)
+2026-04-26 21:36:21 [info]: Socket disconnected: FB8Gxc6Bwj3m9lZrAAAJ — client namespace disconnect
+2026-04-26 21:36:24 [info]: Incoming Request: GET /api/auth/me
+2026-04-26 21:36:24 [info]: Incoming Request: GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-04-26 21:36:24 [info]: Incoming Request: GET /api/geofences
+2026-04-26 21:36:24 [info]: Socket connected: 1rnLQ8PY9kG4QalsAAAL (user 69d591c0d102e6ae9731dc62)
+2026-04-26 21:36:35 [info]: Incoming Request: GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-04-26 21:36:35 [info]: Incoming Request: GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-04-26 21:36:38 [info]: Socket disconnected: 1rnLQ8PY9kG4QalsAAAL — client namespace disconnect
+2026-04-26 21:36:38 [info]: Incoming Request: GET /api/geofences
+2026-04-26 21:36:45 [info]: Incoming Request: GET /api/geofences
+2026-04-26 21:36:45 [info]: Incoming Request: GET /api/devices?status=free
+2026-04-26 21:36:50 [info]: Incoming Request: POST /api/animals/69ee75019753872c84c75a6f/action
+2026-04-26 21:36:55 [info]: Incoming Request: GET /api/alerts?status=active
+2026-04-26 21:36:58 [info]: Incoming Request: GET /api/alerts?status=active
+2026-04-26 21:37:00 [info]: Incoming Request: GET /api/alerts?status=resolved
+2026-04-26 21:37:01 [info]: Incoming Request: GET /api/alerts?
+2026-04-26 21:37:02 [info]: Incoming Request: GET /api/alerts?severity=critical
+2026-04-26 21:37:03 [info]: Incoming Request: GET /api/alerts?
+2026-04-26 21:37:03 [info]: Incoming Request: GET /api/alerts?status=active
+2026-04-26 21:37:06 [info]: Incoming Request: GET /api/alerts?status=active
+2026-04-26 21:37:25 [info]: Socket connected: dcAREI9_5U9cxi2XAAAN (user 69d591c0d102e6ae9731dc62)
+2026-04-26 21:37:27 [info]: Socket disconnected: dcAREI9_5U9cxi2XAAAN — client namespace disconnect
+2026-04-26 21:38:03 [info]: Incoming Request: GET /api/alerts?status=active
+2026-04-26 21:38:08 [info]: Socket connected: Fzutl6aURdA_efDRAAAP (user 69d591c0d102e6ae9731dc62)

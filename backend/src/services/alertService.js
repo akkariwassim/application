@@ -6,6 +6,7 @@ const Zone    = require('../models/Zone');
 const { emitAlert, emitStatusChange } = require('../config/socket');
 const logger = require('../utils/logger');
 const { checkBreach } = require('./geofenceService');
+const zoneMonitorService = require('./zoneMonitorService');
 
 /**
  * Alert Service
@@ -63,6 +64,12 @@ async function createGeofenceAlert({ animalId, userId, latitude, longitude, dist
     emitStatusChange(userId, animalId, 'out_of_zone');
 
     logger.warn(`🚨 Geofence breach — animal ${animalId}: ${message}`);
+    
+    // Trigger zone evaluation
+    if (zoneId) {
+      zoneMonitorService.evaluateZone(zoneId).catch(err => logger.error(`Zone evaluation failed: ${err.message}`));
+    }
+    
     return alert;
   } catch (err) {
     logger.error('Failed to create geofence alert:', err.message);
@@ -116,6 +123,13 @@ async function createHealthAlert({ animalId, userId, type, severity, message, la
 
     emitAlert(userId, animalId, alertPayload);
     logger.warn(`🩺 Health alert — animal ${animalId} (${type}): ${message}`);
+
+    // Trigger zone evaluation for the animal's zone
+    const animal = await Animal.findById(animalId);
+    if (animal && animal.current_zone_id) {
+      zoneMonitorService.evaluateZone(animal.current_zone_id).catch(err => logger.error(`Zone evaluation failed: ${err.message}`));
+    }
+
     return alert;
   } catch (err) {
     logger.error('Failed to create health alert:', err.message);
@@ -127,8 +141,13 @@ async function createHealthAlert({ animalId, userId, type, severity, message, la
  * Mark an animal as safe and resolve any active breach alerts.
  */
 async function markAnimalSafe(animalId, userId) {
-  await Animal.findByIdAndUpdate(animalId, { $set: { status: 'healthy' } });
+  const animal = await Animal.findByIdAndUpdate(animalId, { $set: { status: 'healthy' } }, { new: true });
   emitStatusChange(userId, animalId, 'healthy');
+
+  // Trigger zone evaluation
+  if (animal && animal.current_zone_id) {
+    zoneMonitorService.evaluateZone(animal.current_zone_id).catch(err => logger.error(`Zone evaluation failed: ${err.message}`));
+  }
 }
 
 /**

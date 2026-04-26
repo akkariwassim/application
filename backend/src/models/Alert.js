@@ -11,10 +11,11 @@ const alertSchema = new mongoose.Schema({
   animal_id: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Animal',
-    required: true,
+    required: false,
   },
   geofence_id: {
-    type: Number,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Zone',
   },
   type: {
     type: String,
@@ -23,7 +24,8 @@ const alertSchema = new mongoose.Schema({
       'geofence_breach', 'high_temperature', 'abnormal_heart_rate', 
       'low_battery', 'no_movement', 'device_offline', 
       'low_gps_signal', 'sensor_failure', 'exit', 'entry',
-      'health_critical', 'health_attention', 'geofence_exit', 'geofence_entry'
+      'health_critical', 'health_attention', 'geofence_exit', 'geofence_entry',
+      'zone_danger'
     ],
   },
   severity: {

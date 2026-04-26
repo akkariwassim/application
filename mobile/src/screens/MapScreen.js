@@ -247,19 +247,40 @@ export default function MapScreen({ route }) {
       const coords = safeParseCoords(gf.polygon_coords);
       if (coords.length === 0) return null;
       const isSelected = selectedAnimal?.isZone && String(selectedAnimal.id) === String(gf.id || gf._id);
+      
+      // Use status color for visualization
+      const baseColor = gf.status_color || COLORS.primary;
+      
       return (
         <Polygon
           key={`zone-${gf.id || gf._id}`}
           coordinates={coords}
-          fillColor={isSelected ? `${COLORS.gold}22` : `${gf.fill_color || COLORS.primary}22`}
-          strokeColor={isSelected ? COLORS.gold : (gf.fill_color || COLORS.primary)}
-          strokeWidth={isSelected ? 3 : 2}
+          fillColor={isSelected ? `${COLORS.gold}33` : `${baseColor}22`}
+          strokeColor={isSelected ? COLORS.gold : baseColor}
+          strokeWidth={isSelected ? 4 : 2}
           onPress={() => focusZone(gf)}
           tappable={true}
         />
       );
     });
   }, [geofences, selectedAnimal?.id]);
+
+  const MapLegend = () => (
+    <View style={styles.legendContainer}>
+      <View style={styles.legendItem}>
+        <View style={[styles.legendDot, { backgroundColor: '#22C55E' }]} />
+        <Text style={styles.legendText}>Sécurisé</Text>
+      </View>
+      <View style={styles.legendItem}>
+        <View style={[styles.legendDot, { backgroundColor: '#F59E0B' }]} />
+        <Text style={styles.legendText}>Attention</Text>
+      </View>
+      <View style={styles.legendItem}>
+        <View style={[styles.legendDot, { backgroundColor: '#EF4444' }]} />
+        <Text style={styles.legendText}>Danger</Text>
+      </View>
+    </View>
+  );
 
   const renderLoading = () => (
     <View style={styles.fullscreenOverlay}>
@@ -322,6 +343,8 @@ export default function MapScreen({ route }) {
         socketConnected={socketConnected}
       />
 
+      <MapLegend />
+
       {selectedAnimal && (
         <View style={[styles.detailSheet, { paddingBottom: insets.bottom + SPACING.md }]}>
           <View style={styles.sheetHandle} />
@@ -331,9 +354,23 @@ export default function MapScreen({ route }) {
             </View>
             <View style={{ flex: 1 }}>
               <Text style={styles.detailTitle}>{selectedAnimal.name || 'Animal'}</Text>
-              <Text style={styles.detailSubtitle}>
-                {selectedAnimal.isZone ? `${(selectedAnimal.area_sqm / 10000).toFixed(2)} Ha · ${selectedAnimal.animalsInside} animaux` : `${selectedAnimal.type} · ${selectedAnimal.breed || 'Sans race'}`}
-              </Text>
+              {selectedAnimal.isZone ? (
+                <View style={styles.statusBadgeRow}>
+                  <View style={[styles.statusBadge, { backgroundColor: `${selectedAnimal.status_color || '#22C55E'}22`, borderColor: selectedAnimal.status_color || '#22C55E' }]}>
+                    <View style={[styles.statusDot, { backgroundColor: selectedAnimal.status_color || '#22C55E' }]} />
+                    <Text style={[styles.statusText, { color: selectedAnimal.status_color || '#22C55E' }]}>
+                      {selectedAnimal.status?.toUpperCase() || 'SAFE'}
+                    </Text>
+                  </View>
+                  <Text style={styles.statusReason} numberOfLines={1}>
+                    {selectedAnimal.status_reason || 'Conditions normales'}
+                  </Text>
+                </View>
+              ) : (
+                <Text style={styles.detailSubtitle}>
+                  {`${selectedAnimal.type} · ${selectedAnimal.breed || 'Sans race'}`}
+                </Text>
+              )}
             </View>
             <TouchableOpacity 
               style={styles.detailActionBtn} 
@@ -434,4 +471,64 @@ const styles = StyleSheet.create({
   zoneDot: { width: 10, height: 10, borderRadius: 5, marginRight: 16 },
   zoneMiniName: { color: COLORS.white, fontSize: 15, fontWeight: '700' },
   zoneMiniSub: { color: COLORS.textDim, fontSize: 11, marginTop: 2 },
+  legendContainer: {
+    position: 'absolute',
+    top: 130, // Below top bar
+    left: 20,
+    backgroundColor: 'rgba(10, 15, 30, 0.9)',
+    borderRadius: 16,
+    padding: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
+    gap: 10,
+    ...SHADOWS.hard
+  },
+  legendItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10
+  },
+  legendDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.2)'
+  },
+  legendText: {
+    color: COLORS.text,
+    fontSize: 10,
+    fontWeight: '800',
+    letterSpacing: 0.5,
+    textTransform: 'uppercase'
+  },
+  statusBadgeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginTop: 4
+  },
+  statusBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 6,
+    borderWidth: 1,
+    gap: 4
+  },
+  statusDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3
+  },
+  statusText: {
+    fontSize: 10,
+    fontWeight: '800'
+  },
+  statusReason: {
+    color: COLORS.textDim,
+    fontSize: 11,
+    flex: 1
+  }
 });
