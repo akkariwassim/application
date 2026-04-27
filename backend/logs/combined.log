@@ -330,4 +330,10 @@
 2026-04-27 14:35:23 [info]: ✅ MongoDB Connected: 127.0.0.1
 2026-04-27 14:35:23 [info]: 🚀 Server running on http://localhost:3000
 2026-04-27 14:35:23 [info]:    Environment: development
+<<<<<<< HEAD
 >>>>>>> origin/main
+=======
+2026-04-27 14:47:01 [info]: ✅ MongoDB Connected: 127.0.0.1
+2026-04-27 14:47:01 [info]: 🚀 Server running on http://localhost:3000
+2026-04-27 14:47:01 [info]:    Environment: development
+>>>>>>> 8b0cdea4 (resolve merge conflict)
