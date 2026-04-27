@@ -1,3 +1,121 @@
+<<<<<<< HEAD
+2026-04-27 13:35:32 [info]: ✅ MongoDB Connected: 127.0.0.1
+2026-04-27 13:35:32 [info]: 🚀 Server running on http://localhost:3000
+2026-04-27 13:35:32 [info]:    Environment: development
+2026-04-27 13:40:01 [info]: ✅ MongoDB Connected: 127.0.0.1
+2026-04-27 13:40:01 [info]: 🚀 Server running on http://localhost:3000
+2026-04-27 13:40:01 [info]:    Environment: development
+2026-04-27 14:06:23 [error]: ❌ CRITICAL: Error connecting to MongoDB!
+2026-04-27 14:06:29 [error]: ❌ CRITICAL: Error connecting to MongoDB!
+2026-04-27 14:06:38 [error]: ❌ CRITICAL: Error connecting to MongoDB!
+2026-04-27 14:06:44 [error]: ❌ CRITICAL: Error connecting to MongoDB!
+2026-04-27 14:06:52 [error]: ❌ CRITICAL: Error connecting to MongoDB!
+2026-04-27 14:07:03 [error]: ❌ CRITICAL: Error connecting to MongoDB!
+2026-04-27 14:07:15 [error]: ❌ CRITICAL: Error connecting to MongoDB!
+2026-04-27 14:07:25 [error]: ❌ CRITICAL: Error connecting to MongoDB!
+2026-04-27 14:07:36 [error]: ❌ CRITICAL: Error connecting to MongoDB!
+2026-04-27 14:08:09 [info]: ✅ MongoDB Connected: ac-lokdmj8-shard-00-02.7zypd8b.mongodb.net
+2026-04-27 14:08:09 [info]: 🚀 Server running on http://localhost:3000
+2026-04-27 14:08:09 [info]:    Environment: development
+2026-04-27 14:08:20 [info]: ✅ MongoDB Connected: ac-lokdmj8-shard-00-02.7zypd8b.mongodb.net
+2026-04-27 14:08:20 [info]: 🚀 Server running on http://localhost:3000
+2026-04-27 14:08:20 [info]:    Environment: development
+2026-04-27 14:08:31 [info]: ✅ MongoDB Connected: ac-lokdmj8-shard-00-00.7zypd8b.mongodb.net
+2026-04-27 14:08:31 [info]: 🚀 Server running on http://localhost:3000
+2026-04-27 14:08:31 [info]:    Environment: development
+2026-04-27 14:08:42 [info]: ✅ MongoDB Connected: ac-lokdmj8-shard-00-01.7zypd8b.mongodb.net
+2026-04-27 14:08:42 [info]: 🚀 Server running on http://localhost:3000
+2026-04-27 14:08:42 [info]:    Environment: development
+2026-04-27 14:08:53 [info]: ✅ MongoDB Connected: ac-lokdmj8-shard-00-02.7zypd8b.mongodb.net
+2026-04-27 14:08:53 [info]: 🚀 Server running on http://localhost:3000
+2026-04-27 14:08:53 [info]:    Environment: development
+2026-04-27 14:09:02 [info]: ✅ MongoDB Connected: ac-lokdmj8-shard-00-00.7zypd8b.mongodb.net
+2026-04-27 14:09:02 [info]: 🚀 Server running on http://localhost:3000
+2026-04-27 14:09:02 [info]:    Environment: development
+2026-04-27 14:09:17 [info]: ✅ MongoDB Connected: ac-lokdmj8-shard-00-02.7zypd8b.mongodb.net
+2026-04-27 14:09:17 [info]: 🚀 Server running on http://localhost:3000
+2026-04-27 14:09:17 [info]:    Environment: development
+2026-04-27 14:09:27 [info]: ✅ MongoDB Connected: ac-lokdmj8-shard-00-02.7zypd8b.mongodb.net
+2026-04-27 14:09:27 [info]: 🚀 Server running on http://localhost:3000
+2026-04-27 14:09:27 [info]:    Environment: development
+2026-04-27 14:09:44 [info]: ✅ MongoDB Connected: ac-lokdmj8-shard-00-02.7zypd8b.mongodb.net
+2026-04-27 14:09:44 [info]: 🚀 Server running on http://localhost:3000
+2026-04-27 14:09:44 [info]:    Environment: development
+2026-04-27 14:09:56 [info]: ✅ MongoDB Connected: ac-lokdmj8-shard-00-02.7zypd8b.mongodb.net
+2026-04-27 14:09:56 [info]: 🚀 Server running on http://localhost:3000
+2026-04-27 14:09:56 [info]:    Environment: development
+2026-04-27 14:10:04 [info]: ✅ MongoDB Connected: ac-lokdmj8-shard-00-00.7zypd8b.mongodb.net
+2026-04-27 14:10:04 [info]: 🚀 Server running on http://localhost:3000
+2026-04-27 14:10:04 [info]:    Environment: development
+2026-04-27 14:11:14 [info]: ✅ MongoDB Connected: ac-lokdmj8-shard-00-01.7zypd8b.mongodb.net
+2026-04-27 14:11:14 [info]: 🚀 Server running on http://localhost:3000
+2026-04-27 14:11:14 [info]:    Environment: development
+2026-04-27 14:13:46 [info]: [Data Audit] POST /api/auth/login
+2026-04-27 14:13:46 [warn]: Login failed: User not found - bacharbenhassin@gmail.com
+2026-04-27 14:15:04 [info]: [Data Audit] POST /api/auth/login
+2026-04-27 14:15:04 [warn]: Login failed: User not found - akkariwassim11@gmail.com
+2026-04-27 14:15:49 [info]: [Data Audit] POST /api/auth/register
+2026-04-27 14:15:49 [info]: ✅ [DB Save] New user & farm created: akkariwassim11@gmail.com
+2026-04-27 14:15:49 [info]: [Data Audit] GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-04-27 14:15:49 [info]: [Data Audit] GET /api/geofences
+2026-04-27 14:15:50 [info]: Socket connected: WcjAjBNv20sUNFx7AAAB (user 69ef6185425e89f7bf220be6)
+2026-04-27 14:16:17 [info]: Socket disconnected: WcjAjBNv20sUNFx7AAAB — client namespace disconnect
+2026-04-27 14:16:17 [info]: [Data Audit] GET /api/auth/me
+2026-04-27 14:16:17 [info]: [Data Audit] POST /api/auth/refresh
+2026-04-27 14:16:18 [info]: [Data Audit] GET /api/auth/me
+2026-04-27 14:16:18 [info]: [Data Audit] GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-04-27 14:16:18 [info]: [Data Audit] GET /api/geofences
+2026-04-27 14:16:18 [info]: Socket connected: C7zRPC3lm29gUEPiAAAD (user 69ef6185425e89f7bf220be6)
+2026-04-27 14:16:34 [info]: Socket disconnected: C7zRPC3lm29gUEPiAAAD — client namespace disconnect
+2026-04-27 14:16:34 [info]: [Data Audit] GET /api/auth/me
+2026-04-27 14:16:34 [info]: [Data Audit] GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-04-27 14:16:34 [info]: [Data Audit] GET /api/geofences
+2026-04-27 14:16:34 [info]: Socket connected: 0UU02QJQayxT_GSBAAAF (user 69ef6185425e89f7bf220be6)
+2026-04-27 14:16:43 [info]: ✅ MongoDB Connected: ac-lokdmj8-shard-00-00.7zypd8b.mongodb.net
+2026-04-27 14:16:43 [info]: 🚀 Server running on http://localhost:3000
+2026-04-27 14:16:43 [info]:    Environment: development
+2026-04-27 14:16:55 [info]: ✅ MongoDB Connected: ac-lokdmj8-shard-00-00.7zypd8b.mongodb.net
+2026-04-27 14:16:55 [info]: 🚀 Server running on http://localhost:3000
+2026-04-27 14:16:55 [info]:    Environment: development
+2026-04-27 14:17:06 [info]: [Data Audit] GET /api/auth/me
+2026-04-27 14:17:06 [info]: [Data Audit] GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-04-27 14:17:06 [info]: [Data Audit] GET /api/geofences
+2026-04-27 14:17:07 [info]: Socket connected: wFNQiZgHnh6Mqr_9AAAB (user 69ef6185425e89f7bf220be6)
+2026-04-27 14:17:32 [info]: ✅ MongoDB Connected: ac-lokdmj8-shard-00-01.7zypd8b.mongodb.net
+2026-04-27 14:17:32 [info]: 🚀 Server running on http://localhost:3000
+2026-04-27 14:17:32 [info]:    Environment: development
+2026-04-27 14:17:33 [info]: Socket connected: LWib0XsvcTGM_AmGAAAB (user 69ef6185425e89f7bf220be6)
+2026-04-27 14:17:42 [info]: ✅ MongoDB Connected: ac-lokdmj8-shard-00-01.7zypd8b.mongodb.net
+2026-04-27 14:17:42 [info]: 🚀 Server running on http://localhost:3000
+2026-04-27 14:17:42 [info]:    Environment: development
+2026-04-27 14:17:44 [info]: Socket connected: BRTTk6OXIwfWI2tQAAAB (user 69ef6185425e89f7bf220be6)
+2026-04-27 14:17:49 [info]: ✅ MongoDB Connected: ac-lokdmj8-shard-00-00.7zypd8b.mongodb.net
+2026-04-27 14:17:49 [info]: 🚀 Server running on http://localhost:3000
+2026-04-27 14:17:49 [info]:    Environment: development
+2026-04-27 14:17:50 [info]: Socket connected: C41m-gwWHr-9D3FWAAAB (user 69ef6185425e89f7bf220be6)
+2026-04-27 14:18:20 [info]: Socket disconnected: C41m-gwWHr-9D3FWAAAB — transport close
+2026-04-27 14:28:20 [info]: Socket connected: AV8HPCJCHwS2OEplAAAD (user 69ef6185425e89f7bf220be6)
+2026-04-27 14:28:21 [info]: Socket disconnected: AV8HPCJCHwS2OEplAAAD — client namespace disconnect
+2026-04-27 14:28:25 [info]: [Data Audit] GET /api/auth/me
+2026-04-27 14:28:26 [info]: [Data Audit] GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-04-27 14:28:26 [info]: [Data Audit] GET /api/geofences
+2026-04-27 14:28:26 [info]: Socket connected: LufR_VvnrdkYe0zHAAAF (user 69ef6185425e89f7bf220be6)
+2026-04-27 14:28:32 [info]: [Data Audit] POST /api/auth/logout
+2026-04-27 14:28:32 [info]: User logged out
+2026-04-27 14:28:32 [info]: Socket disconnected: LufR_VvnrdkYe0zHAAAF — client namespace disconnect
+2026-04-27 14:28:48 [info]: [Data Audit] POST /api/auth/login
+2026-04-27 14:28:49 [info]: ✅ User logged in successfully: akkariwassim11@gmail.com
+2026-04-27 14:28:49 [info]: [Data Audit] GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-04-27 14:28:49 [info]: [Data Audit] GET /api/geofences
+2026-04-27 14:28:49 [info]: Socket connected: yhLIzNN4SjJ3tqP4AAAH (user 69ef6185425e89f7bf220be6)
+2026-04-27 14:29:04 [info]: [Data Audit] GET /api/geofences
+2026-04-27 14:41:35 [info]: ✅ MongoDB Connected: ac-lokdmj8-shard-00-01.7zypd8b.mongodb.net
+2026-04-27 14:41:35 [info]: 🚀 Server running on http://localhost:3000
+2026-04-27 14:41:35 [info]:    Environment: development
+2026-04-27 14:50:22 [info]: ✅ MongoDB Connected: ac-lokdmj8-shard-00-02.7zypd8b.mongodb.net
+2026-04-27 14:50:22 [info]: 🚀 Server running on http://localhost:3000
+2026-04-27 14:50:22 [info]:    Environment: development
+=======
 2026-04-26 22:09:44 [info]: ✅ MongoDB Connected: 127.0.0.1
 2026-04-26 22:22:00 [info]: ✅ MongoDB Connected: 127.0.0.1
 2026-04-26 22:22:00 [info]: 🚀 Server running on http://localhost:3000
@@ -212,3 +330,4 @@
 2026-04-27 14:35:23 [info]: ✅ MongoDB Connected: 127.0.0.1
 2026-04-27 14:35:23 [info]: 🚀 Server running on http://localhost:3000
 2026-04-27 14:35:23 [info]:    Environment: development
+>>>>>>> origin/main

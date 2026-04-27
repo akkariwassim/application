@@ -46,13 +46,22 @@ api.interceptors.request.use(
       config.headers.Authorization = `Bearer ${token}`;
     }
 
+<<<<<<< HEAD
+    // 2. Attach Farm Context (Multi-tenancy)
+    const farmId = await SecureStore.getItemAsync('activeFarmId');
+=======
     // 1b. Attach Farm ID context
     const farmId = await SecureStore.getItemAsync('currentFarmId');
+>>>>>>> origin/main
     if (farmId) {
       config.headers['x-farm-id'] = farmId;
     }
 
+<<<<<<< HEAD
+    // 3. Ensure /api prefix
+=======
     // 2. Ensure /api prefix
+>>>>>>> origin/main
     if (config.url && !config.url.startsWith('/api')) {
       const separator = config.url.startsWith('/') ? '' : '/';
       config.url = `/api${separator}${config.url}`;

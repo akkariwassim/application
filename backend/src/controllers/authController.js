@@ -52,11 +52,18 @@ async function register(req, res, next) {
     });
 
     // ── NEW: Auto-create Farm and Membership ──
+<<<<<<< HEAD
+    const farm = await Farm.create({
+      name: `${user.name}'s Farm`,
+      owner_id: user._id,
+      description: 'Ferme par défaut créée à l\'inscription',
+=======
     // This ensures new users aren't blocked by RBAC (403 Forbidden)
     const farm = await Farm.create({
       name: `${user.name}'s Farm`,
       owner_id: user._id,
       description: 'Default farm created on registration',
+>>>>>>> origin/main
       subscription_status: 'trial'
     });
 
@@ -76,14 +83,25 @@ async function register(req, res, next) {
     });
     await user.save();
 
+<<<<<<< HEAD
+    logger.info(`✅ [DB Save] New user & farm created: ${email}`, { farmId: farm._id });
+
+=======
     logger.info(`✅ New user registered with farm: ${farm.name} (${email})`);
     
+>>>>>>> origin/main
     res.status(201).json({ 
-      success: true,
+      success: true, 
       data: {
-        user, 
-        accessToken, 
-        refreshToken 
+        user: {
+          id: user._id,
+          name: user.name,
+          email: user.email,
+          role: user.role
+        },
+        farmId: farm._id,
+        accessToken,
+        refreshToken
       }
     });
   } catch (err) {
@@ -154,10 +172,34 @@ async function login(req, res, next) {
 
     logger.info(`✅ User logged in successfully: ${email}`);
     
+    // Fetch memberships to provide a default farm context
+    const Membership = require('../models/Membership');
+    const Farm = require('../models/Farm');
+    let primaryMembership = await Membership.findOne({ user_id: user._id }).sort({ created_at: 1 });
+
+    if (!primaryMembership) {
+      logger.info(`🏗️ [Legacy Migration] Creating default farm for user ${user.email}`);
+      const farm = await Farm.create({
+        name: `${user.name}'s Farm`,
+        owner_id: user._id
+      });
+      primaryMembership = await Membership.create({
+        user_id: user._id,
+        farm_id: farm._id,
+        role: 'owner'
+      });
+    }
+
     res.json({ 
       success: true,
       data: {
-        user, 
+        user: {
+          id: user._id,
+          name: user.name,
+          email: user.email,
+          role: user.role
+        }, 
+        farmId: primaryMembership ? primaryMembership.farm_id : null,
         accessToken, 
         refreshToken 
       }
@@ -179,7 +221,35 @@ async function getMe(req, res, next) {
       error: 'USER_NOT_FOUND',
       message: 'Utilisateur non trouvé.' 
     });
-    res.json({ success: true, data: user });
+
+    const Membership = require('../models/Membership');
+    const Farm = require('../models/Farm');
+    let memberships = await Membership.find({ user_id: user._id });
+
+    if (memberships.length === 0) {
+      logger.info(`🏗️ [Legacy Migration] Creating default farm for user ${user.email} (via getMe)`);
+      const farm = await Farm.create({
+        name: `${user.name}'s Farm`,
+        owner_id: user._id
+      });
+      const membership = await Membership.create({
+        user_id: user._id,
+        farm_id: farm._id,
+        role: 'owner'
+      });
+      memberships = [membership];
+    }
+
+    res.json({ 
+      success: true, 
+      data: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        memberships
+      }
+    });
   } catch (err) {
     next(err);
   }

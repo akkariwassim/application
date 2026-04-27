@@ -13,6 +13,12 @@ const aiPredictionSchema = new mongoose.Schema({
     ref: 'User',
     required: true,
   },
+  farm_id: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Farm',
+    required: true,
+    index: true,
+  },
   status: {
     type: String,
     enum: ['NORMAL', 'ATTENTION', 'CRITICAL'],
@@ -44,6 +50,7 @@ const aiPredictionSchema = new mongoose.Schema({
   toObject: { virtuals: true }
 });
 
+aiPredictionSchema.index({ farm_id: 1, timestamp: -1 });
 aiPredictionSchema.index({ animal_id: 1, timestamp: -1 });
 
 const AIPrediction = mongoose.model('AIPrediction', aiPredictionSchema);

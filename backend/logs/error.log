@@ -1,3 +1,14 @@
+<<<<<<< HEAD
+2026-04-27 14:06:23 [error]: ❌ CRITICAL: Error connecting to MongoDB!
+2026-04-27 14:06:29 [error]: ❌ CRITICAL: Error connecting to MongoDB!
+2026-04-27 14:06:38 [error]: ❌ CRITICAL: Error connecting to MongoDB!
+2026-04-27 14:06:44 [error]: ❌ CRITICAL: Error connecting to MongoDB!
+2026-04-27 14:06:52 [error]: ❌ CRITICAL: Error connecting to MongoDB!
+2026-04-27 14:07:03 [error]: ❌ CRITICAL: Error connecting to MongoDB!
+2026-04-27 14:07:15 [error]: ❌ CRITICAL: Error connecting to MongoDB!
+2026-04-27 14:07:25 [error]: ❌ CRITICAL: Error connecting to MongoDB!
+2026-04-27 14:07:36 [error]: ❌ CRITICAL: Error connecting to MongoDB!
+=======
 2026-04-27 13:10:31 [error]: ReferenceError: mongoose is not defined
     at getAnimals (C:\Users\Wassim\Desktop\mon-application\backend\src\controllers\animalsController.js:128:34)
     at Layer.handle [as handle_request] (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\layer.js:95:5)
@@ -87,3 +98,4 @@
     at C:\Users\Wassim\Desktop\mon-application\backend\src\middleware\rbac.js:64:7
     at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
 2026-04-27 13:23:13 [error]: ❌ Registration failed for hamdighofran13@gmail.com: User validation failed: role: `farmer` is not a valid enum value for path `role`.
+>>>>>>> origin/main

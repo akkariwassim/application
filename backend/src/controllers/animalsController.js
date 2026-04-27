@@ -126,7 +126,11 @@ async function getAnimals(req, res, next) {
       Animal.countDocuments(query),
       // Aggregate stats for the farm
       Animal.aggregate([
+<<<<<<< HEAD
+        { $match: { farm_id: req.farm_id } },
+=======
         { $match: { farm_id: new mongoose.Types.ObjectId(req.farm_id) } },
+>>>>>>> origin/main
         { $group: { 
           _id: "$status", 
           count: { $sum: 1 } 
@@ -191,6 +195,7 @@ async function createAnimal(req, res, next) {
       const existing = await Animal.findOne({ device_id: deviceId.trim() });
       if (existing) {
         return res.status(409).json({ 
+          success: false,
           error: 'DUPLICATE_DEVICE', 
           field: 'device_id',
           message: `Le collier ${deviceId} est déjà assigné à ${existing.name}.` 
@@ -202,6 +207,7 @@ async function createAnimal(req, res, next) {
       const existing = await Animal.findOne({ rfid_tag: rfidTag.trim() });
       if (existing) {
         return res.status(409).json({ 
+          success: false,
           error: 'DUPLICATE_DEVICE', 
           field: 'rfid_tag',
           message: `Le tag RFID ${rfidTag} est déjà utilisé.` 
@@ -290,7 +296,7 @@ async function updateAnimal(req, res, next) {
       delete updates.currentZoneId; 
     }
 
-    const existing = await Animal.findOne({ _id: id, user_id: req.user.id });
+    const existing = await Animal.findOne({ _id: id, farm_id: req.farm_id });
     if (!existing) return res.status(404).json({ 
       success: false, 
       error: 'ANIMAL_NOT_FOUND',
