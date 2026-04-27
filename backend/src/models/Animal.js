@@ -8,6 +8,12 @@ const animalSchema = new mongoose.Schema({
     ref: 'User',
     required: true,
   },
+  farm_id: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Farm',
+    required: false, // Will be required after migration
+    index: true,
+  },
   name: {
     type: String,
     required: [true, 'Animal name is required'],

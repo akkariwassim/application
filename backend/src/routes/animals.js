@@ -5,9 +5,11 @@ const { body, param, query } = require('express-validator');
 const ctrl     = require('../controllers/animalsController');
 const validate = require('../middleware/validate');
 const { authenticate } = require('../middleware/auth');
+const { checkRole } = require('../middleware/rbac');
 
-// All animals routes require authentication
+// All animals routes require authentication and farm context
 router.use(authenticate);
+router.use(checkRole([])); // Ensures farm membership and attaches req.farm_id
 
 const idParam = param('id').isMongoId().withMessage('Invalid ID format');
 

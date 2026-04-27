@@ -1,5 +1,6 @@
 'use strict';
 
+const mongoose = require('mongoose');
 const statsService = require('../services/statsService');
 const HealthLog = require('../models/HealthLog');
 const MovementHistory = require('../models/MovementHistory');
@@ -41,13 +42,12 @@ async function getAnimalStats(req, res, next) {
  */
 async function getFarmStats(req, res, next) {
   try {
-    const mongoose = require('mongoose');
-    const userId = new mongoose.Types.ObjectId(req.user.id);
+    const farmId = new mongoose.Types.ObjectId(req.farm_id);
     
     // Aggregate health status counts
     const HealthLog = require('../models/HealthLog');
     const recentLogs = await HealthLog.aggregate([
-      { $match: { user_id: userId, timestamp: { $gte: new Date(Date.now() - 24*60*60*1000) } } },
+      { $match: { farm_id: farmId, timestamp: { $gte: new Date(Date.now() - 24*60*60*1000) } } },
       { $group: { _id: '$status', count: { $sum: 1 } } }
     ]);
 

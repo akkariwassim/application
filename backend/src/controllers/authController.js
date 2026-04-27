@@ -1,8 +1,10 @@
 'use strict';
 
-const User    = require('../models/User');
-const jwt     = require('jsonwebtoken');
-const logger  = require('../utils/logger');
+const User       = require('../models/User');
+const Farm       = require('../models/Farm');
+const Membership = require('../models/Membership');
+const jwt        = require('jsonwebtoken');
+const logger     = require('../utils/logger');
 
 // Helper to generate tokens
 const generateTokens = (userId) => {
@@ -45,8 +47,24 @@ async function register(req, res, next) {
       email,
       password,
       phone: phone || '',
-      role: role || 'farmer',
+      role: role || 'owner',
       is_active: true
+    });
+
+    // ── NEW: Auto-create Farm and Membership ──
+    // This ensures new users aren't blocked by RBAC (403 Forbidden)
+    const farm = await Farm.create({
+      name: `${user.name}'s Farm`,
+      owner_id: user._id,
+      description: 'Default farm created on registration',
+      subscription_status: 'trial'
+    });
+
+    await Membership.create({
+      user_id: user._id,
+      farm_id: farm._id,
+      role: 'owner',
+      status: 'active'
     });
     
     const { accessToken, refreshToken } = generateTokens(user._id);
@@ -58,7 +76,7 @@ async function register(req, res, next) {
     });
     await user.save();
 
-    logger.info(`✅ New user registered and logged in: ${email}`);
+    logger.info(`✅ New user registered with farm: ${farm.name} (${email})`);
     
     res.status(201).json({ 
       success: true,
