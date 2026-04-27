@@ -52,10 +52,18 @@ async function register(req, res, next) {
     });
 
     // ── NEW: Auto-create Farm and Membership ──
+<<<<<<< HEAD
     const farm = await Farm.create({
       name: `${user.name}'s Farm`,
       owner_id: user._id,
       description: 'Ferme par défaut créée à l\'inscription',
+=======
+    // This ensures new users aren't blocked by RBAC (403 Forbidden)
+    const farm = await Farm.create({
+      name: `${user.name}'s Farm`,
+      owner_id: user._id,
+      description: 'Default farm created on registration',
+>>>>>>> origin/main
       subscription_status: 'trial'
     });
 
@@ -75,8 +83,13 @@ async function register(req, res, next) {
     });
     await user.save();
 
+<<<<<<< HEAD
     logger.info(`✅ [DB Save] New user & farm created: ${email}`, { farmId: farm._id });
 
+=======
+    logger.info(`✅ New user registered with farm: ${farm.name} (${email})`);
+    
+>>>>>>> origin/main
     res.status(201).json({ 
       success: true, 
       data: {

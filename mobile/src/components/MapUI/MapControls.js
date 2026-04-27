@@ -21,26 +21,28 @@ const MapControls = ({
   socketConnected = true,
   showHistory,
   onToggleHistory,
-  onOpenFilters
+  onOpenFilters,
+  isLocked,
+  onToggleLock
 }) => {
   return (
     <View style={styles.container}>
       {/* ── Top Bar Controls (Glassmorphism inspired) ── */}
       <View style={styles.topBar}>
         <TouchableOpacity 
-          style={[styles.btn, (followUser || (selectedAnimal && !selectedAnimal.manualMove)) && styles.btnActive]} 
+          style={[styles.btn, (followUser || isLocked || (selectedAnimal && !selectedAnimal.manualMove)) && styles.btnActive]} 
           onPress={onToggleFollow}
           activeOpacity={0.7}
         >
-          <View style={[styles.btnIconBg, (followUser || selectedAnimal) && styles.btnIconBgActive]}>
+          <View style={[styles.btnIconBg, (followUser || isLocked || selectedAnimal) && styles.btnIconBgActive]}>
             <Ionicons 
-              name={selectedAnimal ? "paw" : (followUser ? "navigate" : "navigate-outline")} 
+              name={selectedAnimal ? "paw" : (isLocked ? "lock-closed" : (followUser ? "navigate" : "navigate-outline"))} 
               size={18} 
-              color={(followUser || selectedAnimal) ? COLORS.white : COLORS.primary} 
+              color={(followUser || isLocked || selectedAnimal) ? COLORS.white : COLORS.primary} 
             />
           </View>
-          <Text style={[styles.btnText, (followUser || selectedAnimal) && styles.btnTextActive]}>
-            {selectedAnimal ? `${selectedAnimal.name}` : (followUser ? 'Suivi ON' : 'Libre')}
+          <Text style={[styles.btnText, (followUser || isLocked || selectedAnimal) && styles.btnTextActive]}>
+            {selectedAnimal ? `${selectedAnimal.name}` : (isLocked ? 'Verrouillé' : (followUser ? 'Suivi ON' : 'Libre'))}
           </Text>
         </TouchableOpacity>
 
@@ -219,4 +221,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default MapControls;
+export default React.memo(MapControls);

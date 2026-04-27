@@ -5,8 +5,10 @@ const { param, query } = require('express-validator');
 const ctrl     = require('../controllers/alertsController');
 const validate = require('../middleware/validate');
 const { authenticate } = require('../middleware/auth');
+const { checkRole } = require('../middleware/rbac');
 
 router.use(authenticate);
+router.use(checkRole([]));
 
 // GET /api/alerts
 router.get('/', [

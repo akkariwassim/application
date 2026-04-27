@@ -36,11 +36,24 @@ function initSocket(httpServer) {
   });
 
   // ── Connection handler ─────────────────────────────────────
-  io.on('connection', (socket) => {
+  const Membership = require('../models/Membership');
+
+  io.on('connection', async (socket) => {
     logger.info(`Socket connected: ${socket.id} (user ${socket.userId})`);
 
-    // Join user-specific room to receive their alerts
+    // Join user-specific room
     socket.join(`user:${socket.userId}`);
+
+    // Join rooms for all farms the user belongs to
+    try {
+      const userFarms = await Membership.find({ user_id: socket.userId, status: 'active' });
+      userFarms.forEach(m => {
+        socket.join(`farm:${m.farm_id}`);
+        logger.debug(`Socket ${socket.id} joined farm:${m.farm_id}`);
+      });
+    } catch (err) {
+      logger.error(`Error joining farm rooms for user ${socket.userId}:`, err.message);
+    }
 
     // Subscribe to a specific animal's updates
     socket.on('subscribe-animal', ({ animalId }) => {
@@ -75,31 +88,30 @@ function getIO() {
 }
 
 // ── Batch Update Store ──────────────────────────────────────
-const positionBatch = new Map(); // userId -> Map(animalId -> data)
+const positionBatch = new Map(); // farmId -> Map(animalId -> data)
 let batchInterval;
 
 /**
  * Emit a position update to subscribers of an animal.
- * Now Batched: Collects updates and sends them every 500ms
  */
-function emitPositionUpdate(userId, animalId, data) {
+function emitPositionUpdate(farmId, animalId, data) {
   if (!io) return;
 
-  // 1. Direct subscription update (legacy / high priority)
+  // 1. Direct subscription update
   io.to(`animal:${animalId}`).emit('position-update', { animalId, ...data });
 
-  // 2. Add to batch for dashboard/global views
-  if (!positionBatch.has(userId)) {
-    positionBatch.set(userId, new Map());
+  // 2. Add to batch for farm dashboard
+  if (!positionBatch.has(farmId)) {
+    positionBatch.set(farmId, new Map());
   }
-  positionBatch.get(userId).set(animalId, { animalId, ...data });
+  positionBatch.get(farmId).set(animalId, { animalId, ...data });
 
-  // 3. Start batch loop if not running
+  // 3. Start batch loop
   if (!batchInterval) {
     batchInterval = setInterval(() => {
-      positionBatch.forEach((updates, uId) => {
+      positionBatch.forEach((updates, fId) => {
         if (updates.size > 0) {
-          io.to(`user:${uId}`).emit('batch-position-update', Array.from(updates.values()));
+          io.to(`farm:${fId}`).emit('batch-position-update', Array.from(updates.values()));
           updates.clear();
         }
       });
@@ -108,20 +120,20 @@ function emitPositionUpdate(userId, animalId, data) {
 }
 
 /**
- * Emit an alert to the animal's owner (by userId).
+ * Emit an alert to the farm.
  */
-function emitAlert(userId, animalId, alertData) {
+function emitAlert(farmId, animalId, alertData) {
   if (!io) return;
-  io.to(`user:${userId}`).emit('alert-triggered', { animalId, ...alertData });
+  io.to(`farm:${farmId}`).emit('alert-triggered', { animalId, ...alertData });
   io.to(`animal:${animalId}`).emit('alert-triggered', { animalId, ...alertData });
 }
 
 /**
  * Emit an animal status change.
  */
-function emitStatusChange(userId, animalId, status) {
+function emitStatusChange(farmId, animalId, status) {
   if (!io) return;
-  io.to(`user:${userId}`).emit('animal-status-change', { animalId, status });
+  io.to(`farm:${farmId}`).emit('animal-status-change', { animalId, status });
 }
 
 module.exports = {

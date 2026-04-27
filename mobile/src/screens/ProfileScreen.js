@@ -30,11 +30,12 @@ function MenuItem({ icon, label, value, onPress, danger, toggle, toggleValue, on
   );
 }
 
-export default function ProfileScreen() {
+export default function ProfileScreen({ navigation }) {
   const insets = useSafeAreaInsets();
   const { user, logout, updateUserProfile, error, clearError } = useAuthStore();
   const { animals } = useAnimalStore();
   const { geofences } = useGeofenceStore();
+  const { currentFarm } = useAuthStore();
   
   const [notifications, setNotifications] = useState(true);
   
@@ -161,7 +162,7 @@ export default function ProfileScreen() {
           <Text style={styles.userName}>{user?.name || 'Administrateur'}</Text>
           <View style={styles.farmPill}>
             <Ionicons name="business" size={12} color={COLORS.primary} />
-            <Text style={styles.farmPillText}>{user?.farm_name || 'Ma Ferme IOT'}</Text>
+            <Text style={styles.farmPillText}>{currentFarm?.farm_id?.name || currentFarm?.farm_name || 'Ma Ferme IOT'}</Text>
           </View>
         </View>
 
@@ -231,6 +232,21 @@ export default function ProfileScreen() {
             }} 
           />
           <MenuItem icon="lock-closed-outline" label="Sécurité & Mot de passe" onPress={() => { setActiveTab('security'); setEditModalVisible(true); }} />
+        </View>
+
+        <Text style={styles.sectionHeader}>Gestion d'Équipe & Cloud</Text>
+        <View style={styles.section}>
+          <MenuItem 
+            icon="people-outline" 
+            label="Gestion de l'Équipe" 
+            value={currentFarm?.role?.toUpperCase()}
+            onPress={() => navigation.navigate('TeamManagement')} 
+          />
+          <MenuItem 
+            icon="cloud-done-outline" 
+            label="Sauvegardes & Sync" 
+            onPress={() => navigation.navigate('BackupSync')} 
+          />
         </View>
 
         <Text style={styles.sectionHeader}>Préférences App</Text>

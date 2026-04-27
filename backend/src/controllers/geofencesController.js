@@ -116,7 +116,7 @@ async function updateGeofence(req, res, next) {
     
     // Check for unique name (exclude self)
     if (name) {
-      const existing = await Zone.findOne({ user_id: req.user.id, name, _id: { $ne: id } });
+      const existing = await Zone.findOne({ farm_id: req.farm_id, name, _id: { $ne: id } });
       if (existing) {
         return res.status(400).json({ 
           success: false,
@@ -183,7 +183,7 @@ async function updateGeofence(req, res, next) {
     }
 
     const zone = await Zone.findOneAndUpdate(
-      { _id: id, user_id: req.user.id },
+      { _id: id, farm_id: req.farm_id },
       { $set: updateData },
       { new: true, runValidators: true }
     );
@@ -206,7 +206,7 @@ async function updateGeofence(req, res, next) {
 async function deleteGeofence(req, res, next) {
   try {
     const { id } = req.params;
-    const result = await Zone.deleteOne({ _id: id, user_id: req.user.id });
+    const result = await Zone.deleteOne({ _id: id, farm_id: req.farm_id });
     if (result.deletedCount === 0) return res.status(404).json({ 
       success: false,
       error: 'ZONE_NOT_FOUND',

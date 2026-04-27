@@ -33,6 +33,8 @@ import AlertDetailScreen from './src/screens/AlertDetailScreen';
 import AnimalSettingsScreen from './src/screens/AnimalSettingsScreen';
 import SimulationScreen from './src/screens/SimulationScreen';
 import StatisticsScreen from './src/screens/StatisticsScreen';
+import TeamManagementScreen from './src/screens/TeamManagementScreen';
+import BackupSyncScreen from './src/screens/BackupSyncScreen';
 
 import useSimulationStore from './src/store/simulationStore';
 
@@ -148,6 +150,22 @@ function ZonesStack() {
   );
 }
 
+// ── Profile Stack ────────────────────────────────────────────
+function ProfileStack() {
+  return (
+    <Stack.Navigator
+      screenOptions={{
+        headerStyle: { backgroundColor: COLORS.surface },
+        headerTintColor: COLORS.text,
+      }}
+    >
+      <Stack.Screen name="ProfileMain" component={ProfileScreen} options={{ title: 'Profile', headerShown: false }} />
+      <Stack.Screen name="TeamManagement" component={TeamManagementScreen} options={{ title: 'Team Management', headerShown: false }} />
+      <Stack.Screen name="BackupSync" component={BackupSyncScreen} options={{ title: 'Cloud Backup', headerShown: false }} />
+    </Stack.Navigator>
+  );
+}
+
 // ── Main Tab Navigator ────────────────────────────────────────
 function MainNavigator() {
   const unreadCount        = useAlertStore((s) => s.unreadCount);
@@ -156,6 +174,7 @@ function MainNavigator() {
   const isSimulationMode   = useSimulationStore((s) => s.isSimulationMode);
   const setSocketConnected = useAnimalStore((s) => s.setSocketConnected);
   const updateAnimalPos    = useAnimalStore((s) => s.updateAnimalPosition);
+  const batchUpdatePos    = useAnimalStore((s) => s.batchUpdatePositions);
   const addAlert           = useAlertStore((s) => s.addAlert);
 
   useEffect(() => {
@@ -169,6 +188,7 @@ function MainNavigator() {
       onConnect: () => setSocketConnected(true),
       onDisconnect: () => setSocketConnected(false),
       onPositionUpdate: (data) => updateAnimalPos(data.animalId, data),
+      onBatchUpdate: (batch) => batchUpdatePos(batch),
       onAlertTriggered: (data) => addAlert(data),
       onStatusChange:   (data) => updateAnimalStatus(data.animalId, data.status),
       onZoneStatusChange: (data) => updateZoneStatus(data),
@@ -215,7 +235,7 @@ function MainNavigator() {
       }} />
       <Tab.Screen name="Animals" component={AnimalsStack} options={{ title: 'Animals', headerShown: false }} />
       <Tab.Screen name="Simulation" component={SimulationScreen} options={{ title: '🔬 Simulation', headerShown: false }} />
-      <Tab.Screen name="Profile" component={ProfileScreen} options={{ title: 'Profile' }} />
+      <Tab.Screen name="Profile" component={ProfileStack} options={{ title: 'Profile' }} />
     </Tab.Navigator>
   );
 }

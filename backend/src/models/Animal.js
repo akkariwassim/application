@@ -11,7 +11,11 @@ const animalSchema = new mongoose.Schema({
   farm_id: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Farm',
+<<<<<<< HEAD
     required: true,
+=======
+    required: false, // Will be required after migration
+>>>>>>> origin/main
     index: true,
   },
   name: {

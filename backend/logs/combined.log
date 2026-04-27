@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 2026-04-27 13:35:32 [info]: ✅ MongoDB Connected: 127.0.0.1
 2026-04-27 13:35:32 [info]: 🚀 Server running on http://localhost:3000
 2026-04-27 13:35:32 [info]:    Environment: development
@@ -114,3 +115,219 @@
 2026-04-27 14:50:22 [info]: ✅ MongoDB Connected: ac-lokdmj8-shard-00-02.7zypd8b.mongodb.net
 2026-04-27 14:50:22 [info]: 🚀 Server running on http://localhost:3000
 2026-04-27 14:50:22 [info]:    Environment: development
+=======
+2026-04-26 22:09:44 [info]: ✅ MongoDB Connected: 127.0.0.1
+2026-04-26 22:22:00 [info]: ✅ MongoDB Connected: 127.0.0.1
+2026-04-26 22:22:00 [info]: 🚀 Server running on http://localhost:3000
+2026-04-26 22:22:00 [info]:    Environment: development
+2026-04-27 13:08:51 [info]: ✅ MongoDB Connected: 127.0.0.1
+2026-04-27 13:08:51 [info]: 🚀 Server running on http://localhost:3000
+2026-04-27 13:08:51 [info]:    Environment: development
+2026-04-27 13:10:31 [info]: Incoming Request: GET /api/auth/me
+2026-04-27 13:10:31 [info]: Incoming Request: POST /api/auth/refresh
+2026-04-27 13:10:31 [info]: Incoming Request: GET /api/auth/me
+2026-04-27 13:10:31 [info]: Incoming Request: GET /api/memberships/my
+2026-04-27 13:10:31 [info]: Incoming Request: GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-04-27 13:10:31 [error]: ReferenceError: mongoose is not defined
+    at getAnimals (C:\Users\Wassim\Desktop\mon-application\backend\src\controllers\animalsController.js:128:34)
+    at Layer.handle [as handle_request] (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\layer.js:95:5)
+    at next (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\route.js:149:13)
+    at Route.dispatch (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\route.js:119:3)
+    at Layer.handle [as handle_request] (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\layer.js:95:5)
+    at C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\index.js:284:15
+    at router.process_params (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\index.js:280:10)
+    at C:\Users\Wassim\Desktop\mon-application\backend\src\middleware\rbac.js:64:7
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+2026-04-27 13:10:31 [info]: Incoming Request: GET /api/geofences
+2026-04-27 13:10:32 [info]: Socket connected: WOjG2LN_okMEcfwZAAAB (user 69d591c0d102e6ae9731dc62)
+2026-04-27 13:10:32 [info]: Incoming Request: GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-04-27 13:10:32 [error]: ReferenceError: mongoose is not defined
+    at getAnimals (C:\Users\Wassim\Desktop\mon-application\backend\src\controllers\animalsController.js:128:34)
+    at Layer.handle [as handle_request] (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\layer.js:95:5)
+    at next (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\route.js:149:13)
+    at Route.dispatch (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\route.js:119:3)
+    at Layer.handle [as handle_request] (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\layer.js:95:5)
+    at C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\index.js:284:15
+    at router.process_params (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\index.js:280:10)
+    at C:\Users\Wassim\Desktop\mon-application\backend\src\middleware\rbac.js:64:7
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+2026-04-27 13:10:34 [info]: Incoming Request: GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-04-27 13:10:34 [error]: ReferenceError: mongoose is not defined
+    at getAnimals (C:\Users\Wassim\Desktop\mon-application\backend\src\controllers\animalsController.js:128:34)
+    at Layer.handle [as handle_request] (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\layer.js:95:5)
+    at next (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\route.js:149:13)
+    at Route.dispatch (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\route.js:119:3)
+    at Layer.handle [as handle_request] (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\layer.js:95:5)
+    at C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\index.js:284:15
+    at router.process_params (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\index.js:280:10)
+    at C:\Users\Wassim\Desktop\mon-application\backend\src\middleware\rbac.js:64:7
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+2026-04-27 13:10:38 [info]: Incoming Request: GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-04-27 13:10:38 [error]: ReferenceError: mongoose is not defined
+    at getAnimals (C:\Users\Wassim\Desktop\mon-application\backend\src\controllers\animalsController.js:128:34)
+    at Layer.handle [as handle_request] (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\layer.js:95:5)
+    at next (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\route.js:149:13)
+    at Route.dispatch (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\route.js:119:3)
+    at Layer.handle [as handle_request] (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\layer.js:95:5)
+    at C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\index.js:284:15
+    at router.process_params (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\index.js:280:10)
+    at C:\Users\Wassim\Desktop\mon-application\backend\src\middleware\rbac.js:64:7
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+2026-04-27 13:12:28 [info]: Socket disconnected: WOjG2LN_okMEcfwZAAAB — client namespace disconnect
+2026-04-27 13:12:32 [info]: Incoming Request: GET /api/auth/me
+2026-04-27 13:12:32 [info]: Incoming Request: GET /api/memberships/my
+2026-04-27 13:12:32 [info]: Incoming Request: GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-04-27 13:12:32 [error]: ReferenceError: mongoose is not defined
+    at getAnimals (C:\Users\Wassim\Desktop\mon-application\backend\src\controllers\animalsController.js:128:34)
+    at Layer.handle [as handle_request] (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\layer.js:95:5)
+    at next (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\route.js:149:13)
+    at Route.dispatch (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\route.js:119:3)
+    at Layer.handle [as handle_request] (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\layer.js:95:5)
+    at C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\index.js:284:15
+    at router.process_params (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\index.js:280:10)
+    at C:\Users\Wassim\Desktop\mon-application\backend\src\middleware\rbac.js:64:7
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+2026-04-27 13:12:32 [info]: Incoming Request: GET /api/geofences
+2026-04-27 13:12:32 [info]: Socket connected: ma0LnlrUNsSD3H9YAAAD (user 69d591c0d102e6ae9731dc62)
+2026-04-27 13:12:33 [info]: Incoming Request: GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-04-27 13:12:33 [error]: ReferenceError: mongoose is not defined
+    at getAnimals (C:\Users\Wassim\Desktop\mon-application\backend\src\controllers\animalsController.js:128:34)
+    at Layer.handle [as handle_request] (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\layer.js:95:5)
+    at next (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\route.js:149:13)
+    at Route.dispatch (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\route.js:119:3)
+    at Layer.handle [as handle_request] (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\layer.js:95:5)
+    at C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\index.js:284:15
+    at router.process_params (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\index.js:280:10)
+    at C:\Users\Wassim\Desktop\mon-application\backend\src\middleware\rbac.js:64:7
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+2026-04-27 13:12:35 [info]: Incoming Request: GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-04-27 13:12:35 [error]: ReferenceError: mongoose is not defined
+    at getAnimals (C:\Users\Wassim\Desktop\mon-application\backend\src\controllers\animalsController.js:128:34)
+    at Layer.handle [as handle_request] (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\layer.js:95:5)
+    at next (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\route.js:149:13)
+    at Route.dispatch (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\route.js:119:3)
+    at Layer.handle [as handle_request] (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\layer.js:95:5)
+    at C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\index.js:284:15
+    at router.process_params (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\index.js:280:10)
+    at C:\Users\Wassim\Desktop\mon-application\backend\src\middleware\rbac.js:64:7
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+2026-04-27 13:12:38 [info]: Incoming Request: GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-04-27 13:12:38 [error]: ReferenceError: mongoose is not defined
+    at getAnimals (C:\Users\Wassim\Desktop\mon-application\backend\src\controllers\animalsController.js:128:34)
+    at Layer.handle [as handle_request] (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\layer.js:95:5)
+    at next (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\route.js:149:13)
+    at Route.dispatch (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\route.js:119:3)
+    at Layer.handle [as handle_request] (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\layer.js:95:5)
+    at C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\index.js:284:15
+    at router.process_params (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\index.js:280:10)
+    at C:\Users\Wassim\Desktop\mon-application\backend\src\middleware\rbac.js:64:7
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+2026-04-27 13:13:12 [info]: ✅ MongoDB Connected: 127.0.0.1
+2026-04-27 13:13:12 [info]: 🚀 Server running on http://localhost:3000
+2026-04-27 13:13:12 [info]:    Environment: development
+2026-04-27 13:13:13 [info]: Socket connected: 7ZctNM7el_ergdOVAAAB (user 69d591c0d102e6ae9731dc62)
+2026-04-27 13:13:24 [info]: ✅ MongoDB Connected: 127.0.0.1
+2026-04-27 13:13:24 [info]: 🚀 Server running on http://localhost:3000
+2026-04-27 13:13:24 [info]:    Environment: development
+2026-04-27 13:13:25 [info]: Socket connected: UCYvvEfo6hjUKd--AAAB (user 69d591c0d102e6ae9731dc62)
+2026-04-27 13:13:30 [info]: ✅ MongoDB Connected: 127.0.0.1
+2026-04-27 13:13:30 [info]: 🚀 Server running on http://localhost:3000
+2026-04-27 13:13:30 [info]:    Environment: development
+2026-04-27 13:13:32 [info]: Socket connected: V8iQvqb00Qmthp9tAAAB (user 69d591c0d102e6ae9731dc62)
+2026-04-27 13:14:06 [info]: Socket disconnected: V8iQvqb00Qmthp9tAAAB — client namespace disconnect
+2026-04-27 13:14:18 [info]: Incoming Request: GET /api/auth/me
+2026-04-27 13:14:18 [info]: Incoming Request: GET /api/memberships/my
+2026-04-27 13:14:19 [info]: Incoming Request: GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-04-27 13:14:19 [info]: Incoming Request: GET /api/geofences
+2026-04-27 13:14:19 [info]: Socket connected: L1GwV5-szhxiy2hSAAAD (user 69d591c0d102e6ae9731dc62)
+2026-04-27 13:14:52 [info]: Incoming Request: GET /api/geofences
+2026-04-27 13:15:01 [info]: Incoming Request: GET /api/stats/farm
+2026-04-27 13:15:19 [info]: Incoming Request: GET /api/alerts?status=active
+2026-04-27 13:15:21 [info]: Incoming Request: GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-04-27 13:15:21 [info]: Incoming Request: GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-04-27 13:15:22 [info]: Incoming Request: GET /api/animals/69ee75019753872c84c75a6f
+2026-04-27 13:15:22 [info]: Incoming Request: GET /api/ai/animal/69ee75019753872c84c75a6f
+2026-04-27 13:17:54 [info]: Socket disconnected: L1GwV5-szhxiy2hSAAAD — transport close
+2026-04-27 13:20:03 [info]: Socket connected: JDYgavp8_ctfWwyTAAAF (user 69d591c0d102e6ae9731dc62)
+2026-04-27 13:22:26 [info]: Socket disconnected: JDYgavp8_ctfWwyTAAAF — client namespace disconnect
+2026-04-27 13:22:30 [info]: Incoming Request: GET /api/auth/me
+2026-04-27 13:22:30 [info]: Incoming Request: GET /api/memberships/my
+2026-04-27 13:22:30 [info]: Incoming Request: GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-04-27 13:22:30 [info]: Incoming Request: GET /api/geofences
+2026-04-27 13:22:30 [info]: Socket connected: zVlkBtSmFxI54D8FAAAH (user 69d591c0d102e6ae9731dc62)
+2026-04-27 13:22:42 [info]: Incoming Request: POST /api/auth/logout
+2026-04-27 13:22:42 [info]: User logged out
+2026-04-27 13:22:42 [info]: Socket disconnected: zVlkBtSmFxI54D8FAAAH — client namespace disconnect
+2026-04-27 13:23:13 [info]: Incoming Request: POST /api/auth/register
+2026-04-27 13:23:13 [error]: ❌ Registration failed for hamdighofran13@gmail.com: User validation failed: role: `farmer` is not a valid enum value for path `role`.
+2026-04-27 13:23:48 [info]: ✅ MongoDB Connected: 127.0.0.1
+2026-04-27 13:23:48 [info]: 🚀 Server running on http://localhost:3000
+2026-04-27 13:23:48 [info]:    Environment: development
+2026-04-27 13:24:08 [info]: ✅ MongoDB Connected: 127.0.0.1
+2026-04-27 13:24:08 [info]: 🚀 Server running on http://localhost:3000
+2026-04-27 13:24:08 [info]:    Environment: development
+2026-04-27 13:26:02 [info]: Incoming Request: POST /api/auth/register
+2026-04-27 13:26:03 [info]: ✅ New user registered and logged in: ghofranehamdi@gmail.com
+2026-04-27 13:26:03 [info]: Incoming Request: GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-04-27 13:26:03 [info]: Incoming Request: GET /api/geofences
+2026-04-27 13:26:03 [warn]: Unauthorized farm access: User 69ef55da8527867d36c4b343 tried to access farm 69ef4f782af176f8d289499e
+2026-04-27 13:26:03 [warn]: Unauthorized farm access: User 69ef55da8527867d36c4b343 tried to access farm 69ef4f782af176f8d289499e
+2026-04-27 13:26:03 [info]: Socket connected: hiOtmjz9p2MtOuK-AAAB (user 69ef55da8527867d36c4b343)
+2026-04-27 13:26:28 [info]: ✅ MongoDB Connected: 127.0.0.1
+2026-04-27 13:26:28 [info]: 🚀 Server running on http://localhost:3000
+2026-04-27 13:26:28 [info]:    Environment: development
+2026-04-27 13:26:29 [info]: Socket connected: oqCj_Q9-NnCQmgSyAAAB (user 69ef55da8527867d36c4b343)
+2026-04-27 13:26:46 [info]: Socket disconnected: oqCj_Q9-NnCQmgSyAAAB — client namespace disconnect
+2026-04-27 13:26:46 [info]: Incoming Request: GET /api/auth/me
+2026-04-27 13:26:46 [info]: Incoming Request: GET /api/memberships/my
+2026-04-27 13:26:46 [info]: Incoming Request: GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-04-27 13:26:46 [info]: Incoming Request: GET /api/geofences
+2026-04-27 13:26:46 [info]: Socket connected: 7MtDh2bljMNg8uURAAAD (user 69ef55da8527867d36c4b343)
+2026-04-27 13:27:17 [info]: ✅ MongoDB Connected: 127.0.0.1
+2026-04-27 13:27:17 [info]: 🚀 Server running on http://localhost:3000
+2026-04-27 13:27:17 [info]:    Environment: development
+2026-04-27 13:27:17 [info]: Socket connected: scsbVGXmeS5o3OU5AAAB (user 69ef55da8527867d36c4b343)
+2026-04-27 13:27:25 [info]: Socket disconnected: scsbVGXmeS5o3OU5AAAB — client namespace disconnect
+2026-04-27 13:27:25 [info]: Incoming Request: GET /api/auth/me
+2026-04-27 13:27:25 [info]: Incoming Request: GET /api/memberships/my
+2026-04-27 13:27:25 [info]: Incoming Request: GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-04-27 13:27:25 [info]: Incoming Request: GET /api/geofences
+2026-04-27 13:27:25 [info]: Socket connected: qzsBarmYpjyjRBZMAAAD (user 69ef55da8527867d36c4b343)
+2026-04-27 13:27:56 [info]: Socket disconnected: qzsBarmYpjyjRBZMAAAD — client namespace disconnect
+2026-04-27 13:28:00 [info]: Incoming Request: GET /api/auth/me
+2026-04-27 13:28:00 [info]: Incoming Request: GET /api/memberships/my
+2026-04-27 13:28:00 [info]: Incoming Request: GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-04-27 13:28:00 [info]: Incoming Request: GET /api/geofences
+2026-04-27 13:28:00 [info]: Socket connected: TfZbvTyScndaOB-qAAAF (user 69ef55da8527867d36c4b343)
+2026-04-27 13:30:45 [info]: Socket disconnected: TfZbvTyScndaOB-qAAAF — client namespace disconnect
+2026-04-27 13:31:24 [info]: Incoming Request: GET /api/auth/me
+2026-04-27 13:31:24 [info]: Incoming Request: GET /api/memberships/my
+2026-04-27 13:32:22 [info]: Incoming Request: GET /api/auth/me
+2026-04-27 13:32:22 [info]: Incoming Request: GET /api/memberships/my
+2026-04-27 13:32:22 [info]: Incoming Request: GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-04-27 13:32:22 [info]: Incoming Request: GET /api/geofences
+2026-04-27 13:32:22 [info]: Socket connected: 5Jq1IjHwf4CqvOOIAAAH (user 69ef55da8527867d36c4b343)
+2026-04-27 13:32:40 [info]: Incoming Request: GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-04-27 13:32:40 [info]: Incoming Request: GET /api/geofences
+2026-04-27 13:33:11 [info]: Socket disconnected: 5Jq1IjHwf4CqvOOIAAAH — client namespace disconnect
+2026-04-27 13:33:15 [info]: Incoming Request: GET /api/auth/me
+2026-04-27 13:33:15 [info]: Incoming Request: GET /api/memberships/my
+2026-04-27 13:33:16 [info]: Incoming Request: GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-04-27 13:33:16 [info]: Incoming Request: GET /api/geofences
+2026-04-27 13:33:16 [info]: Socket connected: 6ed_XBHXA0AcnGkJAAAJ (user 69ef55da8527867d36c4b343)
+2026-04-27 13:33:38 [info]: Incoming Request: GET /api/geofences
+2026-04-27 13:33:41 [info]: Incoming Request: GET /api/stats/farm
+2026-04-27 13:33:43 [info]: Incoming Request: GET /api/alerts?status=active
+2026-04-27 13:33:44 [info]: Incoming Request: GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-04-27 14:35:23 [info]: ✅ MongoDB Connected: 127.0.0.1
+2026-04-27 14:35:23 [info]: 🚀 Server running on http://localhost:3000
+2026-04-27 14:35:23 [info]:    Environment: development
+>>>>>>> origin/main

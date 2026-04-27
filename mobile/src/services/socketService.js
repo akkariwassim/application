@@ -40,6 +40,7 @@ export async function connectSocket({
   onConnect,
   onDisconnect,
   onPositionUpdate,
+  onBatchUpdate,
   onAlertTriggered,
   onStatusChange,
   onZoneStatusChange,
@@ -76,6 +77,12 @@ export async function connectSocket({
   if (onPositionUpdate) {
     socket.on('position-update', (data) => {
       onPositionUpdate(data);
+    });
+  }
+
+  if (onBatchUpdate) {
+    socket.on('batch-position-update', (batch) => {
+      onBatchUpdate(batch);
     });
   }
 

@@ -16,7 +16,7 @@ const zoneMonitorService = require('./zoneMonitorService');
 /**
  * Create a geofence breach alert.
  */
-async function createGeofenceAlert({ animalId, userId, latitude, longitude, distanceM, radiusM, zoneId, zoneName }) {
+async function createGeofenceAlert({ animalId, userId, farmId, latitude, longitude, distanceM, radiusM, zoneId, zoneName }) {
   try {
     // Deduplication: check if an active geofence alert exists in the last 15 mins
     const fifteenMinsAgo = new Date(Date.now() - 15 * 60 * 1000);
@@ -37,6 +37,7 @@ async function createGeofenceAlert({ animalId, userId, latitude, longitude, dist
     const alert = await Alert.create({
       animal_id: animalId,
       user_id: userId,
+      farm_id: farmId,
       zone_id: zoneId,
       type:      'geofence_exit',
       severity:  'critical',
@@ -60,8 +61,8 @@ async function createGeofenceAlert({ animalId, userId, latitude, longitude, dist
       createdAt: alert.createdAt
     };
 
-    emitAlert(userId, animalId, alertPayload);
-    emitStatusChange(userId, animalId, 'out_of_zone');
+    emitAlert(farmId, animalId, alertPayload);
+    emitStatusChange(farmId, animalId, 'out_of_zone');
 
     logger.warn(`🚨 Geofence breach — animal ${animalId}: ${message}`);
     
@@ -80,7 +81,7 @@ async function createGeofenceAlert({ animalId, userId, latitude, longitude, dist
 /**
  * Create a health-related alert (temperature or activity).
  */
-async function createHealthAlert({ animalId, userId, type, severity, message, latitude, longitude }) {
+async function createHealthAlert({ animalId, userId, farmId, type, severity, message, latitude, longitude }) {
   try {
     // Deduplication: check if similar active alert exists in the last 30 mins
     const thirtyMinsAgo = new Date(Date.now() - 30 * 60 * 1000);
@@ -96,6 +97,7 @@ async function createHealthAlert({ animalId, userId, type, severity, message, la
     const alert = await Alert.create({
       animal_id: animalId,
       user_id: userId,
+      farm_id: farmId,
       type,
       severity,
       message,
@@ -108,7 +110,7 @@ async function createHealthAlert({ animalId, userId, type, severity, message, la
     // Update animal status if critical
     if (severity === 'critical') {
       await Animal.findByIdAndUpdate(animalId, { $set: { status: 'warning' } });
-      emitStatusChange(userId, animalId, 'warning');
+      emitStatusChange(farmId, animalId, 'warning');
     }
 
     const alertPayload = {
@@ -121,7 +123,7 @@ async function createHealthAlert({ animalId, userId, type, severity, message, la
       createdAt: alert.createdAt
     };
 
-    emitAlert(userId, animalId, alertPayload);
+    emitAlert(farmId, animalId, alertPayload);
     logger.warn(`🩺 Health alert — animal ${animalId} (${type}): ${message}`);
 
     // Trigger zone evaluation for the animal's zone
@@ -140,9 +142,9 @@ async function createHealthAlert({ animalId, userId, type, severity, message, la
 /**
  * Mark an animal as safe and resolve any active breach alerts.
  */
-async function markAnimalSafe(animalId, userId) {
+async function markAnimalSafe(animalId, userId, farmId) {
   const animal = await Animal.findByIdAndUpdate(animalId, { $set: { status: 'healthy' } }, { new: true });
-  emitStatusChange(userId, animalId, 'healthy');
+  emitStatusChange(farmId, animalId, 'healthy');
 
   // Trigger zone evaluation
   if (animal && animal.current_zone_id) {
@@ -155,12 +157,12 @@ async function markAnimalSafe(animalId, userId) {
  * Checks all user zones for transitions and breaches via Mongoose.
  */
 async function processZoneMonitoring(animal, currentPos) {
-  const { _id: animalId, user_id: userId, current_zone_id: assignedZoneId } = animal;
+  const { _id: animalId, user_id: userId, farm_id: farmId, current_zone_id: assignedZoneId } = animal;
   const { latitude, longitude } = currentPos;
 
   try {
-    // 1. Fetch all zones for this user to find current position
-    const allZones = await Zone.find({ user_id: userId, is_active: true });
+    // 1. Fetch all zones for this farm to find current position
+    const allZones = await Zone.find({ farm_id: farmId, is_active: true });
     let matchedZone = null;
 
     for (const zone of allZones) {
@@ -187,7 +189,7 @@ async function processZoneMonitoring(animal, currentPos) {
         
         if (breached) {
           await createGeofenceAlert({
-            animalId, userId, 
+            animalId, userId, farmId,
             latitude, longitude,
             distanceM, radiusM: primaryZone.radiusM,
             zoneId: primaryZone._id,
@@ -195,7 +197,7 @@ async function processZoneMonitoring(animal, currentPos) {
           });
         } else if (animal.status === 'out_of_zone' || animal.status === 'warning') {
           // Animal returned to its assigned zone
-          await markAnimalSafe(animalId, userId);
+          await markAnimalSafe(animalId, userId, farmId);
         }
       }
     }

@@ -24,6 +24,8 @@ const userRoutes      = require('./routes/user');
 const devicesRoutes    = require('./routes/devices');
 const aiRoutes         = require('./routes/ai');
 const statsRoutes      = require('./routes/stats');
+const membershipRoutes = require('./routes/membership');
+const backupRoutes     = require('./routes/backups');
 
 // Middleware
 const errorHandler   = require('./middleware/errorHandler');
@@ -100,6 +102,8 @@ app.use('/api/user',      userRoutes);
 app.use('/api/devices',   devicesRoutes);
 app.use('/api/ai',        aiRoutes);
 app.use('/api/stats',     statsRoutes);
+app.use('/api/memberships', membershipRoutes);
+app.use('/api/backups',     backupRoutes);
 
 // ── 404 handler ────────────────────────────────────────────────
 app.use((req, res) => {

@@ -18,6 +18,7 @@ import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import theme, { COLORS, SHADOWS, SPACING, BORDER_RADIUS, TYPOGRAPHY } from '../config/theme';
 import AnimalMarker from '../components/AnimalMarker';
 import MapControls from '../components/MapUI/MapControls';
+import useMapStore from '../store/mapStore';
 
 // ── Map State Machine Types ──
 const MAP_STATES = {
@@ -63,42 +64,7 @@ function haversineDist(lat1, lon1, lat2, lon2) {
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
-/**
- * Lightweight Grid-based Clustering
- */
-function getClusters(animals, region, clusterRadius = 40) {
-  if (!animals.length || !region) return [];
-  const latPerPixel = region.latitudeDelta / Dimensions.get('window').height;
-  const lonPerPixel = region.longitudeDelta / Dimensions.get('window').width;
-  const clusterSizeLat = clusterRadius * latPerPixel;
-  const clusterSizeLon = clusterRadius * lonPerPixel;
-  const clusters = [];
-  const processed = new Set();
-  for (let i = 0; i < animals.length; i++) {
-    if (processed.has(i)) continue;
-    const a = animals[i];
-    const group = [a];
-    processed.add(i);
-    for (let j = i + 1; j < animals.length; j++) {
-      if (processed.has(j)) continue;
-      const b = animals[j];
-      const dLat = Math.abs(parseFloat(a.latitude) - parseFloat(b.latitude));
-      const dLon = Math.abs(parseFloat(a.longitude) - parseFloat(b.longitude));
-      if (dLat < clusterSizeLat && dLon < clusterSizeLon) {
-        group.push(b);
-        processed.add(j);
-      }
-    }
-    if (group.length > 1) {
-      const avgLat = group.reduce((s, x) => s + parseFloat(x.latitude), 0) / group.length;
-      const avgLon = group.reduce((s, x) => s + parseFloat(x.longitude), 0) / group.length;
-      clusters.push({ id: `cluster-${i}`, isCluster: true, count: group.length, latitude: avgLat, longitude: avgLon, animals: group });
-    } else {
-      clusters.push({ ...a, isCluster: false });
-    }
-  }
-  return clusters;
-}
+// ── Removed Manual Clustering Logic (Using native clustering instead) ──
 
 function safeParseCoords(coordsData) {
   if (!coordsData) return [];
@@ -132,17 +98,35 @@ export default function MapScreen({ route }) {
   const [currentRegion,   setCurrentRegion]   = useState(null);
   const [pulseAnim]                     = useState(new Animated.Value(0));
   const [mapState, setMapState] = useState(MAP_STATES.INITIALIZING);
-  const [mapType, setMapType]   = useState('hybrid');
-  const [followUser, setFollowUser]     = useState(true);
   const [isMapReady, setIsMapReady]     = useState(false);
   const [hasLocation, setHasLocation]   = useState(false);
+  const { 
+    isLocked, 
+    lockedLocation, 
+    setLockedLocation, 
+    unlockLocation, 
+    mapType, 
+    setMapType,
+    followUser,
+    setFollowUser
+  } = useMapStore();
 
   const locationSub = useRef(null);
   const mapReadyRef = useRef(false);
 
+  const renderCount = useRef(0);
+  const isUserDragging = useRef(false);
+
   useEffect(() => {
-    fetchAnimals();
-    fetchGeofences();
+    renderCount.current++;
+    // console.log(`[MapScreen] Render #${renderCount.current}`);
+  });
+
+  useEffect(() => {
+    if (!isLoading) {
+      fetchAnimals();
+      fetchGeofences();
+    }
     const pulse = Animated.loop(
       Animated.sequence([
         Animated.timing(pulseAnim, { toValue: 1, duration: 2000, useNativeDriver: true }),
@@ -150,7 +134,10 @@ export default function MapScreen({ route }) {
       ])
     );
     pulse.start();
-    return () => { pulse.stop(); cleanupTracking(); };
+    return () => { 
+      pulse.stop(); 
+      cleanupTracking(); 
+    };
   }, []);
 
   const cleanupTracking = () => {
@@ -160,12 +147,26 @@ export default function MapScreen({ route }) {
     }
   };
 
-  const visibleAnimals = useMemo(() => {
-    const filtered = selectedAnimal?.isZone
+  const onRegionChange = (region, isGesture) => {
+    if (isGesture) {
+      isUserDragging.current = true;
+      if (followUser) setFollowUser(false);
+    }
+  };
+
+  const onRegionChangeComplete = (region) => {
+    setCurrentRegion(region);
+    // After some time, allow auto-follow again if not explicitly disabled
+    setTimeout(() => {
+      isUserDragging.current = false;
+    }, 3000);
+  };
+
+  const filteredAnimals = useMemo(() => {
+    return selectedAnimal?.isZone
       ? animals.filter(a => String(a.current_zone_id || '') === String(selectedAnimal.id || ''))
       : animals;
-    return getClusters(filtered, currentRegion, 35); 
-  }, [animals, selectedAnimal?.id, selectedAnimal?.isZone, currentRegion]);
+  }, [animals, selectedAnimal?.id, selectedAnimal?.isZone]);
 
   const startTracking = async () => {
     try {
@@ -190,17 +191,47 @@ export default function MapScreen({ route }) {
       setMapState(MAP_STATES.READY);
       cleanupTracking();
       locationSub.current = await Location.watchPositionAsync(
-        { accuracy: Location.Accuracy.BestForNavigation, timeInterval: 2000, distanceInterval: 3 },
+        { 
+          accuracy: Location.Accuracy.Balanced, 
+          timeInterval: 5000, // Reduced frequency to 5s
+          distanceInterval: 10 // Only update if moved 10m
+        },
         loc => {
-          if (!loc.coords || loc.coords.accuracy > 35) return; 
-          const newLoc = { latitude: loc.coords.latitude, longitude: loc.coords.longitude, heading: loc.coords.heading };
+          if (!loc.coords || loc.coords.accuracy > 50) return; 
+          const newLoc = { 
+            latitude: loc.coords.latitude, 
+            longitude: loc.coords.longitude, 
+            heading: loc.coords.heading 
+          };
+
           setUserLocation(prev => {
-            if (!prev) { setMarkerLoc(newLoc); setHasLocation(true); return newLoc; }
-            if (getDistance(prev, newLoc) < 2.5) return prev;
+            if (!prev) {
+              setMarkerLoc(newLoc);
+              setHasLocation(true);
+              
+              // ── AUTO-INITIALIZATION RULE ──
+              // If not locked and no user location yet, center on GPS
+              if (!isLocked && mapRef.current) {
+                mapRef.current.animateToRegion({
+                  ...newLoc,
+                  latitudeDelta: 0.01,
+                  longitudeDelta: 0.01
+                }, 1000);
+              }
+              return newLoc;
+            }
+            // Ignore tiny noise (less than 5m)
+            const dist = getDistance(prev, newLoc);
+            if (dist < 5) return prev;
+
+            // Smooth marker movement
             setMarkerLoc(prevM => {
               if (!prevM) return newLoc;
-              const alpha = 0.45;
-              return { latitude: prevM.latitude + (newLoc.latitude - prevM.latitude) * alpha, longitude: prevM.longitude + (newLoc.longitude - prevM.longitude) * alpha };
+              const alpha = 0.5;
+              return { 
+                latitude: prevM.latitude + (newLoc.latitude - prevM.latitude) * alpha, 
+                longitude: prevM.longitude + (newLoc.longitude - prevM.longitude) * alpha 
+              };
             });
             return newLoc;
           });
@@ -212,11 +243,29 @@ export default function MapScreen({ route }) {
   useFocusEffect(useCallback(() => { startTracking(); return () => cleanupTracking(); }, []));
 
   useEffect(() => {
-    if (!mapReadyRef.current || !mapRef.current || !userLocation) return;
-    if (followUser && !selectedAnimal) {
-      mapRef.current.animateCamera({ center: { latitude: userLocation.latitude, longitude: userLocation.longitude }, pitch: 45, altitude: 1000, zoom: 17 }, { duration: 1500 });
+    if (!mapReadyRef.current || !mapRef.current || isUserDragging.current) return;
+    
+    // ── PRIORITY 1: Locked Location ──
+    if (isLocked && lockedLocation) {
+      mapRef.current.animateCamera({ 
+        center: { latitude: lockedLocation.latitude, longitude: lockedLocation.longitude }, 
+        pitch: 45, 
+        altitude: 1200, 
+        zoom: 16 
+      }, { duration: 1500 });
+      return;
     }
-  }, [userLocation?.latitude, followUser, !!selectedAnimal]);
+
+    // ── PRIORITY 2: Follow User GPS ──
+    if (followUser && userLocation && !selectedAnimal) {
+      mapRef.current.animateCamera({ 
+        center: { latitude: userLocation.latitude, longitude: userLocation.longitude }, 
+        pitch: 45, 
+        altitude: 1000, 
+        zoom: 17 
+      }, { duration: 1000 });
+    }
+  }, [userLocation?.latitude, followUser, !!selectedAnimal, isLocked, lockedLocation?.latitude]);
 
   const handleMapReady = () => {
     if (!mapReadyRef.current) {
@@ -227,9 +276,40 @@ export default function MapScreen({ route }) {
   };
 
   const recenterOnUser = (manual = true) => {
-    if (!userLocation || !mapRef.current) return;
-    if (manual) { setFollowUser(true); setSelectedAnimal(null); }
-    mapRef.current.animateCamera({ center: { latitude: userLocation.latitude, longitude: userLocation.longitude }, pitch: 45, zoom: 17 }, { duration: 1200 });
+    if (!mapRef.current) return;
+    
+    if (manual) { 
+      setFollowUser(true); 
+      setSelectedAnimal(null); 
+      unlockLocation(); // Explicitly unlock when manually recentering to GPS
+    }
+
+    if (userLocation) {
+      mapRef.current.animateCamera({ 
+        center: { latitude: userLocation.latitude, longitude: userLocation.longitude }, 
+        pitch: 45, 
+        zoom: 17 
+      }, { duration: 1200 });
+    }
+  };
+
+  const handleLongPress = (e) => {
+    const coords = e.nativeEvent.coordinate;
+    Alert.alert(
+      "Fixer la position",
+      "Voulez-vous verrouiller la vue sur cet emplacement ?",
+      [
+        { text: "Annuler", style: "cancel" },
+        { 
+          text: "Verrouiller", 
+          onPress: () => {
+            setLockedLocation(coords);
+            setFollowUser(false);
+            LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+          } 
+        }
+      ]
+    );
   };
 
   const focusZone = (gf) => {
@@ -298,10 +378,28 @@ export default function MapScreen({ route }) {
         style={StyleSheet.absoluteFillObject}
         provider={PROVIDER_GOOGLE}
         mapType={mapType}
-        onRegionChangeComplete={setCurrentRegion}
+        onRegionChange={onRegionChange}
+        onRegionChangeComplete={onRegionChangeComplete}
         onMapReady={handleMapReady}
-        initialRegion={{ latitude: 35.038, longitude: 9.484, latitudeDelta: 0.02, longitudeDelta: 0.02 }}
+        onLongPress={handleLongPress}
+        loadingEnabled={true}
+        tracksViewChanges={false} 
+        pitchEnabled={true}
+        initialRegion={lockedLocation || { latitude: 35.038, longitude: 9.484, latitudeDelta: 0.02, longitudeDelta: 0.02 }}
       >
+        {isLocked && lockedLocation && (
+          <Marker 
+            coordinate={lockedLocation} 
+            pinColor={COLORS.primary}
+            title="Position Verrouillée"
+            zIndex={2000}
+          >
+            <View style={styles.lockedMarkerContainer}>
+              <View style={styles.lockedMarkerPulse} />
+              <Ionicons name="location" size={30} color={COLORS.primary} />
+            </View>
+          </Marker>
+        )}
         {mapZones}
         {markerLoc && (
           <Marker coordinate={markerLoc} anchor={{ x: 0.5, y: 0.5 }} zIndex={1000} cluster={false}>
@@ -311,37 +409,41 @@ export default function MapScreen({ route }) {
             </View>
           </Marker>
         )}
-        {visibleAnimals.map(item => {
-          if (item.isCluster) {
-            return (
-              <Marker key={item.id} coordinate={{ latitude: item.latitude, longitude: item.longitude }} onPress={() => mapRef.current?.animateToRegion({ latitude: item.latitude, longitude: item.longitude, latitudeDelta: currentRegion.latitudeDelta/4, longitudeDelta: currentRegion.longitudeDelta/4 }, 600)}>
-                <View style={styles.clusterMarker}><View style={styles.clusterInner}><Text style={styles.clusterText}>{item.count}</Text></View></View>
-              </Marker>
-            );
-          }
-          const color = STATUS_COLOR[item.status] || STATUS_COLOR.offline;
-          const isSel = selectedAnimal?.id === item.id;
-          return (
-            <Marker key={item.id} coordinate={{ latitude: parseFloat(item.latitude), longitude: parseFloat(item.longitude) }} anchor={{ x: 0.5, y: 0.5 }} onPress={() => setSelectedAnimal({ ...item, isZone: false })}>
-              <View style={[styles.animalPin, { borderColor: color }, isSel && styles.animalPinSelected]}>
-                <MaterialCommunityIcons name={item.type === 'equine' ? 'horse-variant' : item.type === 'bovine' ? 'cow' : 'sheep'} size={17} color={color} />
-              </View>
-            </Marker>
-          );
-        })}
+        {filteredAnimals.map(animal => (
+          <MemoizedAnimalMarker 
+            key={animal.id || animal._id}
+            animal={animal}
+            onPress={() => setSelectedAnimal({ ...animal, isZone: false })}
+          />
+        ))}
       </MapView>
 
       <MapControls 
         followUser={followUser}
-        onToggleFollow={() => setFollowUser(!followUser)}
+        onToggleFollow={() => {
+          if (isLocked) unlockLocation();
+          setFollowUser(!followUser);
+        }}
         onRecenter={() => recenterOnUser(true)}
         mapType={mapType}
-        onToggleMapType={() => setMapType(prev => prev === 'hybrid' ? 'standard' : 'hybrid')}
+        onToggleMapType={() => setMapType(mapType === 'hybrid' ? 'standard' : 'hybrid')}
         onToggleZones={() => setShowZonesList(true)}
         onResetMap={() => startTracking()}
         selectedAnimal={selectedAnimal}
         socketConnected={socketConnected}
+        isLocked={isLocked}
+        onToggleLock={unlockLocation}
       />
+
+      {isLocked && (
+        <View style={styles.lockBadge}>
+          <Ionicons name="lock-closed" size={14} color={COLORS.white} />
+          <Text style={styles.lockBadgeText}>POSITION VERROUILLÉE ACTIVE</Text>
+          <TouchableOpacity onPress={unlockLocation} style={styles.lockBadgeClose}>
+            <Ionicons name="close-circle" size={18} color={COLORS.white} />
+          </TouchableOpacity>
+        </View>
+      )}
 
       <MapLegend />
 
@@ -530,5 +632,40 @@ const styles = StyleSheet.create({
     color: COLORS.textDim,
     fontSize: 11,
     flex: 1
+  },
+  lockedMarkerContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  lockedMarkerPulse: {
+    position: 'absolute',
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    backgroundColor: `${COLORS.primary}44`,
+  },
+  lockBadge: {
+    position: 'absolute',
+    top: 110,
+    alignSelf: 'center',
+    backgroundColor: COLORS.primary,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    gap: 8,
+    ...SHADOWS.hard,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.2)',
+  },
+  lockBadgeText: {
+    color: COLORS.white,
+    fontSize: 11,
+    fontWeight: '800',
+    letterSpacing: 1,
+  },
+  lockBadgeClose: {
+    marginLeft: 4,
   }
 });

@@ -70,7 +70,7 @@ async function resolveAlert(req, res, next) {
   try {
     const { id } = req.params;
     const alert = await Alert.findOneAndUpdate(
-      { _id: id, user_id: req.user.id },
+      { _id: id, farm_id: req.farm_id },
       { $set: { status: 'resolved', resolved_at: new Date() } },
       { new: true }
     );
@@ -92,7 +92,7 @@ async function resolveAlert(req, res, next) {
 async function deleteAlert(req, res, next) {
   try {
     const { id } = req.params;
-    const result = await Alert.deleteOne({ _id: id, user_id: req.user.id });
+    const result = await Alert.deleteOne({ _id: id, farm_id: req.farm_id });
     if (result.deletedCount === 0) return res.status(404).json({ 
       success: false,
       error: 'ALERT_NOT_FOUND',

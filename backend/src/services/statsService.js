@@ -20,6 +20,7 @@ class StatsService {
         await MovementHistory.create({
           animal_id: animal._id,
           user_id: animal.user_id,
+          farm_id: animal.farm_id,
           location: { type: 'Point', coordinates: [longitude, latitude] },
           speed_kmh: speed || 0,
           timestamp: new Date()
@@ -30,6 +31,7 @@ class StatsService {
       await HealthLog.create({
         animal_id: animal._id,
         user_id: animal.user_id,
+        farm_id: animal.farm_id,
         temperature: temperature || animal.temperature,
         heart_rate: heart_rate || animal.heart_rate,
         activity_level: activity || animal.activity,
