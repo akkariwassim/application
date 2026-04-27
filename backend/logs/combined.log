@@ -209,3 +209,6 @@
 2026-04-27 13:33:41 [info]: Incoming Request: GET /api/stats/farm
 2026-04-27 13:33:43 [info]: Incoming Request: GET /api/alerts?status=active
 2026-04-27 13:33:44 [info]: Incoming Request: GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-04-27 14:35:23 [info]: ✅ MongoDB Connected: 127.0.0.1
+2026-04-27 14:35:23 [info]: 🚀 Server running on http://localhost:3000
+2026-04-27 14:35:23 [info]:    Environment: development
