@@ -108,3 +108,6 @@
 2026-04-27 14:28:49 [info]: [Data Audit] GET /api/geofences
 2026-04-27 14:28:49 [info]: Socket connected: yhLIzNN4SjJ3tqP4AAAH (user 69ef6185425e89f7bf220be6)
 2026-04-27 14:29:04 [info]: [Data Audit] GET /api/geofences
+2026-04-27 14:41:35 [info]: ✅ MongoDB Connected: ac-lokdmj8-shard-00-01.7zypd8b.mongodb.net
+2026-04-27 14:41:35 [info]: 🚀 Server running on http://localhost:3000
+2026-04-27 14:41:35 [info]:    Environment: development
