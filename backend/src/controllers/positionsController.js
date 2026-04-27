@@ -35,7 +35,7 @@ async function submitPosition(req, res, next) {
     if (activity !== undefined)       updatePayload.activity       = activity;
 
     const animal = await Animal.findOneAndUpdate(
-      { _id: animalId, user_id: req.user.id },
+      { _id: animalId, farm_id: req.farm_id },
       { $set: updatePayload },
       { new: true }
     );
@@ -60,7 +60,7 @@ async function submitPosition(req, res, next) {
     });
     
     // 3. Broadcast update via WebSocket
-    socketConfig.emitPositionUpdate(req.user.id, animalId, { 
+    socketConfig.emitPositionUpdate(req.farm_id, animalId, { 
       latitude, 
       longitude, 
       temperature: animal.temperature, 
@@ -101,11 +101,12 @@ async function submitPosition(req, res, next) {
             await Alert.create({
               animal_id: animalId,
               user_id: req.user.id,
+              farm_id: req.farm_id,
               type: 'exit',
               zone_id: activeZone._id,
               message: `L'animal ${animal.name} a quitté sa zone "${activeZone.name}"!`
             });
-            socketConfig.emitAlert(req.user.id, {
+            socketConfig.emitAlert(req.farm_id, animalId, {
               type: 'exit',
               animalId,
               animalName: animal.name,
@@ -138,7 +139,7 @@ async function getHistory(req, res, next) {
     const MovementHistory = require('../models/MovementHistory');
     const history = await MovementHistory.find({ 
       animal_id: animalId, 
-      user_id: req.user.id,
+      farm_id: req.farm_id,
       timestamp: { $gte: startDate }
     }).sort({ timestamp: 1 });
     
@@ -156,7 +157,7 @@ async function getLatest(req, res, next) {
     const { animalId } = req.params;
     const latest = await SensorData.findOne({ 
       animal_id: animalId, 
-      user_id: req.user.id 
+      farm_id: req.farm_id 
     }).sort({ timestamp: -1 });
     
     if (!latest) return res.status(404).json({ 

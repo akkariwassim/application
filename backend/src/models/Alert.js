@@ -8,6 +8,12 @@ const alertSchema = new mongoose.Schema({
     ref: 'User',
     required: true,
   },
+  farm_id: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Farm',
+    required: false,
+    index: true,
+  },
   animal_id: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Animal',

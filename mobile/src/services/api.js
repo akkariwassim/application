@@ -46,6 +46,12 @@ api.interceptors.request.use(
       config.headers.Authorization = `Bearer ${token}`;
     }
 
+    // 1b. Attach Farm ID context
+    const farmId = await SecureStore.getItemAsync('currentFarmId');
+    if (farmId) {
+      config.headers['x-farm-id'] = farmId;
+    }
+
     // 2. Ensure /api prefix
     if (config.url && !config.url.startsWith('/api')) {
       const separator = config.url.startsWith('/') ? '' : '/';

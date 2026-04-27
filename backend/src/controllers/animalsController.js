@@ -1,5 +1,6 @@
 'use strict';
 
+const mongoose = require('mongoose');
 const Animal = require('../models/Animal');
 const Zone   = require('../models/Zone');
 const Device = require('../models/Device');
@@ -98,7 +99,7 @@ async function getAnimals(req, res, next) {
       sortOrder = 'desc'
     } = req.query;
 
-    const query = { user_id: req.user.id };
+    const query = { farm_id: req.farm_id };
 
     // ── Filters ───────────────────────────────────────────────────
     if (status) query.status = status;
@@ -123,9 +124,9 @@ async function getAnimals(req, res, next) {
         .skip(skip)
         .limit(limitInt),
       Animal.countDocuments(query),
-      // Aggregate stats for the user
+      // Aggregate stats for the farm
       Animal.aggregate([
-        { $match: { user_id: req.user.id } },
+        { $match: { farm_id: new mongoose.Types.ObjectId(req.farm_id) } },
         { $group: { 
           _id: "$status", 
           count: { $sum: 1 } 
@@ -164,7 +165,7 @@ async function getAnimals(req, res, next) {
 async function getAnimal(req, res, next) {
   try {
     const { id } = req.params;
-    const animal = await Animal.findOne({ _id: id, user_id: req.user.id });
+    const animal = await Animal.findOne({ _id: id, farm_id: req.farm_id });
     if (!animal) return res.status(404).json({ 
       success: false,
       error: 'ANIMAL_NOT_FOUND',
@@ -211,6 +212,7 @@ async function createAnimal(req, res, next) {
     // 2. Data Construction (Omit empty strings to satisfy sparse index)
     const animal = await Animal.create({
       user_id: req.user.id,
+      farm_id: req.farm_id,
       name,
       type,
       breed,
@@ -309,7 +311,7 @@ async function updateAnimal(req, res, next) {
     }
 
     const animal = await Animal.findOneAndUpdate(
-      { _id: id, user_id: req.user.id },
+      { _id: id, farm_id: req.farm_id },
       { $set: updates },
       { new: true, runValidators: true }
     );
@@ -340,7 +342,7 @@ async function updateAnimal(req, res, next) {
 async function deleteAnimal(req, res, next) {
   try {
     const { id } = req.params;
-    const animal = await Animal.findOne({ _id: id, user_id: req.user.id });
+    const animal = await Animal.findOne({ _id: id, farm_id: req.farm_id });
     if (!animal) return res.status(404).json({ 
       success: false,
       error: 'ANIMAL_NOT_FOUND',
@@ -368,7 +370,7 @@ async function deleteAnimal(req, res, next) {
 async function getZone(req, res, next) {
   try {
     const { id } = req.params;
-    const animal = await Animal.findOne({ _id: id, user_id: req.user.id });
+    const animal = await Animal.findOne({ _id: id, farm_id: req.farm_id });
     if (!animal || !animal.current_zone_id) return res.json({ success: true, data: null });
     
     const zone = await Zone.findById(animal.current_zone_id);
@@ -386,7 +388,7 @@ async function setZone(req, res, next) {
     const { id } = req.params;
     const { geofenceId } = req.body;
     const animal = await Animal.findOneAndUpdate(
-      { _id: id, user_id: req.user.id },
+      { _id: id, farm_id: req.farm_id },
       { $set: { current_zone_id: geofenceId } },
       { new: true }
     );
@@ -415,6 +417,7 @@ async function bulkCreateAnimals(req, res, next) {
       try {
         await Animal.create({
           user_id: userId,
+          farm_id: req.farm_id,
           name: data.name,
           type: data.type || 'other',
           rfid_tag: data.rfidTag || data.rfid_tag || null,
@@ -444,7 +447,7 @@ async function triggerAction(req, res, next) {
     const { id } = req.params;
     const { type, state } = req.body;
 
-    const animal = await Animal.findOne({ _id: id, user_id: req.user.id });
+    const animal = await Animal.findOne({ _id: id, farm_id: req.farm_id });
     if (!animal) return res.status(404).json({
       success: false,
       error: 'ANIMAL_NOT_FOUND',

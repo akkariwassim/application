@@ -1,0 +1,89 @@
+2026-04-27 13:10:31 [error]: ReferenceError: mongoose is not defined
+    at getAnimals (C:\Users\Wassim\Desktop\mon-application\backend\src\controllers\animalsController.js:128:34)
+    at Layer.handle [as handle_request] (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\layer.js:95:5)
+    at next (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\route.js:149:13)
+    at Route.dispatch (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\route.js:119:3)
+    at Layer.handle [as handle_request] (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\layer.js:95:5)
+    at C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\index.js:284:15
+    at router.process_params (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\index.js:280:10)
+    at C:\Users\Wassim\Desktop\mon-application\backend\src\middleware\rbac.js:64:7
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+2026-04-27 13:10:32 [error]: ReferenceError: mongoose is not defined
+    at getAnimals (C:\Users\Wassim\Desktop\mon-application\backend\src\controllers\animalsController.js:128:34)
+    at Layer.handle [as handle_request] (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\layer.js:95:5)
+    at next (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\route.js:149:13)
+    at Route.dispatch (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\route.js:119:3)
+    at Layer.handle [as handle_request] (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\layer.js:95:5)
+    at C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\index.js:284:15
+    at router.process_params (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\index.js:280:10)
+    at C:\Users\Wassim\Desktop\mon-application\backend\src\middleware\rbac.js:64:7
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+2026-04-27 13:10:34 [error]: ReferenceError: mongoose is not defined
+    at getAnimals (C:\Users\Wassim\Desktop\mon-application\backend\src\controllers\animalsController.js:128:34)
+    at Layer.handle [as handle_request] (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\layer.js:95:5)
+    at next (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\route.js:149:13)
+    at Route.dispatch (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\route.js:119:3)
+    at Layer.handle [as handle_request] (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\layer.js:95:5)
+    at C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\index.js:284:15
+    at router.process_params (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\index.js:280:10)
+    at C:\Users\Wassim\Desktop\mon-application\backend\src\middleware\rbac.js:64:7
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+2026-04-27 13:10:38 [error]: ReferenceError: mongoose is not defined
+    at getAnimals (C:\Users\Wassim\Desktop\mon-application\backend\src\controllers\animalsController.js:128:34)
+    at Layer.handle [as handle_request] (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\layer.js:95:5)
+    at next (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\route.js:149:13)
+    at Route.dispatch (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\route.js:119:3)
+    at Layer.handle [as handle_request] (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\layer.js:95:5)
+    at C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\index.js:284:15
+    at router.process_params (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\index.js:280:10)
+    at C:\Users\Wassim\Desktop\mon-application\backend\src\middleware\rbac.js:64:7
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+2026-04-27 13:12:32 [error]: ReferenceError: mongoose is not defined
+    at getAnimals (C:\Users\Wassim\Desktop\mon-application\backend\src\controllers\animalsController.js:128:34)
+    at Layer.handle [as handle_request] (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\layer.js:95:5)
+    at next (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\route.js:149:13)
+    at Route.dispatch (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\route.js:119:3)
+    at Layer.handle [as handle_request] (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\layer.js:95:5)
+    at C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\index.js:284:15
+    at router.process_params (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\index.js:280:10)
+    at C:\Users\Wassim\Desktop\mon-application\backend\src\middleware\rbac.js:64:7
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+2026-04-27 13:12:33 [error]: ReferenceError: mongoose is not defined
+    at getAnimals (C:\Users\Wassim\Desktop\mon-application\backend\src\controllers\animalsController.js:128:34)
+    at Layer.handle [as handle_request] (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\layer.js:95:5)
+    at next (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\route.js:149:13)
+    at Route.dispatch (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\route.js:119:3)
+    at Layer.handle [as handle_request] (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\layer.js:95:5)
+    at C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\index.js:284:15
+    at router.process_params (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\index.js:280:10)
+    at C:\Users\Wassim\Desktop\mon-application\backend\src\middleware\rbac.js:64:7
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+2026-04-27 13:12:35 [error]: ReferenceError: mongoose is not defined
+    at getAnimals (C:\Users\Wassim\Desktop\mon-application\backend\src\controllers\animalsController.js:128:34)
+    at Layer.handle [as handle_request] (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\layer.js:95:5)
+    at next (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\route.js:149:13)
+    at Route.dispatch (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\route.js:119:3)
+    at Layer.handle [as handle_request] (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\layer.js:95:5)
+    at C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\index.js:284:15
+    at router.process_params (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\index.js:280:10)
+    at C:\Users\Wassim\Desktop\mon-application\backend\src\middleware\rbac.js:64:7
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+2026-04-27 13:12:38 [error]: ReferenceError: mongoose is not defined
+    at getAnimals (C:\Users\Wassim\Desktop\mon-application\backend\src\controllers\animalsController.js:128:34)
+    at Layer.handle [as handle_request] (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\layer.js:95:5)
+    at next (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\route.js:149:13)
+    at Route.dispatch (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\route.js:119:3)
+    at Layer.handle [as handle_request] (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\layer.js:95:5)
+    at C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\index.js:284:15
+    at router.process_params (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\Wassim\Desktop\mon-application\backend\node_modules\express\lib\router\index.js:280:10)
+    at C:\Users\Wassim\Desktop\mon-application\backend\src\middleware\rbac.js:64:7
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+2026-04-27 13:23:13 [error]: ❌ Registration failed for hamdighofran13@gmail.com: User validation failed: role: `farmer` is not a valid enum value for path `role`.

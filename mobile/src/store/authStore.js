@@ -4,6 +4,8 @@ import api from '../services/api';
 
 const useAuthStore = create((set, get) => ({
   user: null,
+  currentFarm: null,
+  memberships: [],
   isLoading: true,
   isAuthenticated: false,
   error: null,
@@ -16,9 +18,36 @@ const useAuthStore = create((set, get) => ({
         set({ isLoading: false, isAuthenticated: false });
         return;
       }
-      const { data } = await api.get('/api/auth/me');
-      set({ user: data, isAuthenticated: true, isLoading: false });
-    } catch {
+      const { data: user } = await api.get('/api/auth/me');
+      
+      // Fetch memberships
+      const { data: memberships } = await api.get('/api/memberships/my');
+      
+      let currentFarmId = await SecureStore.getItemAsync('currentFarmId');
+      let currentFarm = null;
+      
+      if (memberships.length > 0) {
+        // If stored farmId is not in memberships, pick the first one
+        const isCurrentValid = currentFarmId && memberships.find(m => (m.farm_id?.id || m.farm_id?._id?.toString()) === currentFarmId);
+        
+        if (!isCurrentValid) {
+          console.log('[AuthStore] Stale Farm ID detected, selecting first available.');
+          currentFarmId = memberships[0].farm_id?.id || memberships[0].farm_id?._id?.toString();
+          await SecureStore.setItemAsync('currentFarmId', currentFarmId);
+        }
+        currentFarm = memberships.find(m => (m.farm_id?.id || m.farm_id?._id?.toString()) === currentFarmId);
+        console.log(`[AuthStore] Session recovered. Farm: ${currentFarm?.farm_id?.name || 'Unknown'}`);
+      }
+      
+      set({ 
+        user, 
+        memberships, 
+        currentFarm,
+        isAuthenticated: true, 
+        isLoading: false 
+      });
+    } catch (err) {
+      console.error('[AuthStore] Init failed:', err.message);
       await SecureStore.deleteItemAsync('accessToken');
       await SecureStore.deleteItemAsync('refreshToken');
       set({ isLoading: false, isAuthenticated: false });
@@ -32,7 +61,22 @@ const useAuthStore = create((set, get) => ({
       const { data } = await api.post('/api/auth/login', { email, password });
       await SecureStore.setItemAsync('accessToken', data.accessToken);
       await SecureStore.setItemAsync('refreshToken', data.refreshToken);
-      set({ user: data.user, isAuthenticated: true });
+      
+      // Fetch memberships after login
+      const { data: memberships } = await api.get('/api/memberships/my');
+      let currentFarm = null;
+      if (memberships.length > 0) {
+        const currentFarmId = memberships[0].farm_id?.id;
+        await SecureStore.setItemAsync('currentFarmId', currentFarmId);
+        currentFarm = memberships[0];
+      }
+
+      set({ 
+        user: data.user, 
+        memberships,
+        currentFarm,
+        isAuthenticated: true 
+      });
       return true;
     } catch (err) {
       const message = err.response?.data?.message || err.response?.data?.error || 'Login failed';
@@ -41,14 +85,41 @@ const useAuthStore = create((set, get) => ({
     }
   },
 
-  // ── Register ──────────────────────────────────────────────
+  // ── Switch Farm ──────────────────────────────────────────
+  switchFarm: async (farmId) => {
+    const { memberships } = get();
+    const farm = memberships.find(m => m.farm_id?.id === farmId);
+    if (farm) {
+      await SecureStore.setItemAsync('currentFarmId', farmId);
+      set({ currentFarm: farm });
+      // We might need to refresh other stores here
+      return true;
+    }
+    return false;
+  },
+
   register: async ({ name, email, password, phone }) => {
     set({ error: null });
     try {
       const { data } = await api.post('/api/auth/register', { name, email, password, phone });
       await SecureStore.setItemAsync('accessToken', data.accessToken);
       await SecureStore.setItemAsync('refreshToken', data.refreshToken);
-      set({ user: data.user, isAuthenticated: true });
+      
+      // Fetch memberships after register
+      const { data: memberships } = await api.get('/api/memberships/my');
+      let currentFarm = null;
+      if (memberships.length > 0) {
+        const currentFarmId = memberships[0].farm_id?.id;
+        await SecureStore.setItemAsync('currentFarmId', currentFarmId);
+        currentFarm = memberships[0];
+      }
+
+      set({ 
+        user: data.user, 
+        memberships,
+        currentFarm,
+        isAuthenticated: true 
+      });
       return true;
     } catch (err) {
       const message = err.response?.data?.message || err.response?.data?.error || 'Registration failed';
