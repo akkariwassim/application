@@ -8,7 +8,7 @@ const logger = require('../utils/logger');
  */
 async function getGeofences(req, res, next) {
   try {
-    const zones = await Zone.find({ user_id: req.user.id });
+    const zones = await Zone.find({ farm_id: req.farm_id });
     res.json({ success: true, data: zones });
   } catch (err) {
     next(err);
@@ -24,7 +24,7 @@ async function createGeofence(req, res, next) {
     
     // Check for unique name
     if (name) {
-      const existing = await Zone.findOne({ user_id: req.user.id, name });
+      const existing = await Zone.findOne({ farm_id: req.farm_id, name });
       if (existing) {
         return res.status(400).json({ 
           success: false,
@@ -77,6 +77,7 @@ async function createGeofence(req, res, next) {
 
     const zone = await Zone.create({
       user_id: req.user.id,
+      farm_id: req.farm_id,
       name,
       description: req.body.description,
       zone_type: zoneType || type || 'grazing',

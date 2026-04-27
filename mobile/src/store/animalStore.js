@@ -1,16 +1,20 @@
 import { create } from 'zustand';
+import { persist, createJSONStorage } from 'zustand/middleware';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import api from '../services/api';
 
-const useAnimalStore = create((set, get) => ({
-  animals: [],
-  socketConnected: false,
-  setSocketConnected: (connected) => set({ socketConnected: connected }),
-  selectedAnimal: null,
-  selectedAnimalAI: null,
-  isLoading: false,
-  isFetchingMore: false,
-  error: null,
-  freeDevices: [],
+const useAnimalStore = create(
+  persist(
+    (set, get) => ({
+      animals: [],
+      socketConnected: false,
+      setSocketConnected: (connected) => set({ socketConnected: connected }),
+      selectedAnimal: null,
+      selectedAnimalAI: null,
+      isLoading: false,
+      isFetchingMore: false,
+      error: null,
+      freeDevices: [],
 
   fetchFreeDevices: async () => {
     try {
@@ -271,6 +275,16 @@ const useAnimalStore = create((set, get) => ({
       ),
     }));
   },
-}));
+  }),
+    {
+      name: 'animal-storage',
+      storage: createJSONStorage(() => AsyncStorage),
+      partialize: (state) => ({ 
+        animals: state.animals, 
+        freeDevices: state.freeDevices 
+      }),
+    }
+  )
+);
 
 export default useAnimalStore;

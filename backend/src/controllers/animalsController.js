@@ -98,7 +98,7 @@ async function getAnimals(req, res, next) {
       sortOrder = 'desc'
     } = req.query;
 
-    const query = { user_id: req.user.id };
+    const query = { farm_id: req.farm_id };
 
     // ── Filters ───────────────────────────────────────────────────
     if (status) query.status = status;
@@ -125,7 +125,7 @@ async function getAnimals(req, res, next) {
       Animal.countDocuments(query),
       // Aggregate stats for the user
       Animal.aggregate([
-        { $match: { user_id: req.user.id } },
+        { $match: { farm_id: req.farm_id } },
         { $group: { 
           _id: "$status", 
           count: { $sum: 1 } 
@@ -164,7 +164,7 @@ async function getAnimals(req, res, next) {
 async function getAnimal(req, res, next) {
   try {
     const { id } = req.params;
-    const animal = await Animal.findOne({ _id: id, user_id: req.user.id });
+    const animal = await Animal.findOne({ _id: id, farm_id: req.farm_id });
     if (!animal) return res.status(404).json({ 
       success: false,
       error: 'ANIMAL_NOT_FOUND',
@@ -190,6 +190,7 @@ async function createAnimal(req, res, next) {
       const existing = await Animal.findOne({ device_id: deviceId.trim() });
       if (existing) {
         return res.status(409).json({ 
+          success: false,
           error: 'DUPLICATE_DEVICE', 
           field: 'device_id',
           message: `Le collier ${deviceId} est déjà assigné à ${existing.name}.` 
@@ -201,6 +202,7 @@ async function createAnimal(req, res, next) {
       const existing = await Animal.findOne({ rfid_tag: rfidTag.trim() });
       if (existing) {
         return res.status(409).json({ 
+          success: false,
           error: 'DUPLICATE_DEVICE', 
           field: 'rfid_tag',
           message: `Le tag RFID ${rfidTag} est déjà utilisé.` 
@@ -211,6 +213,7 @@ async function createAnimal(req, res, next) {
     // 2. Data Construction (Omit empty strings to satisfy sparse index)
     const animal = await Animal.create({
       user_id: req.user.id,
+      farm_id: req.farm_id,
       name,
       type,
       breed,
@@ -288,7 +291,7 @@ async function updateAnimal(req, res, next) {
       delete updates.currentZoneId; 
     }
 
-    const existing = await Animal.findOne({ _id: id, user_id: req.user.id });
+    const existing = await Animal.findOne({ _id: id, farm_id: req.farm_id });
     if (!existing) return res.status(404).json({ 
       success: false, 
       error: 'ANIMAL_NOT_FOUND',
@@ -340,7 +343,7 @@ async function updateAnimal(req, res, next) {
 async function deleteAnimal(req, res, next) {
   try {
     const { id } = req.params;
-    const animal = await Animal.findOne({ _id: id, user_id: req.user.id });
+    const animal = await Animal.findOne({ _id: id, farm_id: req.farm_id });
     if (!animal) return res.status(404).json({ 
       success: false,
       error: 'ANIMAL_NOT_FOUND',

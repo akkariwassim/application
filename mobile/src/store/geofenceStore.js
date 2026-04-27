@@ -1,10 +1,14 @@
 import { create } from 'zustand';
+import { persist, createJSONStorage } from 'zustand/middleware';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import api from '../services/api';
 
-const useGeofenceStore = create((set, get) => ({
-  geofences: [],
-  isLoading: false,
-  error: null,
+const useGeofenceStore = create(
+  persist(
+    (set, get) => ({
+      geofences: [],
+      isLoading: false,
+      error: null,
 
   fetchGeofences: async () => {
     set({ isLoading: true, error: null });
@@ -82,6 +86,15 @@ const useGeofenceStore = create((set, get) => ({
       ),
     }));
   },
-}));
+  }),
+    {
+      name: 'geofence-storage',
+      storage: createJSONStorage(() => AsyncStorage),
+      partialize: (state) => ({ 
+        geofences: state.geofences 
+      }),
+    }
+  )
+);
 
 export default useGeofenceStore;

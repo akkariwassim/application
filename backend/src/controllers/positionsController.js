@@ -34,8 +34,9 @@ async function submitPosition(req, res, next) {
     if (gps_signal !== undefined)     updatePayload.signal_strength = gps_signal;
     if (activity !== undefined)       updatePayload.activity       = activity;
 
+    // Find animal first to get its farm if req.farm_id is missing (e.g. legacy firmware)
     const animal = await Animal.findOneAndUpdate(
-      { _id: animalId, user_id: req.user.id },
+      { _id: animalId, $or: [{ farm_id: req.farm_id }, { user_id: req.user.id }] },
       { $set: updatePayload },
       { new: true }
     );
@@ -59,8 +60,8 @@ async function submitPosition(req, res, next) {
       logger.error(`Async AI processing failed: ${err.message}`);
     });
     
-    // 3. Broadcast update via WebSocket
-    socketConfig.emitPositionUpdate(req.user.id, animalId, { 
+    // 3. Broadcast update via WebSocket (using farm room)
+    socketConfig.emitPositionUpdate(req.farm_id || animal.farm_id || req.user.id, animalId, { 
       latitude, 
       longitude, 
       temperature: animal.temperature, 
@@ -80,7 +81,7 @@ async function submitPosition(req, res, next) {
       
       // Fallback geofence logic if alertService fails
       try {
-        const activeZone = await Zone.findByAnimal(animalId, req.user.id);
+        const activeZone = await Zone.findByAnimal(animalId, animal.farm_id);
         if (activeZone && activeZone.is_active) {
           let coords = [];
           if (activeZone.type === 'polygon' && activeZone.polygon_coords) {
@@ -101,11 +102,12 @@ async function submitPosition(req, res, next) {
             await Alert.create({
               animal_id: animalId,
               user_id: req.user.id,
+              farm_id: animal.farm_id,
               type: 'exit',
               zone_id: activeZone._id,
               message: `L'animal ${animal.name} a quitté sa zone "${activeZone.name}"!`
             });
-            socketConfig.emitAlert(req.user.id, {
+            socketConfig.emitAlert(animal.farm_id, {
               type: 'exit',
               animalId,
               animalName: animal.name,
@@ -138,7 +140,7 @@ async function getHistory(req, res, next) {
     const MovementHistory = require('../models/MovementHistory');
     const history = await MovementHistory.find({ 
       animal_id: animalId, 
-      user_id: req.user.id,
+      $or: [{ farm_id: req.farm_id }, { user_id: req.user.id }],
       timestamp: { $gte: startDate }
     }).sort({ timestamp: 1 });
     
@@ -156,7 +158,7 @@ async function getLatest(req, res, next) {
     const { animalId } = req.params;
     const latest = await SensorData.findOne({ 
       animal_id: animalId, 
-      user_id: req.user.id 
+      $or: [{ farm_id: req.farm_id }, { user_id: req.user.id }] 
     }).sort({ timestamp: -1 });
     
     if (!latest) return res.status(404).json({ 

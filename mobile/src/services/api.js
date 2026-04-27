@@ -46,7 +46,13 @@ api.interceptors.request.use(
       config.headers.Authorization = `Bearer ${token}`;
     }
 
-    // 2. Ensure /api prefix
+    // 2. Attach Farm Context (Multi-tenancy)
+    const farmId = await SecureStore.getItemAsync('activeFarmId');
+    if (farmId) {
+      config.headers['x-farm-id'] = farmId;
+    }
+
+    // 3. Ensure /api prefix
     if (config.url && !config.url.startsWith('/api')) {
       const separator = config.url.startsWith('/') ? '' : '/';
       config.url = `/api${separator}${config.url}`;

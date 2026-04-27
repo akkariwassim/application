@@ -9,7 +9,7 @@ async function getAlerts(req, res, next) {
   try {
     const { status, severity, animalId, type } = req.query;
     
-    const query = { user_id: req.user.id };
+    const query = { farm_id: req.farm_id };
     if (status) query.status = status;
     if (severity) query.severity = severity;
     if (animalId) query.animal_id = animalId;
@@ -28,7 +28,7 @@ async function getAlerts(req, res, next) {
 async function getAlert(req, res, next) {
   try {
     const { id } = req.params;
-    const alert = await Alert.findOne({ _id: id, user_id: req.user.id });
+    const alert = await Alert.findOne({ _id: id, farm_id: req.farm_id });
     if (!alert) return res.status(404).json({ 
       success: false,
       error: 'ALERT_NOT_FOUND',
@@ -47,7 +47,7 @@ async function acknowledgeAlert(req, res, next) {
   try {
     const { id } = req.params;
     const alert = await Alert.findOneAndUpdate(
-      { _id: id, user_id: req.user.id },
+      { _id: id, farm_id: req.farm_id },
       { $set: { status: 'acknowledged', acknowledged_at: new Date() } },
       { new: true }
     );

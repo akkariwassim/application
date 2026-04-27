@@ -37,6 +37,7 @@ async function processAIPrediction(animal, sensorData) {
     const savedPrediction = await AIPrediction.create({
       animal_id: animal._id,
       user_id: animal.user_id,
+      farm_id: animal.farm_id,
       status: prediction.status,
       risk_score: prediction.risk_score,
       cause: prediction.cause,
@@ -51,6 +52,7 @@ async function processAIPrediction(animal, sensorData) {
       const alert = await Alert.create({
         animal_id: animal._id,
         user_id: animal.user_id,
+        farm_id: animal.farm_id,
         type: 'health_critical',
         severity: 'critical',
         message: `🤖 AI Alert: ${prediction.cause}. ${prediction.recommendation}`,
@@ -65,7 +67,7 @@ async function processAIPrediction(animal, sensorData) {
       });
 
       // Broadcast via Socket
-      socketConfig.emitAlert(animal.user_id, animal._id, alert);
+      socketConfig.emitAlert(animal.farm_id, animal._id, alert);
     }
 
     return savedPrediction;

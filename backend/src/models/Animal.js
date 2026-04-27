@@ -8,6 +8,12 @@ const animalSchema = new mongoose.Schema({
     ref: 'User',
     required: true,
   },
+  farm_id: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Farm',
+    required: true,
+    index: true,
+  },
   name: {
     type: String,
     required: [true, 'Animal name is required'],
@@ -122,9 +128,10 @@ animalSchema.pre('save', async function() {
   }
 });
 
-animalSchema.index({ user_id: 1, created_at: -1 });
-animalSchema.index({ user_id: 1, status: 1 });
-animalSchema.index({ user_id: 1, current_zone_id: 1 });
+animalSchema.index({ farm_id: 1, created_at: -1 });
+animalSchema.index({ farm_id: 1, status: 1 });
+animalSchema.index({ farm_id: 1, current_zone_id: 1 });
+animalSchema.index({ user_id: 1 });
 animalSchema.index({ current_location: '2dsphere' });
 
 const Animal = mongoose.model('Animal', animalSchema);

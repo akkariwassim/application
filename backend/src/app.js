@@ -49,9 +49,15 @@ app.use(cors({
   credentials: true
 }));
 
-// ── Request Logging (DEBUG) ────────────────────────────────────
+// ── DATA AUDIT LOGGING ─────────────────────────────────────────
 app.use((req, res, next) => {
-  logger.info(`Incoming Request: ${req.method} ${req.url}`);
+  const body = { ...req.body };
+  if (body.password) body.password = '********';
+  
+  logger.info(`[Data Audit] ${req.method} ${req.originalUrl}`, {
+    ip: req.ip,
+    body: Object.keys(body).length ? body : undefined
+  });
   next();
 });
 
