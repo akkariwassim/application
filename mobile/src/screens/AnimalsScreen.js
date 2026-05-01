@@ -6,22 +6,12 @@ import {
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import useAnimalStore from '../store/animalStore';
+import useThemeStore from '../store/themeStore';
+import { SHADOWS } from '../config/theme';
+import StatSkeleton from '../components/Skeletons/StatSkeleton';
+import EmptyState from '../components/EmptyState';
 
 const { width } = Dimensions.get('window');
-
-const COLORS = {
-  primary:    '#6366F1', 
-  secondary:  '#8B5CF6', 
-  background: '#0F172A', 
-  surface:    '#1E293B', 
-  text:       '#F8FAFC', 
-  subtext:    '#94A3B8', 
-  safe:       '#10B981', 
-  warning:    '#F59E0B', 
-  danger:     '#EF4444', 
-  offline:    '#64748B', 
-  border:     'rgba(255, 255, 255, 0.06)',
-};
 
 const TYPE_ICONS = {
   bovine:  'cow',
@@ -37,6 +27,10 @@ export default function AnimalsScreen({ navigation }) {
     animals, fetchAnimals, isFetchingMore, pagination, 
     setFilters, filters, stats, deleteAnimal 
   } = useAnimalStore();
+  
+  const { getColors, isDarkMode } = useThemeStore();
+  const COLORS = getColors();
+  const styles = createStyles(COLORS);
   
   const [refreshing, setRefreshing] = useState(false);
   const [search, setSearch] = useState('');
@@ -63,242 +57,181 @@ export default function AnimalsScreen({ navigation }) {
 
   const handleDelete = (animal) => {
     Alert.alert(
-      'Remove Animal',
-      `Are you sure you want to remove "${animal.name}"? This action releases its device for reuse.`,
+      "Supprimer l'animal",
+      `Voulez-vous vraiment supprimer ${animal.name} ?`,
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: "Annuler", style: "cancel" },
         { 
-          text: 'Remove', 
-          style: 'destructive', 
+          text: "Supprimer", 
+          style: "destructive", 
           onPress: () => deleteAnimal(animal.id) 
-        },
+        }
       ]
     );
   };
 
-  const renderHeader = () => (
-    <View style={styles.header}>
-      <View style={styles.headerTop}>
-        <View>
-          <Text style={styles.headerTitle}>My Animals</Text>
-          <Text style={styles.headerSub}>Managing {stats.total} livestock</Text>
+  const renderAnimalItem = ({ item }) => (
+    <TouchableOpacity 
+      style={styles.card}
+      onPress={() => navigation.navigate('AnimalView', { animal: item })}
+      onLongPress={() => handleDelete(item)}
+    >
+      <View style={styles.cardHeader}>
+        <View style={[styles.iconBox, { backgroundColor: COLORS.primary + '15' }]}>
+          <MaterialCommunityIcons 
+            name={TYPE_ICONS[item.type?.toLowerCase()] || 'paw'} 
+            size={24} 
+            color={COLORS.primary} 
+          />
         </View>
-        <TouchableOpacity 
-          style={styles.statsIcon} 
-          onPress={() => fetchAnimals(true)}
-        >
-          <Ionicons name="refresh" size={20} color={COLORS.text} />
-        </TouchableOpacity>
+        <View style={styles.headerInfo}>
+          <Text style={styles.animalName}>{item.name}</Text>
+          <Text style={styles.animalId}>ID: {item.device_id || 'N/A'}</Text>
+        </View>
+        <View style={[styles.statusBadge, { backgroundColor: (item.status === 'danger' ? COLORS.danger : COLORS.success) + '15' }]}>
+          <View style={[styles.statusDot, { backgroundColor: item.status === 'danger' ? COLORS.danger : COLORS.success }]} />
+          <Text style={[styles.statusText, { color: item.status === 'danger' ? COLORS.danger : COLORS.success }]}>
+            {item.status?.toUpperCase() || 'OK'}
+          </Text>
+        </View>
       </View>
 
-      <View style={styles.statsRow}>
-        <StatItem label="Safe" value={stats.safe} color={COLORS.safe} icon="shield-checkmark" />
-        <StatItem label="Alert" value={stats.danger + stats.warning} color={COLORS.danger} icon="alert-circle" />
-        <StatItem label="Offline" value={stats.offline} color={COLORS.offline} icon="cloud-offline" />
+      <View style={styles.statsGrid}>
+        <View style={styles.stat}>
+          <Ionicons name="thermometer-outline" size={14} color={COLORS.textMuted} />
+          <Text style={styles.statVal}>{item.temperature || '--'}°C</Text>
+        </View>
+        <View style={styles.stat}>
+          <Ionicons name="heart-outline" size={14} color={COLORS.textMuted} />
+          <Text style={styles.statVal}>{item.heart_rate || '--'} bpm</Text>
+        </View>
+        <View style={styles.stat}>
+          <Ionicons name="battery-charging" size={14} color={COLORS.textMuted} />
+          <Text style={styles.statVal}>{item.battery_level || '--'}%</Text>
+        </View>
+      </View>
+    </TouchableOpacity>
+  );
+
+  return (
+    <View style={styles.container}>
+      <View style={[styles.header, { paddingTop: insets.top + 10 }]}>
+        <View style={styles.headerTop}>
+          <View>
+            <Text style={styles.title}>Troupeau</Text>
+            <Text style={styles.subtitle}>Gestion de l'exploitation</Text>
+          </View>
+          <TouchableOpacity 
+            style={styles.addBtn} 
+            onPress={() => navigation.navigate('Map')} // Use Map for adding or a separate form
+          >
+            <Ionicons name="add" size={28} color={COLORS.white} />
+          </TouchableOpacity>
+        </View>
       </View>
 
-      <View style={styles.searchContainer}>
-        <View style={styles.searchInputWrapper}>
-          <Ionicons name="search" size={20} color={COLORS.subtext} style={{ marginLeft: 12 }} />
+      <View style={styles.searchRow}>
+        <View style={styles.searchBar}>
+          <Ionicons name="search" size={18} color={COLORS.textMuted} />
           <TextInput
             style={styles.searchInput}
-            placeholder="Search by name or device..."
-            placeholderTextColor={COLORS.subtext}
+            placeholder="Rechercher un animal..."
+            placeholderTextColor={COLORS.textDim}
             value={search}
             onChangeText={handleSearch}
           />
         </View>
       </View>
 
-      <View style={styles.filterScroll}>
-        {['bovine', 'ovine', 'equine', 'caprine'].map(t => (
-          <TouchableOpacity 
-            key={t}
-            style={[styles.filterBtn, filters.type === t && styles.filterBtnActive]}
-            onPress={() => toggleFilter(t)}
-          >
-            <MaterialCommunityIcons 
-              name={TYPE_ICONS[t]} 
-              size={18} 
-              color={filters.type === t ? '#fff' : COLORS.subtext} 
-            />
-            <Text style={[styles.filterBtnText, filters.type === t && styles.filterBtnTextActive]}>
-              {t.charAt(0).toUpperCase() + t.slice(1)}
-            </Text>
-          </TouchableOpacity>
-        ))}
+      <View style={styles.filterRow}>
+        <FlatList
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          data={['bovine', 'ovine', 'caprine', 'equine']}
+          keyExtractor={item => item}
+          renderItem={({ item }) => (
+            <TouchableOpacity 
+              style={[styles.filterChip, filters.type === item && styles.activeChip]}
+              onPress={() => toggleFilter(item)}
+            >
+              <Text style={[styles.chipText, filters.type === item && styles.activeChipText]}>
+                {item.charAt(0).toUpperCase() + item.slice(1)}
+              </Text>
+            </TouchableOpacity>
+          )}
+          contentContainerStyle={{ paddingHorizontal: 20, gap: 10 }}
+        />
       </View>
-    </View>
-  );
 
-  const renderAnimalCard = ({ item }) => {
-    const statusColor = COLORS[item.status] || COLORS.offline;
-    const lastSeen = item.last_seen ? new Date(item.last_seen).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Never';
-    const battery = item.battery_level ?? 100;
-    
-    return (
-      <TouchableOpacity 
-        style={styles.card}
-        activeOpacity={0.9}
-        onPress={() => navigation.navigate('AnimalView', { animalId: item.id })}
-      >
-        <View style={styles.cardMain}>
-          <View style={[styles.avatarBox, { borderColor: statusColor + '44' }]}>
-            <MaterialCommunityIcons name={TYPE_ICONS[item.type] || 'paw'} size={32} color={statusColor} />
-            <View style={[styles.statusDot, { backgroundColor: statusColor }]} />
-          </View>
-
-          <View style={styles.cardInfo}>
-            <View style={styles.cardHeader}>
-              <Text style={styles.animalName} numberOfLines={1}>{item.name}</Text>
-              <View style={styles.typeBadge}>
-                <Text style={styles.typeBadgeText}>{item.type}</Text>
-              </View>
-            </View>
-            
-            <View style={styles.metaRow}>
-              <View style={styles.metaItem}>
-                <Ionicons name="time-outline" size={14} color={COLORS.subtext} />
-                <Text style={styles.metaText}>{lastSeen}</Text>
-              </View>
-              <View style={styles.metaItem}>
-                <Ionicons 
-                  name={battery > 20 ? "battery-charging" : "battery-dead"} 
-                  size={14} 
-                  color={battery > 20 ? COLORS.safe : COLORS.danger} 
-                />
-                <Text style={[styles.metaText, battery <= 20 && { color: COLORS.danger }]}>{battery}%</Text>
-              </View>
-            </View>
-          </View>
-
-          <Ionicons name="chevron-forward" size={20} color={COLORS.border} />
-        </View>
-
-        <View style={styles.cardFooter}>
-          <Text style={[styles.footerStatus, { color: statusColor }]}>
-            ● {item.status.toUpperCase()}
-          </Text>
-          <TouchableOpacity style={styles.deleteBtn} onPress={() => handleDelete(item)}>
-            <Ionicons name="trash-outline" size={18} color={COLORS.danger + '88'} />
-          </TouchableOpacity>
-        </View>
-      </TouchableOpacity>
-    );
-  };
-
-  return (
-    <View style={styles.container}>
       <FlatList
         data={animals}
-        keyExtractor={item => item.id}
-        renderItem={renderAnimalCard}
-        ListHeaderComponent={renderHeader}
-        contentContainerStyle={[styles.list, { paddingBottom: insets.bottom + 100 }]}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={COLORS.primary} />
-        }
-        onEndReached={() => fetchAnimals(false)}
-        onEndReachedThreshold={0.5}
-        ListFooterComponent={isFetchingMore ? <ActivityIndicator style={{ margin: 20 }} color={COLORS.primary} /> : null}
-        ListEmptyComponent={!isFetchingMore && (
-          <View style={styles.empty}>
-            <Ionicons name="paw-outline" size={48} color={COLORS.surface} />
-            <Text style={styles.emptyText}>No animals found matching your search.</Text>
+        renderItem={renderAnimalItem}
+        keyExtractor={item => item.id.toString()}
+        contentContainerStyle={styles.list}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={COLORS.primary} />}
+        ListHeaderComponent={() => (
+          <View style={styles.overview}>
+            <View style={styles.overviewCard}>
+              <Text style={styles.ovVal}>{animals.length}</Text>
+              <Text style={styles.ovLab}>Total</Text>
+            </View>
+            <View style={styles.overviewCard}>
+              <Text style={[styles.ovVal, { color: COLORS.success }]}>
+                {animals.filter(a => a.status !== 'danger').length}
+              </Text>
+              <Text style={styles.ovLab}>Sains</Text>
+            </View>
+            <View style={styles.overviewCard}>
+              <Text style={[styles.ovVal, { color: COLORS.danger }]}>
+                {animals.filter(a => a.status === 'danger').length}
+              </Text>
+              <Text style={styles.ovLab}>Alertes</Text>
+            </View>
           </View>
         )}
+        ListEmptyComponent={<EmptyState title="Aucun animal" subtitle="Commencez par ajouter vos bêtes depuis la carte." />}
       />
-
-      <TouchableOpacity 
-        style={[styles.fab, { bottom: insets.bottom + 20 }]}
-        activeOpacity={0.8}
-        onPress={() => navigation.navigate('AnimalDetail', { mode: 'create' })}
-      >
-        <View style={styles.fabInner}>
-          <Ionicons name="add" size={32} color="#fff" />
-        </View>
-      </TouchableOpacity>
-
-      {/* Undo Snackbar */}
-      {useAnimalStore.getState().lastDeletedAnimal && (
-        <View style={[styles.undoBar, { bottom: insets.bottom + 100 }]}>
-          <Text style={styles.undoText}>Animal removed</Text>
-          <TouchableOpacity onPress={() => useAnimalStore.getState().restoreAnimal()}>
-            <Text style={styles.undoAction}>UNDO</Text>
-          </TouchableOpacity>
-        </View>
-      )}
     </View>
   );
 }
 
-function StatItem({ label, value, color, icon }) {
-  return (
-    <View style={[styles.statItem, { borderColor: color + '22' }]}>
-      <Ionicons name={icon} size={18} color={color} />
-      <View style={{ marginLeft: 8 }}>
-        <Text style={[styles.statValue, { color }]}>{value}</Text>
-        <Text style={styles.statLabel}>{label}</Text>
-      </View>
-    </View>
-  );
-}
-
-const styles = StyleSheet.create({
+const createStyles = (COLORS) => StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.background },
-  list: { padding: 16 },
-  header: { marginBottom: 12 },
-  headerTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 },
-  headerTitle: { fontSize: 28, fontWeight: '900', color: COLORS.text, letterSpacing: -0.5 },
-  headerSub: { fontSize: 13, color: COLORS.subtext, marginTop: 2 },
-  statsIcon: { width: 40, height: 40, borderRadius: 12, backgroundColor: COLORS.surface, justifyContent: 'center', alignItems: 'center', borderWidth: 1, borderColor: COLORS.border },
+  header: { paddingHorizontal: 20, paddingBottom: 10 },
+  headerTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  title: { fontSize: 32, fontWeight: '900', color: COLORS.text, letterSpacing: -1 },
+  subtitle: { fontSize: 14, color: COLORS.textMuted, marginTop: 4 },
   
-  statsRow: { flexDirection: 'row', gap: 10, marginBottom: 20 },
-  statItem: { flex: 1, flexDirection: 'row', alignItems: 'center', backgroundColor: COLORS.surface, padding: 12, borderRadius: 16, borderWidth: 1 },
-  statValue: { fontSize: 16, fontWeight: '800' },
-  statLabel: { fontSize: 10, color: COLORS.subtext, fontWeight: '600', textTransform: 'uppercase' },
-
-  searchContainer: { marginBottom: 12 },
-  searchInputWrapper: { flexDirection: 'row', alignItems: 'center', backgroundColor: COLORS.surface, borderRadius: 16, height: 50, borderWidth: 1, borderColor: COLORS.border },
-  searchInput: { flex: 1, color: COLORS.text, fontSize: 15, paddingHorizontal: 12 },
-
-  filterScroll: { flexDirection: 'row', gap: 8, marginBottom: 8 },
-  filterBtn: { flexDirection: 'row', alignItems: 'center', backgroundColor: COLORS.surface, paddingHorizontal: 14, paddingVertical: 8, borderRadius: 12, borderWidth: 1, borderColor: COLORS.border },
-  filterBtnActive: { backgroundColor: COLORS.primary, borderColor: COLORS.primary },
-  filterBtnText: { color: COLORS.subtext, fontSize: 12, fontWeight: '700', marginLeft: 6 },
-  filterBtnTextActive: { color: '#fff' },
-
-  card: { backgroundColor: COLORS.surface, borderRadius: 24, padding: 16, marginBottom: 12, borderWidth: 1, borderColor: COLORS.border },
-  cardMain: { flexDirection: 'row', alignItems: 'center' },
-  avatarBox: { width: 60, height: 60, borderRadius: 20, backgroundColor: COLORS.background, justifyContent: 'center', alignItems: 'center', borderWidth: 1, position: 'relative' },
-  statusDot: { position: 'absolute', bottom: -2, right: -2, width: 14, height: 14, borderRadius: 7, borderWidth: 2, borderColor: COLORS.surface },
-  cardInfo: { flex: 1, marginLeft: 16 },
-  cardHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 },
-  animalName: { color: COLORS.text, fontSize: 18, fontWeight: '800', flex: 1 },
-  typeBadge: { backgroundColor: COLORS.background, paddingHorizontal: 8, paddingVertical: 2, borderRadius: 6 },
-  typeBadgeText: { color: COLORS.subtext, fontSize: 10, fontWeight: '900', textTransform: 'uppercase' },
-  metaRow: { flexDirection: 'row', gap: 12 },
-  metaItem: { flexDirection: 'row', alignItems: 'center', gap: 4 },
-  metaText: { color: COLORS.subtext, fontSize: 12, fontWeight: '600' },
+  addBtn: { width: 44, height: 44, borderRadius: 14, backgroundColor: COLORS.primary, alignItems: 'center', justifyContent: 'center', ...SHADOWS.soft },
   
-  cardFooter: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 12, paddingTop: 12, borderTopWidth: 1, borderTopColor: COLORS.border },
-  footerStatus: { fontSize: 10, fontWeight: '900', letterSpacing: 0.5 },
-  deleteBtn: { padding: 4 },
+  searchRow: { paddingHorizontal: 20, marginTop: 15 },
+  searchBar: { height: 48, backgroundColor: COLORS.card, borderRadius: 14, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, borderWidth: 1, borderColor: COLORS.border },
+  searchInput: { flex: 1, marginLeft: 10, color: COLORS.text, fontSize: 14, fontWeight: '600' },
 
-  fab: { position: 'absolute', right: 20, width: 64, height: 64, borderRadius: 32, elevation: 8, shadowColor: COLORS.primary, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.4, shadowRadius: 8 },
-  fabInner: { flex: 1, borderRadius: 32, backgroundColor: COLORS.primary, justifyContent: 'center', alignItems: 'center' },
+  filterRow: { marginTop: 15, marginBottom: 10 },
+  filterChip: { paddingHorizontal: 16, paddingVertical: 8, borderRadius: 12, backgroundColor: COLORS.card, borderWidth: 1, borderColor: COLORS.border },
+  activeChip: { backgroundColor: COLORS.primary, borderColor: COLORS.primary },
+  chipText: { fontSize: 13, fontWeight: '700', color: COLORS.textMuted },
+  activeChipText: { color: COLORS.white },
 
-  empty: { alignItems: 'center', justifyContent: 'center', padding: 40, marginTop: 40 },
-  emptyText: { color: COLORS.subtext, fontSize: 14, textAlign: 'center', marginTop: 16, lineHeight: 20 },
+  list: { paddingHorizontal: 20, paddingBottom: 100 },
+  overview: { flexDirection: 'row', gap: 12, marginBottom: 24, marginTop: 10 },
+  overviewCard: { flex: 1, backgroundColor: COLORS.card, padding: 16, borderRadius: 20, alignItems: 'center', borderWidth: 1, borderColor: COLORS.border, ...SHADOWS.soft },
+  ovVal: { fontSize: 24, fontWeight: '900', color: COLORS.text },
+  ovLab: { fontSize: 10, fontWeight: '800', color: COLORS.textMuted, textTransform: 'uppercase', marginTop: 4 },
 
-  undoBar: { 
-    position: 'absolute', left: 20, right: 20, 
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-    backgroundColor: COLORS.surface, borderRadius: 16, 
-    paddingHorizontal: 20, paddingVertical: 14,
-    borderWidth: 1, borderColor: COLORS.primary + '44',
-    shadowColor: '#000', shadowOpacity: 0.3, shadowRadius: 10, shadowOffset: { width:0, height:4 }
-  },
-  undoText: { color: COLORS.text, fontSize: 14, fontWeight: '600' },
-  undoAction: { color: COLORS.primary, fontSize: 14, fontWeight: '800', letterSpacing: 1 },
+  card: { backgroundColor: COLORS.card, borderRadius: 24, padding: 20, marginBottom: 16, borderWidth: 1, borderColor: COLORS.border, ...SHADOWS.soft },
+  cardHeader: { flexDirection: 'row', alignItems: 'center' },
+  iconBox: { width: 48, height: 48, borderRadius: 16, alignItems: 'center', justifyContent: 'center', marginRight: 12 },
+  headerInfo: { flex: 1 },
+  animalName: { fontSize: 17, fontWeight: '800', color: COLORS.text },
+  animalId: { fontSize: 12, color: COLORS.textMuted, marginTop: 2 },
+  
+  statusBadge: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 10, gap: 6 },
+  statusDot: { width: 6, height: 6, borderRadius: 3 },
+  statusText: { fontSize: 10, fontWeight: '900' },
+
+  statsGrid: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 20, paddingVertical: 15, borderTopWidth: 1, borderColor: COLORS.divider },
+  stat: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  statVal: { fontSize: 13, fontWeight: '700', color: COLORS.text },
 });

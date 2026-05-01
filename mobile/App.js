@@ -15,7 +15,13 @@ import useAuthStore from './src/store/authStore';
 import useAlertStore from './src/store/alertStore';
 import useAnimalStore from './src/store/animalStore';
 import useGeofenceStore from './src/store/geofenceStore';
+import useThemeStore from './src/store/themeStore';
 import { connectSocket, disconnectSocket } from './src/services/socketService';
+import { SHADOWS } from './src/config/theme';
+
+import { startConnectivityMonitoring, stopConnectivityMonitoring } from './src/services/connectivityService';
+import SyncStatusIndicator from './src/components/SyncStatusIndicator';
+
 
 // Screens
 import LoginScreen from './src/screens/LoginScreen';
@@ -31,24 +37,15 @@ import ZonesListScreen from './src/screens/ZonesListScreen';
 import AnimalViewScreen from './src/screens/AnimalViewScreen';
 import AlertDetailScreen from './src/screens/AlertDetailScreen';
 import AnimalSettingsScreen from './src/screens/AnimalSettingsScreen';
-import SimulationScreen from './src/screens/SimulationScreen';
 import StatisticsScreen from './src/screens/StatisticsScreen';
 import TeamManagementScreen from './src/screens/TeamManagementScreen';
 import BackupSyncScreen from './src/screens/BackupSyncScreen';
 
-import useSimulationStore from './src/store/simulationStore';
 
 const Tab   = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
-const COLORS = {
-  primary:    '#4F46E5',
-  background: '#0A0F1E',
-  surface:    '#131929',
-  text:       '#F0F4FF',
-  subtext:    '#94A3B8',
-  danger:     '#EF4444',
-};
+
 
 // ── ErrorBoundary — catches React render errors and logs them to terminal ──
 class ErrorBoundary extends React.Component {
@@ -118,49 +115,58 @@ function AuthNavigator() {
 
 // ── Animals Stack ────────────────────────────────────────────
 function AnimalsStack() {
+  const { getColors } = useThemeStore();
+  const COLORS = getColors();
   return (
     <Stack.Navigator
       screenOptions={{
         headerStyle: { backgroundColor: COLORS.surface },
         headerTintColor: COLORS.text,
+        headerTitleStyle: { fontWeight: '800' },
       }}
     >
-      <Stack.Screen name="AnimalsList"  component={AnimalsScreen}      options={{ title: 'My Animals' }} />
+      <Stack.Screen name="AnimalsList"  component={AnimalsScreen}      options={{ title: 'Animaux', headerShown: false }} />
       <Stack.Screen name="AnimalView"   component={AnimalViewScreen}    options={{ title: 'Dashboard' }} />
-      <Stack.Screen name="AnimalDetail" component={AnimalDetailScreen}  options={{ title: 'Animal Details' }} />
-      <Stack.Screen name="AnimalSettings" component={AnimalSettingsScreen} options={{ title: 'Thresholds' }} />
-      <Stack.Screen name="History"      component={HistoryScreen}       options={{ title: 'Movement History' }} />
-      <Stack.Screen name="AlertDetail"  component={AlertDetailScreen}   options={{ title: 'Alert Details' }} />
+      <Stack.Screen name="AnimalDetail" component={AnimalDetailScreen}  options={{ title: 'Détails' }} />
+      <Stack.Screen name="AnimalSettings" component={AnimalSettingsScreen} options={{ title: 'Seuils' }} />
+      <Stack.Screen name="History"      component={HistoryScreen}       options={{ title: 'Historique' }} />
+      <Stack.Screen name="AlertDetail"  component={AlertDetailScreen}   options={{ title: 'Alerte' }} />
     </Stack.Navigator>
   );
 }
 
 // ── Zones Stack ──────────────────────────────────────────────
 function ZonesStack() {
+  const { getColors } = useThemeStore();
+  const COLORS = getColors();
   return (
     <Stack.Navigator
       screenOptions={{
         headerStyle: { backgroundColor: COLORS.surface },
         headerTintColor: COLORS.text,
+        headerTitleStyle: { fontWeight: '800' },
       }}
     >
-      <Stack.Screen name="ZonesList" component={ZonesListScreen} options={{ title: 'My Zones', headerShown: false }} />
-      <Stack.Screen name="Geofence"  component={GeofenceScreen}  options={{ title: 'Zone Editor' }} />
+      <Stack.Screen name="ZonesList" component={ZonesListScreen} options={{ title: 'Mes Zones', headerShown: false }} />
+      <Stack.Screen name="Geofence"  component={GeofenceScreen}  options={{ title: 'Editeur de Zone' }} />
     </Stack.Navigator>
   );
 }
 
 // ── Profile Stack ────────────────────────────────────────────
 function ProfileStack() {
+  const { getColors } = useThemeStore();
+  const COLORS = getColors();
   return (
     <Stack.Navigator
       screenOptions={{
         headerStyle: { backgroundColor: COLORS.surface },
         headerTintColor: COLORS.text,
+        headerTitleStyle: { fontWeight: '800' },
       }}
     >
-      <Stack.Screen name="ProfileMain" component={ProfileScreen} options={{ title: 'Profile', headerShown: false }} />
-      <Stack.Screen name="TeamManagement" component={TeamManagementScreen} options={{ title: 'Team Management', headerShown: false }} />
+      <Stack.Screen name="ProfileMain" component={ProfileScreen} options={{ title: 'Profil', headerShown: false }} />
+      <Stack.Screen name="TeamManagement" component={TeamManagementScreen} options={{ title: 'Equipe', headerShown: false }} />
       <Stack.Screen name="BackupSync" component={BackupSyncScreen} options={{ title: 'Cloud Backup', headerShown: false }} />
     </Stack.Navigator>
   );
@@ -168,22 +174,20 @@ function ProfileStack() {
 
 // ── Main Tab Navigator ────────────────────────────────────────
 function MainNavigator() {
+  const { getColors } = useThemeStore();
+  const COLORS = getColors();
+  
   const unreadCount        = useAlertStore((s) => s.unreadCount);
+
   const updateAnimalStatus = useAnimalStore((s) => s.updateAnimalStatus);
   const updateZoneStatus   = useGeofenceStore((s) => s.updateZoneStatus);
-  const isSimulationMode   = useSimulationStore((s) => s.isSimulationMode);
   const setSocketConnected = useAnimalStore((s) => s.setSocketConnected);
   const updateAnimalPos    = useAnimalStore((s) => s.updateAnimalPosition);
   const batchUpdatePos    = useAnimalStore((s) => s.batchUpdatePositions);
   const addAlert           = useAlertStore((s) => s.addAlert);
 
   useEffect(() => {
-    if (isSimulationMode) {
-      setSocketConnected(true); // Virtual socket is always "connected"
-      disconnectSocket();
-      return;
-    }
-
+    startConnectivityMonitoring();
     connectSocket({
       onConnect: () => setSocketConnected(true),
       onDisconnect: () => setSocketConnected(false),
@@ -193,65 +197,67 @@ function MainNavigator() {
       onStatusChange:   (data) => updateAnimalStatus(data.animalId, data.status),
       onZoneStatusChange: (data) => updateZoneStatus(data),
     });
-    return () => disconnectSocket();
-  }, [isSimulationMode]);
+    return () => {
+      disconnectSocket();
+      stopConnectivityMonitoring();
+    };
+  }, []);
 
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
-        tabBarIcon: ({ focused, color, size }) => {
-          const icons = {
-            Map:        focused ? 'map'          : 'map-outline',
-            Zones:      focused ? 'layers'       : 'layers-outline',
-            Alerts:     focused ? 'notifications': 'notifications-outline',
-            Animals:    focused ? 'paw'          : 'paw-outline',
-            Stats:      focused ? 'bar-chart'    : 'bar-chart-outline',
-            Simulation: focused ? 'flask'        : 'flask-outline',
-            Profile:    focused ? 'person'       : 'person-outline',
-          };
-          return <Ionicons name={icons[route.name]} size={size} color={color} />;
-        },
-        tabBarActiveTintColor:   COLORS.primary,
-        tabBarInactiveTintColor: COLORS.subtext,
+        headerShown: false,
+        tabBarActiveTintColor: COLORS.primary,
+        tabBarInactiveTintColor: COLORS.textDim,
         tabBarStyle: {
           backgroundColor: COLORS.surface,
-          borderTopColor: 'rgba(255,255,255,0.05)',
-          paddingBottom: 4,
+          borderTopWidth: 1,
+          borderTopColor: COLORS.border,
           height: 60,
+          paddingBottom: 4,
+          ...SHADOWS.soft,
         },
-        tabBarLabelStyle: { fontSize: 11 },
-        headerStyle:      { backgroundColor: COLORS.surface },
-        headerTintColor:  COLORS.text,
-        headerTitleStyle: { fontWeight: '700' },
+        tabBarIcon: ({ color, size, focused }) => {
+          let iconName;
+          if (route.name === 'Map')        iconName = focused ? 'map'          : 'map-outline';
+          else if (route.name === 'Zones') iconName = focused ? 'layers'       : 'layers-outline';
+          else if (route.name === 'Alerts') iconName = focused ? 'notifications': 'notifications-outline';
+          else if (route.name === 'Animals') iconName = focused ? 'paw'        : 'paw-outline';
+          else if (route.name === 'Stats') iconName = focused ? 'bar-chart'    : 'bar-chart-outline';
+          else if (route.name === 'Profile') iconName = focused ? 'person'     : 'person-outline';
+
+          return <Ionicons name={iconName} size={size} color={color} />;
+        },
       })}
     >
-      <Tab.Screen name="Map"     component={MapScreen}      options={{ title: '🛡 Live Zone', headerShown: false }} />
-      <Tab.Screen name="Zones"   component={ZonesStack} options={{ title: '🛡 Zones' }} />
-      <Tab.Screen name="Stats"   component={StatisticsScreen} options={{ title: '📊 Stats' }} />
-      <Tab.Screen name="Alerts"  component={AlertsScreen} options={{
-        title: 'Alerts',
-        tabBarBadge: unreadCount > 0 ? unreadCount : undefined,
-        tabBarBadgeStyle: { backgroundColor: COLORS.danger },
-      }} />
-      <Tab.Screen name="Animals" component={AnimalsStack} options={{ title: 'Animals', headerShown: false }} />
-      <Tab.Screen name="Simulation" component={SimulationScreen} options={{ title: '🔬 Simulation', headerShown: false }} />
-      <Tab.Screen name="Profile" component={ProfileStack} options={{ title: 'Profile' }} />
+      <Tab.Screen name="Map"     component={MapScreen} />
+      <Tab.Screen name="Zones"   component={ZonesStack} />
+      <Tab.Screen name="Stats"   component={StatisticsScreen} />
+      <Tab.Screen name="Alerts"  component={AlertsScreen} options={{ tabBarBadge: unreadCount > 0 ? unreadCount : null }} />
+      <Tab.Screen name="Animals" component={AnimalsStack} />
+      <Tab.Screen name="Profile" component={ProfileStack} />
     </Tab.Navigator>
   );
 }
 
 // ── Root App ────────────────────────────────────────────────
 export default function App() {
+  const { getColors, init: initTheme } = useThemeStore();
+  const COLORS = getColors();
+  
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const isLoading       = useAuthStore((s) => s.isLoading);
   const init            = useAuthStore((s) => s.init);
 
-  useEffect(() => { init(); }, []);
+  useEffect(() => { 
+    init();
+  }, []);
 
   if (isLoading) {
+    const s = styles(COLORS);
     return (
-      <View style={styles.splash}>
-        <Text style={styles.splashTitle}>🐄 Smart Fence</Text>
+      <View style={s.splash}>
+        <Text style={s.splashTitle}>🐄 Smart Fence</Text>
         <ActivityIndicator color={COLORS.primary} size="large" style={{ marginTop: 20 }} />
       </View>
     );
@@ -261,6 +267,7 @@ export default function App() {
     <ErrorBoundary>
       <GestureHandlerRootView style={{ flex: 1 }}>
         <SafeAreaProvider>
+          <SyncStatusIndicator />
           <NavigationContainer>
             {isAuthenticated ? <MainNavigator /> : <AuthNavigator />}
           </NavigationContainer>
@@ -270,7 +277,7 @@ export default function App() {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = (COLORS) => StyleSheet.create({
   splash: {
     flex: 1,
     backgroundColor: COLORS.background,

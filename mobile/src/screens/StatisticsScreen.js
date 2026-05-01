@@ -11,6 +11,8 @@ import * as Sharing from 'expo-sharing';
 import { COLORS, SHADOWS, SPACING, BORDER_RADIUS } from '../config/theme';
 import useStatsStore from '../store/statsStore';
 import useAnimalStore from '../store/animalStore';
+import useThemeStore from '../store/themeStore';
+
 
 const { width } = Dimensions.get('window');
 
@@ -18,7 +20,11 @@ export default function StatisticsScreen() {
   const insets = useSafeAreaInsets();
   const { farmStats, fetchFarmStats, isLoading } = useStatsStore();
   const { animals } = useAnimalStore();
+  const { getColors, isDarkMode } = useThemeStore();
+  const COLORS = getColors();
+  
   const [selectedPeriod, setSelectedPeriod] = useState('daily');
+
 
   useEffect(() => {
     fetchFarmStats();
@@ -77,10 +83,10 @@ export default function StatisticsScreen() {
   };
 
   const chartConfig = {
-    backgroundGradientFrom: COLORS.surface,
-    backgroundGradientTo: COLORS.surface,
-    color: (opacity = 1) => `rgba(79, 70, 229, ${opacity})`,
-    labelColor: (opacity = 1) => `rgba(148, 163, 184, ${opacity})`,
+    backgroundGradientFrom: COLORS.card,
+    backgroundGradientTo: COLORS.card,
+    color: (opacity = 1) => isDarkMode ? `rgba(46, 204, 113, ${opacity})` : `rgba(39, 174, 96, ${opacity})`,
+    labelColor: (opacity = 1) => COLORS.textMuted,
     strokeWidth: 2,
     barPercentage: 0.5,
     useShadowColorFromDataset: false,
@@ -106,8 +112,8 @@ export default function StatisticsScreen() {
     <View style={[styles.container, { paddingTop: insets.top }]}>
       <View style={styles.header}>
         <View>
-          <Text style={styles.title}>Statistiques</Text>
-          <Text style={styles.subtitle}>Performance du troupeau</Text>
+          <Text style={styles.title}>Dashboard</Text>
+          <Text style={styles.subtitle}>Supervision de l'exploitation</Text>
         </View>
         <TouchableOpacity style={styles.exportBtn} onPress={generatePDF}>
           <Ionicons name="document-text-outline" size={20} color={COLORS.white} />
@@ -171,9 +177,9 @@ export default function StatisticsScreen() {
           <View style={styles.pieContainer}>
             <PieChart
               data={[
-                { name: 'Sain', population: 85, color: '#22C55E', legendFontColor: '#94A3B8' },
-                { name: 'Alerte', population: 10, color: '#F59E0B', legendFontColor: '#94A3B8' },
-                { name: 'Danger', population: 5, color: '#EF4444', legendFontColor: '#94A3B8' },
+                { name: 'Sain', population: 85, color: COLORS.success, legendFontColor: COLORS.textMuted },
+                { name: 'Alerte', population: 10, color: COLORS.warning, legendFontColor: COLORS.textMuted },
+                { name: 'Danger', population: 5, color: COLORS.danger, legendFontColor: COLORS.textMuted },
               ]}
               width={width - 40}
               height={180}
@@ -202,10 +208,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20, 
     paddingVertical: 20,
     borderBottomWidth: 1, 
-    borderBottomColor: 'rgba(255,255,255,0.05)' 
+    borderBottomColor: COLORS.border
   },
-  title: { color: COLORS.text, fontSize: 24, fontWeight: '800' },
-  subtitle: { color: COLORS.subtext, fontSize: 13, marginTop: 2 },
+  title: { color: COLORS.text, fontSize: 28, fontWeight: '900' },
+  subtitle: { color: COLORS.textMuted, fontSize: 14, marginTop: 4 },
   exportBtn: { 
     flexDirection: 'row', 
     alignItems: 'center', 
@@ -216,25 +222,25 @@ const styles = StyleSheet.create({
     gap: 8,
     ...SHADOWS.soft
   },
-  exportText: { color: COLORS.white, fontWeight: '700', fontSize: 13 },
+  exportText: { color: COLORS.white, fontWeight: '800', fontSize: 13 },
   scrollContent: { padding: 20 },
   
-  periodRow: { flexDirection: 'row', backgroundColor: COLORS.surface, borderRadius: 12, padding: 4, marginBottom: 25 },
-  periodBtn: { flex: 1, paddingVertical: 8, alignItems: 'center', borderRadius: 8 },
-  periodBtnActive: { backgroundColor: COLORS.primary },
-  periodBtnText: { color: COLORS.subtext, fontSize: 13, fontWeight: '600' },
+  periodRow: { flexDirection: 'row', backgroundColor: COLORS.card, borderRadius: 14, padding: 4, marginBottom: 25, borderWidth: 1, borderColor: COLORS.border },
+  periodBtn: { flex: 1, paddingVertical: 10, alignItems: 'center', borderRadius: 10 },
+  periodBtnActive: { backgroundColor: COLORS.primary, ...SHADOWS.soft },
+  periodBtnText: { color: COLORS.textMuted, fontSize: 13, fontWeight: '700' },
   textWhite: { color: COLORS.white },
 
   metricsGrid: { flexDirection: 'row', gap: 15, marginBottom: 25 },
-  metricCard: { flex: 1, backgroundColor: COLORS.surface, padding: 15, borderRadius: 20, borderWidth: 1, borderColor: 'rgba(255,255,255,0.05)', ...SHADOWS.soft },
-  metricLabel: { color: COLORS.subtext, fontSize: 10, fontWeight: '700', letterSpacing: 0.5 },
-  metricValue: { color: COLORS.white, fontSize: 22, fontWeight: '800', marginTop: 8 },
-  unit: { fontSize: 12, fontWeight: '400', color: COLORS.subtext },
+  metricCard: { flex: 1, backgroundColor: COLORS.card, padding: 18, borderRadius: 24, borderWidth: 1, borderColor: COLORS.border, ...SHADOWS.soft },
+  metricLabel: { color: COLORS.textMuted, fontSize: 10, fontWeight: '800', letterSpacing: 1 },
+  metricValue: { color: COLORS.text, fontSize: 24, fontWeight: '900', marginTop: 10 },
+  unit: { fontSize: 14, fontWeight: '400', color: COLORS.textMuted },
   trendRow: { flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 8 },
-  trendText: { color: COLORS.success, fontSize: 11, fontWeight: '600' },
+  trendText: { color: COLORS.success, fontSize: 11, fontWeight: '700' },
 
   section: { marginBottom: 30 },
-  sectionTitle: { color: COLORS.white, fontSize: 16, fontWeight: '700', marginBottom: 15 },
-  chart: { borderRadius: 20, marginVertical: 8 },
-  pieContainer: { backgroundColor: COLORS.surface, borderRadius: 20, paddingVertical: 10, borderWidth: 1, borderColor: 'rgba(255,255,255,0.05)' }
+  sectionTitle: { color: COLORS.text, fontSize: 18, fontWeight: '800', marginBottom: 15 },
+  chart: { borderRadius: 24, marginVertical: 8 },
+  pieContainer: { backgroundColor: COLORS.card, borderRadius: 24, paddingVertical: 15, borderWidth: 1, borderColor: COLORS.border, ...SHADOWS.soft }
 });

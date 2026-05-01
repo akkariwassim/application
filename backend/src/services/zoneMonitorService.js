@@ -69,7 +69,7 @@ class ZoneMonitorService {
         logger.info(`[ZoneMonitor] Zone "${zone.name}" changed status to ${status.toUpperCase()}`);
         
         // Broadcast to mobile apps
-        socketConfig.getIO().to(`user:${zone.user_id}`).emit('zone-status-change', {
+        socketConfig.getIO().to(`farm:${zone.farm_id}`).emit('zone-status-change', {
           zoneId: zone._id,
           status,
           color,
@@ -80,6 +80,7 @@ class ZoneMonitorService {
         // Trigger Alert if it becomes RED and didn't have one
         if (status === 'danger') {
            const existingZoneAlert = await Alert.findOne({
+             farm_id: zone.farm_id,
              geofence_id: zone._id,
              type: 'zone_danger',
              status: 'active'
@@ -88,13 +89,14 @@ class ZoneMonitorService {
            if (!existingZoneAlert) {
              const alert = await Alert.create({
                user_id: zone.user_id,
+               farm_id: zone.farm_id,
                geofence_id: zone._id,
                type: 'zone_danger',
                severity: 'critical',
                message: `⚠️ ZONE EN DANGER: ${zone.name} - ${reason}`,
                location: zone.center // Use zone center if available
              });
-             socketConfig.emitAlert(zone.user_id, null, alert);
+             socketConfig.emitAlert(zone.farm_id, null, alert);
            }
         }
       }

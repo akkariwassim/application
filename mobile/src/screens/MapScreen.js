@@ -19,6 +19,8 @@ import theme, { COLORS, SHADOWS, SPACING, BORDER_RADIUS, TYPOGRAPHY } from '../c
 import AnimalMarker from '../components/AnimalMarker';
 import MapControls from '../components/MapUI/MapControls';
 import useMapStore from '../store/mapStore';
+import useThemeStore from '../store/themeStore';
+
 
 // ── Map State Machine Types ──
 const MAP_STATES = {
@@ -90,6 +92,9 @@ export default function MapScreen({ route }) {
   const { animals, fetchAnimals, isLoading, socketConnected } = useAnimalStore();
   const { geofences, fetchGeofences }        = useGeofenceStore();
   const { user }                             = useAuthStore();
+  const { getColors, isDarkMode }            = useThemeStore();
+  const COLORS = getColors();
+
 
   const [selectedAnimal,  setSelectedAnimal]  = useState(null);
   const [showZonesList,   setShowZonesList]   = useState(false);
@@ -137,6 +142,7 @@ export default function MapScreen({ route }) {
     return () => { 
       pulse.stop(); 
       cleanupTracking(); 
+      console.log('[MapScreen] Unmounting, listeners cleaned.');
     };
   }, []);
 
@@ -153,6 +159,8 @@ export default function MapScreen({ route }) {
       if (followUser) setFollowUser(false);
     }
   };
+
+
 
   const onRegionChangeComplete = (region) => {
     setCurrentRegion(region);
@@ -368,8 +376,10 @@ export default function MapScreen({ route }) {
       <Text style={styles.loaderText}>Initialisation SIG...</Text>
     </View>
   );
+  const styles = useMemo(() => createStyles(COLORS), [isDarkMode]);
 
   if (mapState === MAP_STATES.INITIALIZING) return <View style={styles.container}>{renderLoading()}</View>;
+
 
   return (
     <View style={styles.container}>
@@ -536,10 +546,10 @@ export default function MapScreen({ route }) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS) => StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.background },
   fullscreenOverlay: { ...StyleSheet.absoluteFillObject, backgroundColor: COLORS.background, alignItems: 'center', justifyContent: 'center', zIndex: 9999 },
-  loaderText: { color: COLORS.white, fontSize: 18, fontWeight: '800', marginTop: 20 },
+  loaderText: { color: COLORS.text, fontSize: 18, fontWeight: '800', marginTop: 20 },
   userDotContainer: { width: 32, height: 32, alignItems: 'center', justifyContent: 'center' },
   userPulse: { position: 'absolute', width: 30, height: 30, borderRadius: 15, backgroundColor: `${COLORS.primary}66` },
   userInternal: { width: 14, height: 14, borderRadius: 7, backgroundColor: COLORS.primary, borderWidth: 2, borderColor: COLORS.white, alignItems: 'center', justifyContent: 'center', ...SHADOWS.soft },
@@ -552,36 +562,36 @@ const styles = StyleSheet.create({
   sheetHandle: { width: 40, height: 4, backgroundColor: COLORS.border, borderRadius: 2, alignSelf: 'center', marginBottom: SPACING.md },
   detailHeader: { flexDirection: 'row', alignItems: 'center', gap: SPACING.md, marginBottom: SPACING.lg },
   detailIcon: { width: 48, height: 48, borderRadius: 14, alignItems: 'center', justifyContent: 'center' },
-  detailTitle: { color: COLORS.white, fontSize: 18, fontWeight: '800' },
+  detailTitle: { color: COLORS.text, fontSize: 18, fontWeight: '800' },
   detailSubtitle: { color: COLORS.textMuted, fontSize: 13, marginTop: 2 },
   detailActionBtn: { flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: `${COLORS.primary}15`, paddingHorizontal: 12, paddingVertical: 8, borderRadius: 10 },
   detailActionText: { color: COLORS.primary, fontSize: 13, fontWeight: '700' },
   statsGrid: { flexDirection: 'row', gap: SPACING.md },
   statCard: { flex: 1, backgroundColor: COLORS.surface, borderRadius: BORDER_RADIUS.md, padding: SPACING.md, alignItems: 'center', borderWidth: 1, borderColor: COLORS.border },
-  statVal: { color: COLORS.white, fontSize: 16, fontWeight: '800', marginTop: 8 },
+  statVal: { color: COLORS.text, fontSize: 16, fontWeight: '800', marginTop: 8 },
   statLab: { color: COLORS.textDim, fontSize: 10, fontWeight: '600', textTransform: 'uppercase', marginTop: 2 },
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' },
   modalContent: { backgroundColor: COLORS.card, borderTopLeftRadius: 32, borderTopRightRadius: 32, height: '70%', paddingTop: 12 },
   modalHeader: { paddingHorizontal: 24, paddingBottom: 16 },
   modalTitleRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 16 },
-  modalTitle: { color: COLORS.white, fontSize: 20, fontWeight: '800' },
+  modalTitle: { color: COLORS.text, fontSize: 20, fontWeight: '800' },
   modalSubtitle: { color: COLORS.textMuted, fontSize: 13, marginTop: 4 },
   addZoneBtn: { flexDirection: 'row', alignItems: 'center', backgroundColor: COLORS.primary, paddingHorizontal: 16, paddingVertical: 8, borderRadius: 12, gap: 4 },
   addZoneBtnText: { color: COLORS.white, fontWeight: '700', fontSize: 13 },
   modalList: { padding: 20 },
   zoneMiniItem: { flexDirection: 'row', alignItems: 'center', backgroundColor: COLORS.surface, padding: 16, borderRadius: 16, marginBottom: 12, borderWidth: 1, borderColor: COLORS.border },
   zoneDot: { width: 10, height: 10, borderRadius: 5, marginRight: 16 },
-  zoneMiniName: { color: COLORS.white, fontSize: 15, fontWeight: '700' },
+  zoneMiniName: { color: COLORS.text, fontSize: 15, fontWeight: '700' },
   zoneMiniSub: { color: COLORS.textDim, fontSize: 11, marginTop: 2 },
   legendContainer: {
     position: 'absolute',
     top: 130, // Below top bar
     left: 20,
-    backgroundColor: 'rgba(10, 15, 30, 0.9)',
+    backgroundColor: COLORS.card + 'E6', // 90% opacity
     borderRadius: 16,
     padding: 12,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
+    borderColor: COLORS.border,
     gap: 10,
     ...SHADOWS.hard
   },

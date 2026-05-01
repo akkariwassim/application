@@ -8,79 +8,11 @@ const socketConfig = require('../config/socket');
 const zoneMonitorService = require('../services/zoneMonitorService');
 const logger = require('../utils/logger');
 
-/**
- * Generate a random point guaranteed to be inside a polygon.
- * Uses bounding-box rejection sampling.
- */
-function randomPointInPolygon(coords) {
-  if (!coords || coords.length < 3) return null;
-
-  // Compute bounding box
-  let minLat = Infinity, maxLat = -Infinity, minLon = Infinity, maxLon = -Infinity;
-  for (const c of coords) {
-    if (c.latitude < minLat) minLat = c.latitude;
-    if (c.latitude > maxLat) maxLat = c.latitude;
-    if (c.longitude < minLon) minLon = c.longitude;
-    if (c.longitude > maxLon) maxLon = c.longitude;
-  }
-
-  // Rejection sampling: pick random points in the bounding box until one is inside
-  for (let attempt = 0; attempt < 200; attempt++) {
-    const lat = minLat + Math.random() * (maxLat - minLat);
-    const lon = minLon + Math.random() * (maxLon - minLon);
-
-    if (isPointInsidePolygon(lat, lon, coords)) {
-      return { latitude: lat, longitude: lon };
-    }
-  }
-
-  // Fallback: centroid
-  const centLat = coords.reduce((s, c) => s + c.latitude, 0) / coords.length;
-  const centLon = coords.reduce((s, c) => s + c.longitude, 0) / coords.length;
-  return { latitude: centLat, longitude: centLon };
-}
-
-/**
- * Ray-casting point-in-polygon test
- */
-function isPointInsidePolygon(lat, lon, polygon) {
-  let inside = false;
-  for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
-    const xi = polygon[i].latitude, yi = polygon[i].longitude;
-    const xj = polygon[j].latitude, yj = polygon[j].longitude;
-    const intersect = ((yi > lon) !== (yj > lon)) && (lat < (xj - xi) * (lon - yi) / (yj - yi) + xi);
-    if (intersect) inside = !inside;
-  }
-  return inside;
-}
-
 const isAtZero = (lat, lon) => {
   const l = parseFloat(lat);
   const n = parseFloat(lon);
   return isNaN(l) || isNaN(n) || (Math.abs(l) < 0.001 && Math.abs(n) < 0.001);
 };
-
-/**
- * Given a zone, returns a random coordinate inside it
- */
-async function getRandomPointInZone(zoneId) {
-  const zone = await Zone.findById(zoneId);
-  if (!zone) return null;
-
-  if (zone.polygon_coords) {
-    const coords = typeof zone.polygon_coords === 'string' ? JSON.parse(zone.polygon_coords) : zone.polygon_coords;
-    if (coords.length >= 3) {
-      return randomPointInPolygon(coords);
-    }
-  }
-
-  // Fallback to center
-  if (zone.center_lat && zone.center_lon) {
-    return { latitude: zone.center_lat, longitude: zone.center_lon };
-  }
-
-  return null;
-}
 
 /**
  * GET /api/animals
@@ -126,11 +58,7 @@ async function getAnimals(req, res, next) {
       Animal.countDocuments(query),
       // Aggregate stats for the farm
       Animal.aggregate([
-<<<<<<< HEAD
-        { $match: { farm_id: req.farm_id } },
-=======
         { $match: { farm_id: new mongoose.Types.ObjectId(req.farm_id) } },
->>>>>>> origin/main
         { $group: { 
           _id: "$status", 
           count: { $sum: 1 } 
@@ -214,8 +142,28 @@ async function createAnimal(req, res, next) {
         });
       }
     }
+    console.log(`[BACKEND] Creating animal "${name}" with coords:`, { latitude, longitude });
+    logger.info(`Creating animal "${name}" with coords: lat=${latitude}, lon=${longitude}`);
 
-    // 2. Data Construction (Omit empty strings to satisfy sparse index)
+    let finalLat = parseFloat(latitude);
+    let finalLon = parseFloat(longitude);
+    const finalZoneId = currentZoneId || current_zone_id || null;
+
+    // ── FALLBACK: If no coordinates provided, try to use Zone Center ──
+    if ((isNaN(finalLat) || finalLat === 0) && finalZoneId) {
+      const zone = await Zone.findById(finalZoneId);
+      if (zone) {
+        finalLat = zone.center_lat || 0;
+        finalLon = zone.center_lon || 0;
+        logger.info(`[Fallback] Using zone "${zone.name}" center for animal "${name}"`);
+      }
+    }
+
+    // Default to 0 if still NaN
+    if (isNaN(finalLat)) finalLat = 0;
+    if (isNaN(finalLon)) finalLon = 0;
+
+    // 3. Data Construction (Omit empty strings to satisfy sparse index)
     const animal = await Animal.create({
       user_id: req.user.id,
       farm_id: req.farm_id,
@@ -230,9 +178,9 @@ async function createAnimal(req, res, next) {
       color_hex: colorHex || '#4CAF50',
       notes,
       avatar_url: avatarUrl,
-      latitude:  parseFloat(latitude) || 0,
-      longitude: parseFloat(longitude) || 0,
-      current_zone_id: currentZoneId || current_zone_id || null,
+      latitude:  finalLat,
+      longitude: finalLon,
+      current_zone_id: finalZoneId,
       status: 'safe',
       last_seen: new Date()
     });
@@ -307,14 +255,11 @@ async function updateAnimal(req, res, next) {
     const currentLon = updates.longitude !== undefined ? updates.longitude : existing.longitude;
     const zoneId = updates.current_zone_id || existing.current_zone_id;
 
-    // Auto-place inside zone if animal is at 0,0
-    if (zoneId && isAtZero(currentLat, currentLon)) {
-      const point = await getRandomPointInZone(zoneId);
-      if (point) {
-        updates.latitude = point.latitude;
-        updates.longitude = point.longitude;
-      }
-    }
+    console.log(`[BACKEND] Updating animal "${existing.name}" (${id}). Coords in request:`, { 
+      latitude: updates.latitude, 
+      longitude: updates.longitude 
+    });
+    logger.info(`Updating animal "${existing.name}": lat=${updates.latitude}, lon=${updates.longitude}`);
 
     const animal = await Animal.findOneAndUpdate(
       { _id: id, farm_id: req.farm_id },
@@ -480,10 +425,7 @@ async function triggerAction(req, res, next) {
 
     res.json({ 
       success: true, 
-      data: { 
-        message: `Action ${type} envoyée (${state ? 'ON' : 'OFF'})`,
-        animal 
-      } 
+      data: animal 
     });
   } catch (err) {
     next(err);

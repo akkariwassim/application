@@ -1,181 +1,81 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import {
   View, Text, StyleSheet, TouchableOpacity, FlatList, Alert, ActivityIndicator,
-  Modal, TextInput,
+  Modal, TextInput, KeyboardAvoidingView, Platform
 } from 'react-native';
 import MapView, { Polygon, Marker, PROVIDER_GOOGLE } from 'react-native-maps';
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import * as Location from 'expo-location';
 import useGeofenceStore from '../store/geofenceStore';
 import useAnimalStore   from '../store/animalStore';
+import useThemeStore    from '../store/themeStore';
 import { calculateCentroid, calculatePolygonArea } from '../utils/geoUtils';
+import { SHADOWS } from '../config/theme';
 
-const COLORS = {
-  primary: '#4F46E5', background: '#0A0F1E', surface: '#131929',
-  card: '#1E2A45', text: '#F0F4FF', subtext: '#94A3B8',
-  danger: '#EF4444', success: '#22C55E', border: 'rgba(255,255,255,0.08)',
-};
-
-export default function GeofenceScreen({ route }) {
+export default function GeofenceScreen({ navigation, route }) {
   const { geofences, fetchGeofences, createGeofence, updateGeofence, deleteGeofence, isLoading } = useGeofenceStore();
   const { animals } = useAnimalStore();
+  const { getColors, isDarkMode } = useThemeStore();
+  const COLORS = getColors();
+  const styles = createStyles(COLORS);
   
   const [editingId, setEditingId] = useState(null);
   const [isDrawing, setIsDrawing] = useState(false);
   const [newPolygon, setNewPolygon] = useState([]);
   const [mapRef, setMapRef] = useState(null);
   
-  // New state for naming modal
   const [showSaveModal, setShowSaveModal] = useState(false);
   const [zoneName, setZoneName] = useState('');
-  const [isPrimary, setIsPrimary] = useState(false);
   const [zoneType, setZoneType] = useState('grazing');
-  const [priority, setPriority] = useState(1);
-  const [fillColor, setFillColor] = useState('#4F46E5');
   const [area, setArea] = useState(0);
 
-  // ── Center on User ──────────────────────────────────────────
-  const centerOnUser = useCallback(async () => {
-    try {
-      const { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') return;
-      
-      // ⚡ Try last known location first (Instant)
-      const lastKnown = await Location.getLastKnownPositionAsync({});
-      if (lastKnown && mapRef) {
-        mapRef.animateToRegion({
-          latitude: lastKnown.coords.latitude,
-          longitude: lastKnown.coords.longitude,
-          latitudeDelta: 0.005,
-          longitudeDelta: 0.005,
-        }, 500);
-      }
-      
-      // 🛰️ Refine with current location (More precise, slower)
-      const location = await Location.getCurrentPositionAsync({ 
-        accuracy: Location.Accuracy.Balanced 
-      });
-      
-      if (mapRef) {
-        mapRef.animateToRegion({
-          latitude: location.coords.latitude,
-          longitude: location.coords.longitude,
-          latitudeDelta: 0.005,
-          longitudeDelta: 0.005,
-        }, 1000);
-      }
-    } catch (err) {
-      console.warn('Could not get current location', err);
-    }
-  }, [mapRef]);
-
-  // Handle centering when map is ready
   useEffect(() => {
-    if (mapRef) {
-      centerOnUser();
+    if (route.params?.editId) {
+      const gf = geofences.find(g => g.id === route.params.editId);
+      if (gf) {
+        setEditingId(gf.id);
+        const coords = typeof gf.polygon_coords === 'string' ? JSON.parse(gf.polygon_coords) : gf.polygon_coords;
+        setNewPolygon(coords);
+        setIsDrawing(true);
+        setZoneName(gf.name);
+        setZoneType(gf.zone_type || 'grazing');
+      }
     }
-  }, [mapRef, centerOnUser]);
-
-  useEffect(() => {
-    fetchGeofences();
-    
-    // Check for initialZone from navigation (Edit Mode)
-    const initialZone = route.params?.initialZone;
-    if (initialZone) {
-      setEditingId(initialZone.id);
-      setIsDrawing(true);
-      const coords = typeof initialZone.polygon_coords === 'string' ? JSON.parse(initialZone.polygon_coords) : initialZone.polygon_coords;
-      setNewPolygon(coords || []);
-      setZoneName(initialZone.name || '');
-      setIsPrimary(initialZone.is_primary === 1);
-      setZoneType(initialZone.zone_type || 'grazing');
-      setPriority(initialZone.priority_level || 1);
-      setFillColor(initialZone.fill_color || '#4F46E5');
-      setArea(initialZone.area_sqm || 0);
-    }
-  }, [route.params?.initialZone]);
+  }, [route.params?.editId]);
 
   const handleMapPress = (e) => {
     if (!isDrawing) return;
-    const { latitude, longitude } = e.nativeEvent.coordinate;
-    setNewPolygon([...newPolygon, { latitude, longitude }]);
+    setNewPolygon([...newPolygon, e.nativeEvent.coordinate]);
+    setArea(calculatePolygonArea([...newPolygon, e.nativeEvent.coordinate]));
   };
 
-  const handleSaveFinal = async () => {
-    const trimmedName = zoneName.trim();
-    if (!trimmedName) {
-      Alert.alert('Champs Requis', 'Veuillez saisir un nom unique pour cette zone.');
+  const handleSave = async () => {
+    if (!zoneName.trim()) {
+      Alert.alert('Erreur', 'Veuillez donner un nom à cette zone.');
       return;
     }
-
+    
     try {
-      const centroid = calculateCentroid(newPolygon);
-      const polyArea = calculatePolygonArea(newPolygon);
-      
-      const payload = {
-        type: 'polygon',
-        name: trimmedName,
-        polygonCoords: newPolygon,
-        centerLat: centroid.latitude,
-        centerLon: centroid.longitude,
-        isPrimary: isPrimary,
-        zoneType: zoneType,
-        priorityLevel: priority,
-        areaSqm: polyArea,
-        fillColor: fillColor,
-        isActive: 1
+      const zoneData = {
+        name: zoneName,
+        polygon_coords: newPolygon,
+        zone_type: zoneType,
+        is_active: true
       };
 
       if (editingId) {
-        await updateGeofence(editingId, payload);
+        await updateGeofence(editingId, zoneData);
       } else {
-        await createGeofence(payload);
+        await createGeofence(zoneData);
       }
       
+      setShowSaveModal(false);
       setIsDrawing(false);
       setNewPolygon([]);
-      setShowSaveModal(false);
-      setEditingId(null);
-      setZoneName('');
-      setIsPrimary(false);
-      Alert.alert('Succès', `La zone "${trimmedName}" a été ${editingId ? 'mise à jour' : 'créée'} avec succès.`);
+      navigation.goBack();
     } catch (err) {
-      const errorMsg = err.response?.data?.message || 'Échec de l\'enregistrement de la zone.';
-      const errorCode = err.response?.data?.error;
-      
-      if (errorCode === 'NAME_TAKEN') {
-        Alert.alert('Nom déjà utilisé', errorMsg);
-      } else {
-        Alert.alert('Erreur', errorMsg);
-      }
+      Alert.alert('Erreur', 'Impossible d\'enregistrer la zone.');
     }
-  };
-
-  const handleSaveRequest = () => {
-    if (newPolygon.length < 3) {
-      Alert.alert('Invalid Zone', 'A polygon must have at least 3 points.');
-      return;
-    }
-    const polyArea = calculatePolygonArea(newPolygon);
-    setArea(polyArea);
-    setShowSaveModal(true);
-  };
-
-  const updateVertex = (index, coordinate) => {
-    const updated = [...newPolygon];
-    updated[index] = coordinate;
-    setNewPolygon(updated);
-    setArea(calculatePolygonArea(updated)); // Live area update
-  };
-
-  const removeVertex = (index) => {
-    if (newPolygon.length <= 3) {
-      Alert.alert('Notice', 'A polygon needs at least 3 points.');
-      return;
-    }
-    const updated = newPolygon.filter((_, i) => i !== index);
-    setNewPolygon(updated);
-    setArea(calculatePolygonArea(updated)); // Live area update
   };
 
   const handleCancel = () => {
@@ -184,261 +84,153 @@ export default function GeofenceScreen({ route }) {
     setEditingId(null);
   };
 
-  const deleteZone = (id) => {
-    Alert.alert('Delete Zone', 'Are you sure you want to delete this virtual fence?', [
-      { text: 'Cancel', style: 'cancel' },
-      { text: 'Delete', onPress: () => deleteGeofence(id), style: 'destructive' },
-    ]);
-  };
-
-  const renderGeofenceItem = ({ item }) => {
-    const coords = typeof item.polygon_coords === 'string' 
-      ? JSON.parse(item.polygon_coords) 
-      : item.polygon_coords;
-    
-    return (
-      <View style={[styles.zoneCard, item.is_primary && styles.primaryCard]}>
-        <View style={styles.zoneInfo}>
-          <View style={styles.nameRow}>
-            <Text style={styles.zoneTitle}>{item.name || `Polygon Zone #${item.id}`}</Text>
-            {!!item.is_primary && (
-              <View style={styles.primaryBadge}>
-                <Text style={styles.primaryText}>PRIMARY</Text>
-              </View>
-            )}
-          </View>
-          <Text style={styles.zoneMeta}>{coords.length} vertices · {item.is_active ? 'Active' : 'Inactive'}</Text>
-        </View>
-        <TouchableOpacity style={styles.deleteBtn} onPress={() => deleteZone(item.id)}>
-          <Ionicons name="trash-outline" size={20} color={COLORS.danger} />
-        </TouchableOpacity>
-      </View>
-    );
-  };
-
   return (
     <View style={styles.container}>
-      <View style={styles.mapContainer}>
-        <MapView
-          ref={setMapRef}
-          style={StyleSheet.absoluteFillObject}
-          provider={PROVIDER_GOOGLE}
-          mapType="hybrid"
-          onPress={handleMapPress}
-        >
-          {/* Existing Geofences */}
-          {geofences.map((gf) => {
-            const gfId = String(gf.id || gf._id);
-            const rawCoords = gf.polygon_coords || [];
-            let coords = [];
-            try {
-              coords = typeof rawCoords === 'string' ? JSON.parse(rawCoords) : rawCoords;
-            } catch (e) {
-              console.warn(`[GeofenceScreen] Failed to parse coords for zone ${gfId}`);
-            }
+      <MapView
+        ref={setMapRef}
+        style={styles.map}
+        provider={PROVIDER_GOOGLE}
+        mapType="hybrid"
+        onPress={handleMapPress}
+      >
+        {geofences.map((gf) => {
+          const coords = typeof gf.polygon_coords === 'string' ? JSON.parse(gf.polygon_coords) : gf.polygon_coords;
+          if (!coords || coords.length < 3) return null;
+          return (
+            <Polygon
+              key={gf.id}
+              coordinates={coords}
+              strokeColor={COLORS.primary}
+              fillColor={COLORS.primary + '30'}
+              strokeWidth={2}
+            />
+          );
+        })}
 
-            if (Array.isArray(coords) && coords.length > 0) {
-              return (
-                <Polygon
-                  key={gfId}
-                  coordinates={coords}
-                  strokeColor={gf.is_active ? COLORS.primary : COLORS.subtext}
-                  fillColor={gf.is_active ? COLORS.primary + '33' : COLORS.subtext + '22'}
-                  strokeWidth={2}
-                />
-              );
-            }
-            return null;
-          })}
-
-          {/* New Polygon Preview */}
-          {newPolygon.length > 0 && (
-            <>
-              <Polygon
-                coordinates={newPolygon}
-                strokeColor={COLORS.success}
-                fillColor={COLORS.success + '33'}
-                strokeWidth={3}
-              />
-              {newPolygon.map((p, i) => (
-                <Marker 
-                  key={i} 
-                  coordinate={p} 
-                  anchor={{x: 0.5, y: 0.5}}
-                  draggable
-                  onDragEnd={(e) => updateVertex(i, e.nativeEvent.coordinate)}
-                  onLongPress={() => removeVertex(i)}
-                >
-                  <View style={styles.vertexMarker} />
-                </Marker>
-              ))}
-            </>
-          )}
-
-          {/* Animals Markers for context */}
-          {animals.map((a) => !!a.latitude && (
-            <Marker
-              key={a.id}
-              coordinate={{ latitude: parseFloat(a.latitude), longitude: parseFloat(a.longitude) }}
-              title={a.name}
-            >
-              <Ionicons name="paw" size={20} color={COLORS.text} />
-            </Marker>
-          ))}
-        </MapView>
-
-        {isDrawing ? (
-          <View style={styles.drawControls}>
-            <TouchableOpacity style={styles.controlBtn} onPress={handleCancel}>
-              <Ionicons name="close" size={20} color={COLORS.text} />
-              <Text style={styles.controlText}>Cancel</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={[styles.controlBtn, styles.saveBtn]} onPress={handleSaveRequest}>
-              <Ionicons name="save-outline" size={20} color="#fff" />
-              <Text style={[styles.controlText, { color: '#fff' }]}>Save Zone</Text>
-            </TouchableOpacity>
-          </View>
-        ) : (
+        {newPolygon.length > 0 && (
           <>
-            <TouchableOpacity style={[styles.fab, styles.locationFab]} onPress={centerOnUser}>
-              <Ionicons name="location" size={24} color="#fff" />
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.fab} onPress={() => setIsDrawing(true)}>
-              <Ionicons name="add" size={30} color="#fff" />
-            </TouchableOpacity>
+            <Polygon
+              coordinates={newPolygon}
+              strokeColor={COLORS.success}
+              fillColor={COLORS.success + '40'}
+              strokeWidth={3}
+            />
+            {newPolygon.map((p, i) => (
+              <Marker key={i} coordinate={p} anchor={{x: 0.5, y: 0.5}}>
+                <View style={styles.vertexMarker} />
+              </Marker>
+            ))}
           </>
         )}
+      </MapView>
 
-        {/* Save Modal */}
-        <Modal
-          visible={showSaveModal}
-          transparent
-          animationType="slide"
-          onRequestClose={() => setShowSaveModal(false)}
-        >
-          <View style={styles.modalOverlay}>
-            <View style={styles.modalContent}>
-              <Text style={styles.modalTitle}>Zone Details</Text>
-              
-              <Text style={styles.label}>Unique Name</Text>
-              <TextInput
-                style={styles.input}
-                value={zoneName}
-                onChangeText={setZoneName}
-                placeholder="e.g. North Pasture"
-                placeholderTextColor={COLORS.subtext}
-              />
+      <View style={styles.overlay}>
+        <TouchableOpacity style={styles.toolBtn} onPress={() => setIsDrawing(!isDrawing)}>
+          <Ionicons name={isDrawing ? "close" : "brush-outline"} size={24} color={isDrawing ? COLORS.danger : COLORS.primary} />
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.toolBtn} onPress={() => mapRef?.animateToRegion({ latitude: animals[0]?.latitude || 0, longitude: animals[0]?.longitude || 0, latitudeDelta: 0.005, longitudeDelta: 0.005 })}>
+          <Ionicons name="navigate-outline" size={24} color={COLORS.primary} />
+        </TouchableOpacity>
+      </View>
 
-              <View style={styles.row}>
-                <View style={{ flex: 1 }}>
-                  <Text style={styles.label}>Type de Zone</Text>
-                  <View style={styles.pickerContainer}>
-                    <TouchableOpacity onPress={() => setZoneType('grazing')} style={[styles.typeBtn, zoneType === 'grazing' && styles.activeType]}>
-                      <Text style={styles.typeBtnText}>Pâturage</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={() => setZoneType('water')} style={[styles.typeBtn, zoneType === 'water' && styles.activeType]}>
-                      <Text style={styles.typeBtnText}>Eau</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={() => setZoneType('rest')} style={[styles.typeBtn, zoneType === 'rest' && styles.activeType]}>
-                      <Text style={styles.typeBtnText}>Repos</Text>
-                    </TouchableOpacity>
-                  </View>
-                </View>
-              </View>
-
-              <Text style={styles.label}>📐 Superficie: {area >= 10000 ? `${(area / 10000).toFixed(2)} Ha` : `${area.toFixed(0)} m²`}</Text>
-
-              <TouchableOpacity 
-                style={styles.toggleRow} 
-                onPress={() => setIsPrimary(!isPrimary)}
-              >
-                <Ionicons 
-                  name={isPrimary ? "checkbox" : "square-outline"} 
-                  size={24} 
-                  color={isPrimary ? COLORS.primary : COLORS.subtext} 
-                />
-                <Text style={styles.toggleText}>Set as Default Farm Center</Text>
-              </TouchableOpacity>
-
-              <View style={styles.modalActions}>
-                <TouchableOpacity 
-                  style={[styles.modalBtn, styles.cancelBtn]} 
-                  onPress={() => setShowSaveModal(false)}
-                >
-                  <Text style={styles.cancelBtnText}>Cancel</Text>
-                </TouchableOpacity>
-                <TouchableOpacity 
-                  style={[styles.modalBtn, styles.confirmBtn]} 
-                  onPress={handleSaveFinal}
-                >
-                  <Text style={styles.confirmBtnText}>Confirm Save</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
+      {isDrawing && (
+        <View style={styles.bottomBar}>
+          <View style={styles.barInfo}>
+            <Text style={styles.barTitle}>Nouvelle Zone</Text>
+            <Text style={styles.barSub}>{newPolygon.length} points · {(area/10000).toFixed(2)} ha</Text>
           </View>
-        </Modal>
-      </View>
+          <View style={{ flexDirection: 'row', gap: 10 }}>
+            <TouchableOpacity style={styles.cancelBtn} onPress={handleCancel}>
+              <Text style={styles.cancelBtnText}>Annuler</Text>
+            </TouchableOpacity>
+            <TouchableOpacity 
+              style={[styles.primaryBtn, newPolygon.length < 3 && { opacity: 0.5 }]} 
+              onPress={() => setShowSaveModal(true)}
+              disabled={newPolygon.length < 3}
+            >
+              <Text style={styles.primaryBtnText}>Continuer</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      )}
 
-      <View style={styles.listContainer}>
-        <Text style={styles.listHeader}>Your Farm Zones</Text>
-        {isLoading ? (
-          <ActivityIndicator color={COLORS.primary} style={{ marginTop: 20 }} />
-        ) : (
-          <FlatList
-            data={geofences}
-            renderItem={renderGeofenceItem}
-            keyExtractor={(item) => String(item.id || item._id)}
-            ListEmptyComponent={
-              <Text style={styles.emptyText}>No zones defined. Tap + to draw one.</Text>
-            }
-            contentContainerStyle={{ paddingBottom: 20 }}
-          />
-        )}
-      </View>
+      <Modal visible={showSaveModal} animationType="slide" transparent>
+        <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.modalBackdrop}>
+          <View style={styles.modalCard}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Enregistrer la Zone</Text>
+              <TouchableOpacity onPress={() => setShowSaveModal(false)}>
+                <Ionicons name="close" size={28} color={COLORS.textDim} />
+              </TouchableOpacity>
+            </View>
+
+            <Text style={styles.label}>Nom de la Zone</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="ex: Pâturage Nord"
+              placeholderTextColor={COLORS.textDim}
+              value={zoneName}
+              onChangeText={setZoneName}
+              autoFocus
+            />
+
+            <Text style={styles.label}>Type de Terrain</Text>
+            <View style={styles.typeRow}>
+              {['grazing', 'water', 'rest', 'danger'].map(t => (
+                <TouchableOpacity 
+                  key={t} 
+                  style={[styles.typeChip, zoneType === t && styles.typeChipActive]}
+                  onPress={() => setZoneType(t)}
+                >
+                  <Text style={[styles.typeChipText, zoneType === t && styles.typeChipTextActive]}>
+                    {t.charAt(0).toUpperCase() + t.slice(1)}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            <TouchableOpacity style={styles.saveActionBtn} onPress={handleSave}>
+              <Text style={styles.saveActionText}>Confirmer la Création</Text>
+            </TouchableOpacity>
+          </View>
+        </KeyboardAvoidingView>
+      </Modal>
     </View>
   );
 }
 
-const styles = StyleSheet.create({
-  container:      { flex: 1, backgroundColor: COLORS.background },
-  mapContainer:   { flex: 1.5, overflow: 'hidden', borderBottomWidth: 1, borderBottomColor: COLORS.border },
-  listContainer:  { flex: 1, padding: 16 },
-  listHeader:     { color: COLORS.text, fontSize: 18, fontWeight: '700', marginBottom: 12 },
-  fab:            { position: 'absolute', bottom: 20, right: 20, width: 56, height: 56, borderRadius: 28, backgroundColor: COLORS.primary, alignItems: 'center', justifyContent: 'center', elevation: 5, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.3, shadowRadius: 3 },
-  locationFab:    { bottom: 86, backgroundColor: COLORS.surface, borderWidth: 1, borderColor: COLORS.border },
-  drawControls:   { position: 'absolute', bottom: 20, left: 20, right: 20, flexDirection: 'row', gap: 12 },
-  controlBtn:     { flex: 1, height: 48, borderRadius: 12, backgroundColor: COLORS.surface, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, borderWidth: 1, borderColor: COLORS.border },
-  saveBtn:        { backgroundColor: COLORS.primary, borderColor: COLORS.primary },
-  controlText:    { color: COLORS.text, fontWeight: '600' },
-  vertexMarker:   { width: 10, height: 10, borderRadius: 5, backgroundColor: COLORS.success, borderWidth: 2, borderColor: '#fff' },
-  zoneCard:       { flexDirection: 'row', backgroundColor: COLORS.card, borderRadius: 16, padding: 16, marginBottom: 10, alignItems: 'center', borderWidth: 1, borderColor: COLORS.border },
-  primaryCard:    { borderColor: COLORS.primary, borderLeftWidth: 6 },
-  zoneInfo:       { flex: 1 },
-  nameRow:        { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 4 },
-  zoneTitle:      { color: COLORS.text, fontSize: 16, fontWeight: '700' },
-  primaryBadge:   { backgroundColor: COLORS.primary, paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4 },
-  primaryText:    { color: '#fff', fontSize: 10, fontWeight: '800' },
-  zoneMeta:       { color: COLORS.subtext, fontSize: 12 },
-  deleteBtn:      { padding: 8 },
-  emptyText:      { color: COLORS.subtext, textAlign: 'center', marginTop: 40, fontSize: 14 },
-
-  // Modal Styles
-  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'center', padding: 20 },
-  modalContent: { backgroundColor: COLORS.surface, borderRadius: 24, padding: 24, borderWidth: 1, borderColor: COLORS.border },
-  modalTitle:   { color: COLORS.text, fontSize: 22, fontWeight: '800', marginBottom: 24 },
-  label:        { color: COLORS.subtext, fontSize: 12, fontWeight: '600', marginBottom: 8, marginLeft: 4 },
-  input:        { height: 56, backgroundColor: COLORS.card, borderRadius: 16, paddingHorizontal: 16, color: COLORS.text, fontSize: 16, borderWidth: 1, borderColor: COLORS.border, marginBottom: 20 },
-  row:          { flexDirection: 'row', gap: 12, marginBottom: 20 },
-  pickerContainer: { flexDirection: 'row', gap: 8, marginTop: 4 },
-  typeBtn:      { flex: 1, height: 40, borderRadius: 10, backgroundColor: COLORS.card, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: COLORS.border },
-  activeType:   { backgroundColor: COLORS.primary, borderColor: COLORS.primary },
-  typeBtnText:  { color: COLORS.text, fontSize: 13, fontWeight: '600' },
-  toggleRow:    { flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 30 },
-  toggleText:   { color: COLORS.text, fontSize: 15, fontWeight: '600' },
-  modalActions: { flexDirection: 'row', gap: 12 },
-  modalBtn:     { flex: 1, height: 50, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
-  cancelBtn:    { backgroundColor: 'transparent', borderWidth: 1, borderColor: COLORS.border },
-  confirmBtn:   { backgroundColor: COLORS.primary },
-  cancelBtnText: { color: COLORS.subtext, fontWeight: '600' },
-  confirmBtnText: { color: '#fff', fontWeight: '700' },
+const createStyles = (COLORS) => StyleSheet.create({
+  container: { flex: 1, backgroundColor: COLORS.background },
+  map: { flex: 1 },
+  overlay: { position: 'absolute', top: 60, right: 20, gap: 12 },
+  toolBtn: { width: 50, height: 50, borderRadius: 15, backgroundColor: COLORS.surface, alignItems: 'center', justifyContent: 'center', ...SHADOWS.hard, borderWidth: 1, borderColor: COLORS.border },
+  
+  vertexMarker: { width: 12, height: 12, borderRadius: 6, backgroundColor: COLORS.white, borderWidth: 3, borderColor: COLORS.success },
+  
+  bottomBar: { position: 'absolute', bottom: 30, left: 20, right: 20, backgroundColor: COLORS.surface, borderRadius: 24, padding: 20, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', ...SHADOWS.hard, borderWidth: 1, borderColor: COLORS.border },
+  barInfo: { flex: 1 },
+  barTitle: { color: COLORS.text, fontSize: 18, fontWeight: '800' },
+  barSub: { color: COLORS.textMuted, fontSize: 12, marginTop: 2 },
+  
+  cancelBtn: { paddingHorizontal: 16, paddingVertical: 12, borderRadius: 14, backgroundColor: COLORS.background, borderWidth: 1, borderColor: COLORS.border },
+  cancelBtnText: { color: COLORS.text, fontWeight: '700' },
+  primaryBtn: { backgroundColor: COLORS.primary, paddingHorizontal: 24, paddingVertical: 12, borderRadius: 14, ...SHADOWS.soft },
+  primaryBtnText: { color: COLORS.white, fontWeight: '800', fontSize: 15 },
+  
+  modalBackdrop: { flex: 1, backgroundColor: COLORS.overlay, justifyContent: 'flex-end' },
+  modalCard: { backgroundColor: COLORS.surface, borderTopLeftRadius: 32, borderTopRightRadius: 32, padding: 24, paddingBottom: 40 },
+  modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 },
+  modalTitle: { color: COLORS.text, fontSize: 22, fontWeight: '900' },
+  
+  label: { color: COLORS.textMuted, fontSize: 12, fontWeight: '800', textTransform: 'uppercase', marginBottom: 8, marginLeft: 4 },
+  input: { backgroundColor: COLORS.background, borderRadius: 14, height: 54, paddingHorizontal: 18, color: COLORS.text, fontSize: 16, marginBottom: 20, borderWidth: 1, borderColor: COLORS.border },
+  
+  typeRow: { flexDirection: 'row', gap: 10, marginBottom: 24 },
+  typeChip: { flex: 1, paddingVertical: 10, borderRadius: 10, backgroundColor: COLORS.background, alignItems: 'center', borderWidth: 1, borderColor: COLORS.border },
+  typeChipActive: { backgroundColor: COLORS.primary, borderColor: COLORS.primary },
+  typeChipText: { color: COLORS.textMuted, fontSize: 12, fontWeight: '700' },
+  typeChipTextActive: { color: COLORS.white },
+  
+  saveActionBtn: { backgroundColor: COLORS.primary, height: 58, borderRadius: 16, alignItems: 'center', justifyContent: 'center', ...SHADOWS.hard },
+  saveActionText: { color: COLORS.white, fontSize: 16, fontWeight: '800' },
 });

@@ -11,11 +11,7 @@ const animalSchema = new mongoose.Schema({
   farm_id: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Farm',
-<<<<<<< HEAD
     required: true,
-=======
-    required: false, // Will be required after migration
->>>>>>> origin/main
     index: true,
   },
   name: {
@@ -57,10 +53,16 @@ const animalSchema = new mongoose.Schema({
   },
   latitude: {
     type: Number,
+    required: true,
+    min: [-90, 'Latitude must be between -90 and 90'],
+    max: [90, 'Latitude must be between -90 and 90'],
     default: 0,
   },
   longitude: {
     type: Number,
+    required: true,
+    min: [-180, 'Longitude must be between -180 and 180'],
+    max: [180, 'Longitude must be between -180 and 180'],
     default: 0,
   },
   current_location: {
