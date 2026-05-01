@@ -133,6 +133,7 @@ const useAnimalStore = create(
 
   // ... (create/update/delete remain similar but can trigger re-fetch if needed)
   createAnimal: async (animalData) => {
+    console.log("[STORE] Creating animal with data:", animalData);
     try {
       const { data } = await api.post('/animals', animalData);
       set((state) => ({ 
@@ -147,6 +148,7 @@ const useAnimalStore = create(
   },
 
   updateAnimal: async (id, updates) => {
+    console.log(`[STORE] Updating animal ${id} with:`, updates);
     try {
       const { data } = await api.put(`/animals/${id}`, updates);
       set((state) => ({
@@ -209,10 +211,9 @@ const useAnimalStore = create(
   triggerAction: async (animalId, type, state) => {
     try {
       const { data } = await api.post(`/animals/${animalId}/action`, { type, state });
-      const updatedAnimal = data.animal;
       set((stateOld) => ({
-        animals: stateOld.animals.map((a) => (a.id === animalId ? { ...a, actuators: updatedAnimal.actuators } : a)),
-        selectedAnimal: stateOld.selectedAnimal?.id === animalId ? { ...stateOld.selectedAnimal, actuators: updatedAnimal.actuators } : stateOld.selectedAnimal,
+        animals: stateOld.animals.map((a) => (a.id === animalId ? data : a)),
+        selectedAnimal: stateOld.selectedAnimal?.id === animalId ? data : stateOld.selectedAnimal,
       }));
       return data;
     } catch (err) {

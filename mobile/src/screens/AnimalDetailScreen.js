@@ -110,6 +110,7 @@ export default function AnimalDetailScreen({ route, navigation }) {
   }, [animal?.last_sync]);
 
   const handleSave = async (values) => {
+    console.log("[FRONTEND] Submitting Animal Form with values:", values);
     setSaving(true);
     try {
       if (isCreate) {
@@ -183,6 +184,8 @@ export default function AnimalDetailScreen({ route, navigation }) {
               deviceId: animal?.device_id || '',
               rfidTag:  animal?.rfid_tag || '',
               currentZoneId: animal?.current_zone_id || initialZoneId || '',
+              latitude: animal?.latitude || initialLocation?.latitude || 0,
+              longitude: animal?.longitude || initialLocation?.longitude || 0,
             }}
             validationSchema={AnimalSchema}
             onSubmit={handleSave}
@@ -260,7 +263,15 @@ export default function AnimalDetailScreen({ route, navigation }) {
                         <TouchableOpacity 
                           key={gf.id}
                           style={[styles.zoneCard, values.currentZoneId === gf.id && styles.zoneCardActive]}
-                          onPress={() => setFieldValue('currentZoneId', gf.id)}
+                          onPress={() => {
+                            setFieldValue('currentZoneId', gf.id);
+                            // If creating and no specific location chosen, use zone center
+                            if (isCreate && (!values.latitude || values.latitude === 0)) {
+                              console.log(`[FRONTEND] Auto-setting location to zone center:`, { lat: gf.center_lat, lon: gf.center_lon });
+                              setFieldValue('latitude', gf.center_lat || 0);
+                              setFieldValue('longitude', gf.center_lon || 0);
+                            }
+                          }}
                         >
                           <Text style={[styles.zoneName, values.currentZoneId === gf.id && { color: COLORS.primary }]}>{gf.name}</Text>
                         </TouchableOpacity>

@@ -337,3 +337,291 @@
 2026-04-27 14:47:01 [info]: 🚀 Server running on http://localhost:3000
 2026-04-27 14:47:01 [info]:    Environment: development
 >>>>>>> 8b0cdea4 (resolve merge conflict)
+2026-05-01 18:39:21 [info]: ✅ MongoDB Connected: ac-lokdmj8-shard-00-02.7zypd8b.mongodb.net
+2026-05-01 18:39:21 [info]: 🚀 Server running on http://localhost:3000
+2026-05-01 18:39:21 [info]:    Environment: development
+2026-05-01 18:40:23 [info]: [Data Audit] POST /api/auth/login
+2026-05-01 18:40:23 [info]: ✅ User logged in successfully: akkariwassim11@gmail.com
+2026-05-01 18:40:23 [info]: [Data Audit] GET /api/memberships/my
+2026-05-01 18:40:24 [info]: [Data Audit] GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-05-01 18:40:24 [info]: [Data Audit] GET /api/geofences
+2026-05-01 18:40:24 [info]: Socket connected: MxqEe3pPxJ4ZHQk4AAAB (user 69ef6185425e89f7bf220be6)
+2026-05-01 18:40:29 [info]: [Data Audit] GET /api/geofences
+2026-05-01 18:40:31 [info]: [Data Audit] GET /api/geofences
+2026-05-01 18:41:09 [info]: [Data Audit] POST /api/geofences
+2026-05-01 18:41:09 [info]: [Data Audit] GET /api/geofences
+2026-05-01 18:41:12 [info]: [Data Audit] GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-05-01 18:41:14 [info]: [Data Audit] GET /api/geofences
+2026-05-01 18:41:14 [info]: [Data Audit] GET /api/devices?status=free
+2026-05-01 18:41:37 [info]: [Data Audit] POST /api/animals
+2026-05-01 18:41:58 [info]: [Data Audit] GET /api/animals/69f4e5d176bad4a89bb5a050
+2026-05-01 18:41:58 [info]: [Data Audit] GET /api/ai/animal/69f4e5d176bad4a89bb5a050
+2026-05-01 18:45:59 [info]: Socket disconnected: MxqEe3pPxJ4ZHQk4AAAB — client namespace disconnect
+2026-05-01 18:45:59 [info]: [Data Audit] GET /api/auth/me
+2026-05-01 18:46:00 [info]: [Data Audit] GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-05-01 18:46:00 [info]: [Data Audit] GET /api/geofences
+2026-05-01 18:46:00 [info]: Socket connected: QGgzw1eHlwBolSzJAAAD (user 69ef6185425e89f7bf220be6)
+2026-05-01 18:46:00 [info]: [Data Audit] GET /api/memberships/my
+2026-05-01 18:46:43 [info]: Socket disconnected: QGgzw1eHlwBolSzJAAAD — client namespace disconnect
+2026-05-01 18:46:49 [info]: [Data Audit] GET /api/auth/me
+2026-05-01 18:46:49 [info]: [Data Audit] GET /api/memberships/my
+2026-05-01 18:46:49 [info]: [Data Audit] GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-05-01 18:46:49 [info]: [Data Audit] GET /api/geofences
+2026-05-01 18:46:49 [info]: Socket connected: u9YhMIMJAd2Hq-ZJAAAF (user 69ef6185425e89f7bf220be6)
+2026-05-01 18:47:03 [info]: [Data Audit] GET /api/geofences
+2026-05-01 18:47:03 [info]: [Data Audit] GET /api/devices?status=free
+2026-05-01 18:47:11 [info]: [Data Audit] PUT /api/animals/69f4e5d176bad4a89bb5a050
+2026-05-01 18:50:37 [info]: Socket disconnected: u9YhMIMJAd2Hq-ZJAAAF — client namespace disconnect
+2026-05-01 18:50:37 [info]: [Data Audit] GET /api/auth/me
+2026-05-01 18:50:37 [info]: [Data Audit] GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-05-01 18:50:37 [info]: [Data Audit] GET /api/geofences
+2026-05-01 18:50:37 [info]: Socket connected: b-2K03oaJIVd_pS2AAAH (user 69ef6185425e89f7bf220be6)
+2026-05-01 18:50:38 [info]: [Data Audit] GET /api/memberships/my
+2026-05-01 18:50:44 [info]: Socket disconnected: b-2K03oaJIVd_pS2AAAH — client namespace disconnect
+2026-05-01 18:50:50 [info]: [Data Audit] GET /api/auth/me
+2026-05-01 18:50:50 [info]: [Data Audit] GET /api/memberships/my
+2026-05-01 18:50:50 [info]: [Data Audit] GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-05-01 18:50:51 [info]: [Data Audit] GET /api/geofences
+2026-05-01 18:50:51 [info]: Socket connected: WgKN8hy040TEcCHOAAAJ (user 69ef6185425e89f7bf220be6)
+2026-05-01 18:56:10 [info]: Socket disconnected: WgKN8hy040TEcCHOAAAJ — client namespace disconnect
+2026-05-01 18:56:10 [info]: [Data Audit] GET /api/auth/me
+2026-05-01 18:56:10 [info]: [Data Audit] POST /api/auth/refresh
+2026-05-01 18:56:12 [info]: [Data Audit] GET /api/auth/me
+2026-05-01 18:56:14 [info]: [Data Audit] GET /api/memberships/my
+2026-05-01 18:56:16 [info]: [Data Audit] GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-05-01 18:56:16 [info]: [Data Audit] GET /api/geofences
+2026-05-01 18:56:16 [info]: Socket connected: _bCs3M6KtayDaLbPAAAL (user 69ef6185425e89f7bf220be6)
+2026-05-01 18:58:55 [info]: Socket disconnected: _bCs3M6KtayDaLbPAAAL — client namespace disconnect
+2026-05-01 18:58:55 [info]: [Data Audit] GET /api/auth/me
+2026-05-01 18:58:55 [info]: [Data Audit] GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-05-01 18:58:55 [info]: [Data Audit] GET /api/geofences
+2026-05-01 18:58:55 [info]: Socket connected: frQXFwhPp48S9jbjAAAN (user 69ef6185425e89f7bf220be6)
+2026-05-01 18:58:56 [info]: [Data Audit] GET /api/memberships/my
+2026-05-01 18:59:23 [info]: Socket disconnected: frQXFwhPp48S9jbjAAAN — client namespace disconnect
+2026-05-01 18:59:31 [info]: [Data Audit] GET /api/auth/me
+2026-05-01 18:59:32 [info]: [Data Audit] GET /api/memberships/my
+2026-05-01 18:59:35 [info]: [Data Audit] GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-05-01 18:59:35 [info]: [Data Audit] GET /api/geofences
+2026-05-01 18:59:35 [info]: Socket connected: gl_43JNjqxcSt7zLAAAP (user 69ef6185425e89f7bf220be6)
+2026-05-01 19:00:00 [info]: [Data Audit] GET /api/geofences
+2026-05-01 19:00:03 [info]: [Data Audit] GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-05-01 19:00:03 [info]: [Data Audit] GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-05-01 19:00:05 [info]: [Data Audit] GET /api/geofences
+2026-05-01 19:00:05 [info]: [Data Audit] GET /api/devices?status=free
+2026-05-01 19:00:28 [info]: [Data Audit] GET /api/geofences
+2026-05-01 19:04:04 [info]: [Data Audit] POST /api/geofences
+2026-05-01 19:04:05 [info]: [Data Audit] GET /api/geofences
+2026-05-01 19:04:07 [info]: [Data Audit] GET /api/alerts?status=active
+2026-05-01 19:04:08 [info]: [Data Audit] GET /api/geofences
+2026-05-01 19:04:08 [info]: [Data Audit] GET /api/devices?status=free
+2026-05-01 19:04:28 [info]: [Data Audit] POST /api/animals
+2026-05-01 19:04:28 [info]: [Data Audit] GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-05-01 19:04:28 [info]: [Data Audit] GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-05-01 19:05:14 [info]: [Data Audit] GET /api/geofences
+2026-05-01 19:05:14 [info]: [Data Audit] GET /api/devices?status=free
+2026-05-01 19:07:56 [info]: [Data Audit] GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-05-01 19:07:56 [info]: [Data Audit] GET /api/geofences
+2026-05-01 19:09:13 [info]: [Data Audit] GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-05-01 19:09:13 [info]: [Data Audit] GET /api/geofences
+2026-05-01 19:09:20 [info]: [Data Audit] GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-05-01 19:09:20 [info]: [Data Audit] GET /api/geofences
+2026-05-01 19:09:22 [info]: Socket disconnected: gl_43JNjqxcSt7zLAAAP — client namespace disconnect
+2026-05-01 19:11:06 [info]: [Data Audit] GET /api/auth/me
+2026-05-01 19:11:06 [info]: [Data Audit] GET /api/memberships/my
+2026-05-01 19:11:07 [info]: [Data Audit] GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-05-01 19:11:07 [info]: [Data Audit] GET /api/geofences
+2026-05-01 19:11:07 [info]: Socket connected: u6RJkUDN6dfAKsaEAAAR (user 69ef6185425e89f7bf220be6)
+2026-05-01 19:11:07 [info]: Socket disconnected: u6RJkUDN6dfAKsaEAAAR — client namespace disconnect
+2026-05-01 19:12:11 [info]: [Data Audit] GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-05-01 19:12:11 [info]: [Data Audit] GET /api/geofences
+2026-05-01 19:12:11 [info]: [Data Audit] POST /api/auth/refresh
+2026-05-01 19:12:14 [info]: [Data Audit] GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-05-01 19:12:14 [info]: [Data Audit] GET /api/geofences
+2026-05-01 19:12:44 [info]: [Data Audit] GET /api/auth/me
+2026-05-01 19:12:44 [info]: [Data Audit] GET /api/memberships/my
+2026-05-01 19:12:45 [info]: [Data Audit] GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-05-01 19:12:45 [info]: [Data Audit] GET /api/geofences
+2026-05-01 19:12:45 [info]: Socket connected: 3QJh_WND6DUpihxSAAAV (user 69ef6185425e89f7bf220be6)
+2026-05-01 19:12:55 [info]: [Data Audit] GET /api/geofences
+2026-05-01 19:16:18 [info]: [Data Audit] GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-05-01 19:16:18 [info]: [Data Audit] GET /api/geofences
+2026-05-01 19:17:53 [info]: Socket disconnected: 3QJh_WND6DUpihxSAAAV — transport close
+2026-05-01 19:19:33 [info]: Socket connected: GSIz0J_ONw8ZkB9HAAAX (user 69ef6185425e89f7bf220be6)
+2026-05-01 19:19:34 [info]: Socket disconnected: GSIz0J_ONw8ZkB9HAAAX — client namespace disconnect
+2026-05-01 19:19:38 [info]: [Data Audit] GET /api/auth/me
+2026-05-01 19:19:39 [info]: [Data Audit] GET /api/memberships/my
+2026-05-01 19:19:39 [info]: [Data Audit] GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-05-01 19:19:39 [info]: Socket connected: kt7UQo7hxwPn_QVzAAAZ (user 69ef6185425e89f7bf220be6)
+2026-05-01 19:19:39 [info]: [Data Audit] GET /api/geofences
+2026-05-01 19:21:33 [info]: [Data Audit] GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-05-01 19:21:33 [info]: [Data Audit] GET /api/geofences
+2026-05-01 19:21:52 [info]: Socket disconnected: kt7UQo7hxwPn_QVzAAAZ — client namespace disconnect
+2026-05-01 19:21:53 [info]: [Data Audit] GET /api/auth/me
+2026-05-01 19:21:55 [info]: [Data Audit] GET /api/memberships/my
+2026-05-01 19:21:56 [info]: [Data Audit] GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-05-01 19:21:56 [info]: [Data Audit] GET /api/geofences
+2026-05-01 19:21:56 [info]: Socket connected: I6hQgI21nNeYp5LXAAAb (user 69ef6185425e89f7bf220be6)
+2026-05-01 19:24:46 [info]: Socket disconnected: I6hQgI21nNeYp5LXAAAb — client namespace disconnect
+2026-05-01 19:25:51 [info]: [Data Audit] GET /api/auth/me
+2026-05-01 19:25:51 [info]: [Data Audit] GET /api/memberships/my
+2026-05-01 19:25:51 [info]: [Data Audit] GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-05-01 19:25:51 [info]: [Data Audit] GET /api/geofences
+2026-05-01 19:25:51 [info]: Socket connected: 7DS4Bdfz3GY3zj8uAAAd (user 69ef6185425e89f7bf220be6)
+2026-05-01 19:25:55 [info]: [Data Audit] GET /api/geofences
+2026-05-01 19:25:58 [info]: [Data Audit] GET /api/stats/farm
+2026-05-01 19:26:00 [info]: [Data Audit] GET /api/alerts?status=active
+2026-05-01 19:26:02 [info]: [Data Audit] GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-05-01 19:26:02 [info]: [Data Audit] GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-05-01 19:26:03 [info]: [Data Audit] GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-05-01 19:26:03 [info]: [Data Audit] GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-05-01 19:26:05 [info]: [Data Audit] GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-05-01 19:26:05 [info]: [Data Audit] GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-05-01 19:26:11 [info]: Socket disconnected: 7DS4Bdfz3GY3zj8uAAAd — client namespace disconnect
+2026-05-01 19:27:47 [info]: [Data Audit] GET /api/auth/me
+2026-05-01 19:27:47 [info]: [Data Audit] POST /api/auth/refresh
+2026-05-01 19:27:47 [info]: [Data Audit] GET /api/auth/me
+2026-05-01 19:27:47 [info]: [Data Audit] GET /api/memberships/my
+2026-05-01 19:27:48 [info]: [Data Audit] GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-05-01 19:27:48 [info]: [Data Audit] GET /api/geofences
+2026-05-01 19:27:48 [info]: Socket connected: EPdU9QU-OwX8sIrTAAAf (user 69ef6185425e89f7bf220be6)
+2026-05-01 19:27:49 [info]: [Data Audit] GET /api/geofences
+2026-05-01 19:27:51 [info]: [Data Audit] GET /api/stats/farm
+2026-05-01 19:27:52 [info]: [Data Audit] GET /api/alerts?status=active
+2026-05-01 19:27:53 [info]: [Data Audit] GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-05-01 19:27:53 [info]: [Data Audit] GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-05-01 19:27:57 [info]: [Data Audit] GET /api/animals/69f4eb2c76bad4a89bb5a063
+2026-05-01 19:27:57 [info]: [Data Audit] GET /api/ai/animal/69f4eb2c76bad4a89bb5a063
+2026-05-01 19:28:00 [info]: [Data Audit] GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-05-01 19:28:00 [info]: [Data Audit] GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-05-01 19:28:00 [info]: [Data Audit] GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-05-01 19:28:00 [info]: [Data Audit] GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-05-01 19:28:30 [info]: [Data Audit] GET /api/memberships
+2026-05-01 19:30:17 [info]: [Data Audit] GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-05-01 19:30:17 [info]: [Data Audit] GET /api/geofences
+2026-05-01 19:30:17 [info]: [Data Audit] GET /api/stats/farm
+2026-05-01 19:30:17 [info]: [Data Audit] GET /api/alerts?status=active
+2026-05-01 19:30:30 [info]: Socket disconnected: EPdU9QU-OwX8sIrTAAAf — client namespace disconnect
+2026-05-01 19:30:30 [info]: [Data Audit] GET /api/auth/me
+2026-05-01 19:30:30 [info]: [Data Audit] GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-05-01 19:30:30 [info]: [Data Audit] GET /api/geofences
+2026-05-01 19:30:30 [info]: Socket connected: 7wyEUApJPuxvIWTaAAAh (user 69ef6185425e89f7bf220be6)
+2026-05-01 19:30:31 [info]: [Data Audit] GET /api/memberships/my
+2026-05-01 19:33:39 [info]: Socket disconnected: 7wyEUApJPuxvIWTaAAAh — client namespace disconnect
+2026-05-01 19:34:56 [info]: [Data Audit] GET /api/auth/me
+2026-05-01 19:34:57 [info]: [Data Audit] GET /api/memberships/my
+2026-05-01 19:36:00 [info]: [Data Audit] GET /api/auth/me
+2026-05-01 19:36:00 [info]: [Data Audit] GET /api/memberships/my
+2026-05-01 19:36:10 [info]: [Data Audit] GET /api/auth/me
+2026-05-01 19:36:13 [info]: [Data Audit] GET /api/memberships/my
+2026-05-01 19:36:38 [info]: [Data Audit] GET /api/auth/me
+2026-05-01 19:36:39 [info]: [Data Audit] GET /api/memberships/my
+2026-05-01 19:36:46 [info]: [Data Audit] GET /api/auth/me
+2026-05-01 19:36:47 [info]: [Data Audit] GET /api/memberships/my
+2026-05-01 19:36:54 [info]: [Data Audit] GET /api/auth/me
+2026-05-01 19:36:56 [info]: [Data Audit] GET /api/memberships/my
+2026-05-01 19:38:01 [info]: [Data Audit] GET /api/auth/me
+2026-05-01 19:38:02 [info]: [Data Audit] GET /api/memberships/my
+2026-05-01 19:38:03 [info]: [Data Audit] GET /api/stats/farm
+2026-05-01 19:38:03 [info]: Socket connected: PpKw05634_wfwrfwAAAj (user 69ef6185425e89f7bf220be6)
+2026-05-01 19:38:10 [info]: [Data Audit] GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-05-01 19:38:10 [info]: [Data Audit] GET /api/geofences
+2026-05-01 19:38:15 [info]: [Data Audit] GET /api/alerts?status=active
+2026-05-01 19:38:22 [info]: Socket disconnected: PpKw05634_wfwrfwAAAj — client namespace disconnect
+2026-05-01 19:38:25 [info]: [Data Audit] GET /api/stats/farm
+2026-05-01 19:38:25 [info]: Socket connected: pErInIxsKVVasmpZAAAl (user 69ef6185425e89f7bf220be6)
+2026-05-01 19:39:43 [info]: [Data Audit] GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-05-01 19:39:43 [info]: [Data Audit] GET /api/geofences
+2026-05-01 19:39:46 [info]: [Data Audit] GET /api/alerts?status=active
+2026-05-01 19:39:49 [info]: Socket disconnected: pErInIxsKVVasmpZAAAl — client namespace disconnect
+2026-05-01 19:39:52 [info]: [Data Audit] GET /api/stats/farm
+2026-05-01 19:39:52 [info]: Socket connected: ZwE9Qx7-JSm2rXr0AAAn (user 69ef6185425e89f7bf220be6)
+2026-05-01 19:39:56 [info]: [Data Audit] GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-05-01 19:39:56 [info]: [Data Audit] GET /api/geofences
+2026-05-01 19:40:04 [info]: Socket disconnected: ZwE9Qx7-JSm2rXr0AAAn — client namespace disconnect
+2026-05-01 19:40:04 [info]: [Data Audit] GET /api/auth/me
+2026-05-01 19:40:04 [info]: [Data Audit] GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-05-01 19:40:04 [info]: [Data Audit] GET /api/geofences
+2026-05-01 19:40:04 [info]: Socket connected: Cx9baRqtHTL1Z9cJAAAp (user 69ef6185425e89f7bf220be6)
+2026-05-01 19:40:04 [info]: [Data Audit] GET /api/memberships/my
+2026-05-01 19:40:14 [info]: Socket disconnected: Cx9baRqtHTL1Z9cJAAAp — client namespace disconnect
+2026-05-01 19:40:14 [info]: [Data Audit] GET /api/auth/me
+2026-05-01 19:40:14 [info]: [Data Audit] GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-05-01 19:40:14 [info]: [Data Audit] GET /api/geofences
+2026-05-01 19:40:14 [info]: Socket connected: kyHA97_1LQIfuTqZAAAr (user 69ef6185425e89f7bf220be6)
+2026-05-01 19:40:15 [info]: [Data Audit] GET /api/memberships/my
+2026-05-01 19:40:26 [info]: Socket disconnected: kyHA97_1LQIfuTqZAAAr — client namespace disconnect
+2026-05-01 19:40:32 [info]: [Data Audit] GET /api/auth/me
+2026-05-01 19:40:32 [info]: [Data Audit] GET /api/memberships/my
+2026-05-01 19:40:32 [info]: [Data Audit] GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-05-01 19:40:32 [info]: [Data Audit] GET /api/geofences
+2026-05-01 19:40:32 [info]: Socket connected: pXa9n4BWLTM-08nqAAAt (user 69ef6185425e89f7bf220be6)
+2026-05-01 19:40:37 [info]: [Data Audit] GET /api/geofences
+2026-05-01 19:40:38 [info]: [Data Audit] GET /api/geofences
+2026-05-01 19:40:40 [info]: [Data Audit] GET /api/stats/farm
+2026-05-01 19:40:41 [info]: [Data Audit] GET /api/alerts?status=active
+2026-05-01 19:40:42 [info]: [Data Audit] GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-05-01 19:40:42 [info]: [Data Audit] GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-05-01 19:40:43 [info]: Socket disconnected: pXa9n4BWLTM-08nqAAAt — client namespace disconnect
+2026-05-01 19:41:21 [info]: [Data Audit] GET /api/auth/me
+2026-05-01 19:41:22 [info]: [Data Audit] GET /api/memberships/my
+2026-05-01 19:41:23 [info]: [Data Audit] GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-05-01 19:41:23 [info]: [Data Audit] GET /api/geofences
+2026-05-01 19:41:23 [info]: Socket connected: -u9iepBRjf89vk1yAAAv (user 69ef6185425e89f7bf220be6)
+2026-05-01 19:41:27 [info]: [Data Audit] GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-05-01 19:41:27 [info]: [Data Audit] GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-05-01 19:41:29 [info]: [Data Audit] GET /api/alerts?status=active
+2026-05-01 19:41:29 [info]: [Data Audit] GET /api/geofences
+2026-05-01 19:42:59 [info]: [Data Audit] GET /api/geofences
+2026-05-01 19:42:59 [info]: [Data Audit] POST /api/auth/refresh
+2026-05-01 19:43:01 [info]: [Data Audit] GET /api/geofences
+2026-05-01 19:44:20 [info]: [Data Audit] GET /api/alerts?
+2026-05-01 19:45:34 [info]: Socket disconnected: -u9iepBRjf89vk1yAAAv — client namespace disconnect
+2026-05-01 19:45:44 [info]: [Data Audit] GET /api/auth/me
+2026-05-01 19:45:47 [info]: [Data Audit] GET /api/memberships/my
+2026-05-01 19:45:52 [info]: [Data Audit] GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-05-01 19:45:52 [info]: [Data Audit] GET /api/geofences
+2026-05-01 19:45:52 [info]: Socket connected: oIEx9uEeWydp87tfAAAx (user 69ef6185425e89f7bf220be6)
+2026-05-01 19:46:53 [info]: [Data Audit] GET /api/geofences
+2026-05-01 19:47:24 [info]: [Data Audit] GET /api/stats/farm
+2026-05-01 19:47:25 [info]: [Data Audit] GET /api/alerts?
+2026-05-01 19:48:22 [info]: [Data Audit] POST /api/auth/logout
+2026-05-01 19:48:23 [info]: User logged out
+2026-05-01 19:48:23 [info]: Socket disconnected: oIEx9uEeWydp87tfAAAx — client namespace disconnect
+2026-05-01 19:52:02 [info]: [Data Audit] POST /api/auth/register
+2026-05-01 19:52:03 [info]: ✅ New user registered with farm: Thamer's Farm (akkarithamer7@gmail.com)
+2026-05-01 19:52:03 [info]: [Data Audit] GET /api/memberships/my
+2026-05-01 19:52:04 [info]: [Data Audit] GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-05-01 19:52:04 [info]: [Data Audit] GET /api/geofences
+2026-05-01 19:52:04 [info]: Socket connected: rL_XDJqUyRmDDGvLAAAz (user 69f4f65276bad4a89bb5a093)
+2026-05-01 19:52:14 [info]: [Data Audit] POST /api/auth/logout
+2026-05-01 19:52:15 [info]: User logged out
+2026-05-01 19:52:15 [info]: Socket disconnected: rL_XDJqUyRmDDGvLAAAz — client namespace disconnect
+2026-05-01 19:52:20 [info]: [Data Audit] POST /api/auth/login
+2026-05-01 19:52:21 [info]: ✅ User logged in successfully: akkariwassim11@gmail.com
+2026-05-01 19:52:21 [info]: [Data Audit] GET /api/memberships/my
+2026-05-01 19:52:22 [info]: [Data Audit] GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-05-01 19:52:22 [info]: [Data Audit] GET /api/geofences
+2026-05-01 19:52:22 [info]: Socket connected: I9c9jjbA0fgUQuGaAAA1 (user 69ef6185425e89f7bf220be6)
+2026-05-01 19:52:26 [info]: [Data Audit] GET /api/geofences
+2026-05-01 19:54:21 [info]: Socket disconnected: I9c9jjbA0fgUQuGaAAA1 — client namespace disconnect
+2026-05-01 19:54:23 [info]: [Data Audit] GET /api/auth/me
+2026-05-01 19:54:23 [info]: [Data Audit] GET /api/memberships/my
+2026-05-01 19:54:23 [info]: [Data Audit] GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-05-01 19:54:23 [info]: [Data Audit] GET /api/geofences
+2026-05-01 19:54:23 [info]: Socket connected: D-tO8jaNWGZPpKkuAAA3 (user 69ef6185425e89f7bf220be6)
+2026-05-01 19:55:15 [info]: Socket disconnected: D-tO8jaNWGZPpKkuAAA3 — client namespace disconnect
+2026-05-01 19:55:21 [info]: [Data Audit] GET /api/auth/me
+2026-05-01 19:55:22 [info]: [Data Audit] GET /api/memberships/my
+2026-05-01 19:55:22 [info]: [Data Audit] GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-05-01 19:55:22 [info]: [Data Audit] GET /api/geofences
+2026-05-01 19:55:22 [info]: Socket connected: JvU2OX0JUe4KIxJBAAA5 (user 69ef6185425e89f7bf220be6)
+2026-05-01 19:55:26 [info]: [Data Audit] GET /api/geofences
+2026-05-01 19:55:28 [info]: [Data Audit] GET /api/stats/farm
+2026-05-01 19:55:30 [info]: [Data Audit] GET /api/alerts?
+2026-05-01 19:56:07 [info]: Socket disconnected: JvU2OX0JUe4KIxJBAAA5 — ping timeout
+2026-05-01 19:56:11 [info]: Socket connected: byLYwpt2ZjmnnCr4AAA7 (user 69ef6185425e89f7bf220be6)
+2026-05-01 19:58:25 [info]: [Data Audit] GET /api/geofences
+2026-05-01 19:58:25 [info]: [Data Audit] GET /api/devices?status=free
+2026-05-01 19:59:27 [info]: Socket disconnected: byLYwpt2ZjmnnCr4AAA7 — ping timeout
+2026-05-01 19:59:34 [info]: Socket connected: r7jCz-lTYCc4-kHwAAA9 (user 69ef6185425e89f7bf220be6)
+2026-05-01 19:59:37 [info]: Socket disconnected: r7jCz-lTYCc4-kHwAAA9 — transport close

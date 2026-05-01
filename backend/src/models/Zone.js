@@ -11,11 +11,7 @@ const zoneSchema = new mongoose.Schema({
   farm_id: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Farm',
-<<<<<<< HEAD
     required: true,
-=======
-    required: false,
->>>>>>> origin/main
     index: true,
   },
   name: {

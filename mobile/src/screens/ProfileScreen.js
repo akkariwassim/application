@@ -11,8 +11,15 @@ import useAuthStore from '../store/authStore';
 import theme, { COLORS, SPACING, BORDER_RADIUS, SHADOWS, TYPOGRAPHY } from '../config/theme';
 import useAnimalStore from '../store/animalStore';
 import useGeofenceStore from '../store/geofenceStore';
+import useThemeStore from '../store/themeStore';
+import { flushSyncQueue } from '../services/syncService';
+
 
 function MenuItem({ icon, label, value, onPress, danger, toggle, toggleValue, onToggle }) {
+  const { getColors } = useThemeStore();
+  const COLORS = getColors();
+  const styles = createStyles(COLORS);
+
   return (
     <TouchableOpacity style={styles.menuItem} onPress={onPress} activeOpacity={0.7} disabled={toggle}>
       <View style={[styles.menuIconBox, { backgroundColor: (danger ? COLORS.danger : COLORS.primary) + '22' }]}>
@@ -23,7 +30,7 @@ function MenuItem({ icon, label, value, onPress, danger, toggle, toggleValue, on
         {value && <Text style={styles.menuValue} numberOfLines={1}>{value}</Text>}
         {toggle
           ? <Switch value={toggleValue} onValueChange={onToggle} trackColor={{ true: COLORS.primary }} />
-          : <Ionicons name="chevron-forward" size={16} color={COLORS.subtext} />
+          : <Ionicons name="chevron-forward" size={16} color={COLORS.textDim} />
         }
       </View>
     </TouchableOpacity>
@@ -37,12 +44,16 @@ export default function ProfileScreen({ navigation }) {
   const { geofences } = useGeofenceStore();
   const { currentFarm } = useAuthStore();
   
-  const [notifications, setNotifications] = useState(true);
+  const { getColors, isDarkMode, toggleTheme } = useThemeStore();
+  const COLORS = getColors();
   
-  // States
+  const [notifications, setNotifications] = useState(true);
+
   const [isEditModalVisible, setEditModalVisible] = useState(false);
   const [activeTab, setActiveTab] = useState('account'); // account, farm, security
   const [loading, setLoading] = useState(false);
+  const [syncing, setSyncing] = useState(false);
+
 
   // Form states
   const [formData, setFormData] = useState({
@@ -131,6 +142,15 @@ export default function ProfileScreen({ navigation }) {
     }
   };
 
+  const handleManualSync = async () => {
+    setSyncing(true);
+    await flushSyncQueue();
+    setTimeout(() => {
+      setSyncing(false);
+      Alert.alert('Synchronisation', 'Toutes vos données sont à jour.');
+    }, 1500);
+  };
+
   const onUpdatePhone = async () => {
     if (!newPhone.trim()) return;
     setLoading(true);
@@ -142,8 +162,11 @@ export default function ProfileScreen({ navigation }) {
     }
   };
 
+  const styles = createStyles(COLORS);
+
   return (
     <View style={styles.container}>
+
       <ScrollView 
         style={{ flex: 1 }}
         contentContainerStyle={[styles.scroll, { paddingTop: insets.top + 20 }]}
@@ -245,7 +268,8 @@ export default function ProfileScreen({ navigation }) {
           <MenuItem 
             icon="cloud-done-outline" 
             label="Sauvegardes & Sync" 
-            onPress={() => navigation.navigate('BackupSync')} 
+            value={syncing ? "Sync..." : "À jour"}
+            onPress={handleManualSync} 
           />
         </View>
 
@@ -257,7 +281,13 @@ export default function ProfileScreen({ navigation }) {
             toggle toggleValue={notifications}
             onToggle={(v) => setNotifications(v)}
           />
-          <MenuItem icon="color-palette-outline" label="Mode Sombre (OLED)" toggle toggleValue={true} onToggle={() => {}} />
+          <MenuItem 
+            icon="color-palette-outline" 
+            label="Mode Sombre (OLED)" 
+            toggle 
+            toggleValue={isDarkMode} 
+            onToggle={toggleTheme} 
+          />
         </View>
 
         <TouchableOpacity style={styles.logoutBtn} onPress={handleLogout}>
@@ -355,7 +385,7 @@ export default function ProfileScreen({ navigation }) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS) => StyleSheet.create({
   container:   { flex:1, backgroundColor:COLORS.background },
   scroll:      { paddingBottom:60, paddingHorizontal: 16 },
   
@@ -372,20 +402,20 @@ const styles = StyleSheet.create({
   // Dashboard Card
   dashboardCard: { backgroundColor: COLORS.card, borderRadius: 24, padding: 20, borderWidth: 1, borderColor: COLORS.border, ...SHADOWS.soft, marginBottom: 20 },
   dashHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 },
-  dashTitle: { color: COLORS.white, fontSize: 15, fontWeight: '800' },
-  onlineBadge: { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: 'rgba(34, 197, 94, 0.1)', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 10 },
+  dashTitle: { color: COLORS.text, fontSize: 15, fontWeight: '800' },
+  onlineBadge: { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: COLORS.success + '15', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 10 },
   onlineDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: COLORS.success },
   onlineText: { color: COLORS.success, fontSize: 9, fontWeight: '900' },
   
   statsRow: { flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center' },
   statBox: { alignItems: 'center', flex: 1 },
   statIcon: { width: 44, height: 44, borderRadius: 14, alignItems: 'center', justifyContent: 'center', marginBottom: 10 },
-  statValue: { color: COLORS.white, fontSize: 18, fontWeight: '800' },
+  statValue: { color: COLORS.text, fontSize: 18, fontWeight: '800' },
   statLabel: { color: COLORS.textDim, fontSize: 11, fontWeight: '600', marginTop: 2 },
   dividerV: { width: 1, height: 40, backgroundColor: COLORS.border },
 
   sectionHeader: { color: COLORS.textMuted, fontSize: 13, fontWeight: '800', marginLeft: 10, marginBottom: 12, marginTop: 20, textTransform: 'uppercase', letterSpacing: 1 },
-  section: { backgroundColor: COLORS.card, borderRadius: 20, borderWidth: 1, borderColor: COLORS.border, overflow: 'hidden' },
+  section: { backgroundColor: COLORS.card, borderRadius: 20, borderWidth: 1, borderColor: COLORS.border, overflow: 'hidden', ...SHADOWS.soft },
   menuItem: { flexDirection: 'row', alignItems: 'center', padding: 18, borderBottomWidth: 1, borderColor: COLORS.border },
   menuIconBox: { width: 38, height: 38, borderRadius: 12, alignItems: 'center', justifyContent: 'center', marginRight: 14 },
   menuLabel: { flex: 1, color: COLORS.text, fontSize: 15, fontWeight: '600' },
@@ -397,10 +427,10 @@ const styles = StyleSheet.create({
   appVersion: { textAlign: 'center', color: COLORS.textDim, fontSize: 11, marginTop: 30, fontWeight: '600' },
 
   // Management Modal
-  modalBackdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.85)', justifyContent: 'flex-end' },
+  modalBackdrop: { flex: 1, backgroundColor: COLORS.overlay, justifyContent: 'flex-end' },
   managementCard: { backgroundColor: COLORS.surface, borderTopLeftRadius: 32, borderTopRightRadius: 32, padding: 24, paddingBottom: 40, maxHeight: '90%' },
   modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 },
-  modalTitle: { color: COLORS.white, fontSize: 22, fontWeight: '800' },
+  modalTitle: { color: COLORS.text, fontSize: 22, fontWeight: '800' },
   
   tabRow: { flexDirection: 'row', gap: 10, marginBottom: 24 },
   tab: { flex: 1, height: 42, borderRadius: 12, backgroundColor: COLORS.card, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: COLORS.border },
@@ -410,7 +440,7 @@ const styles = StyleSheet.create({
 
   formGroup: { gap: 16 },
   fieldLabel: { color: COLORS.textMuted, fontSize: 12, fontWeight: '700', textTransform: 'uppercase', marginLeft: 4 },
-  fieldInput: { backgroundColor: COLORS.card, borderRadius: 14, height: 54, paddingHorizontal: 18, color: COLORS.white, fontSize: 16, borderWidth: 1, borderColor: COLORS.border },
+  fieldInput: { backgroundColor: COLORS.card, borderRadius: 14, height: 54, paddingHorizontal: 18, color: COLORS.text, fontSize: 16, borderWidth: 1, borderColor: COLORS.border },
   
   primaryAction: { height: 58, borderRadius: 16, alignItems: 'center', justifyContent: 'center', marginTop: 32, ...SHADOWS.hard },
   primaryActionText: { color: COLORS.white, fontSize: 16, fontWeight: '800' },

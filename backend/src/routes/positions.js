@@ -9,8 +9,12 @@ const { authenticate } = require('../middleware/auth');
 // POST /api/positions — can be called by firmware (token auth) or app
 router.post('/', [
   authenticate,
+  body('animalId').isMongoId().withMessage('Invalid animal ID'),
   body('latitude').isFloat({ min: -90, max: 90 }).withMessage('Invalid latitude'),
   body('longitude').isFloat({ min: -180, max: 180 }).withMessage('Invalid longitude'),
+  body('temperature').optional().isFloat(),
+  body('heart_rate').optional().isFloat(),
+  body('activity').optional().isFloat({ min: 0, max: 100 }),
   validate
 ], ctrl.submitPosition);
 

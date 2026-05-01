@@ -2,6 +2,8 @@ import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
 import Constants from 'expo-constants';
 
+// We'll require syncService dynamically to avoid circular dependencies
+
 // ── Robust Dynamic host detection ───────────────────────────────
 const getBaseUrl = () => {
   // 1. Try to find the host machine IP from Expo Packager (MANDATORY for physical devices)
@@ -46,22 +48,13 @@ api.interceptors.request.use(
       config.headers.Authorization = `Bearer ${token}`;
     }
 
-<<<<<<< HEAD
     // 2. Attach Farm Context (Multi-tenancy)
-    const farmId = await SecureStore.getItemAsync('activeFarmId');
-=======
-    // 1b. Attach Farm ID context
     const farmId = await SecureStore.getItemAsync('currentFarmId');
->>>>>>> origin/main
     if (farmId) {
       config.headers['x-farm-id'] = farmId;
     }
 
-<<<<<<< HEAD
     // 3. Ensure /api prefix
-=======
-    // 2. Ensure /api prefix
->>>>>>> origin/main
     if (config.url && !config.url.startsWith('/api')) {
       const separator = config.url.startsWith('/') ? '' : '/';
       config.url = `/api${separator}${config.url}`;
@@ -153,9 +146,25 @@ api.interceptors.response.use(
       }
     }
 
-    // ── 3. Diagnostic Logging ─────────────────────────────────
+    // ── 3. Offline Queuing for Mutations ──────────────────────
+    const isMutation = ['post', 'put', 'delete', 'patch'].includes(error.config.method?.toLowerCase());
+    const isNetworkError = !error.response || error.code === 'ECONNABORTED' || error.message === 'Network Error';
+
+    if (isMutation && isNetworkError) {
+      console.log(`[API] Connection lost during mutation. Queuing: ${error.config.url}`);
+      const { queueAction } = require('./syncService');
+      await queueAction({
+        method: error.config.method,
+        url: error.config.url,
+        data: error.config.data ? JSON.parse(error.config.data) : null,
+        params: error.config.params
+      });
+      // Return a "fake" success or a special offline response to the store
+      return Promise.resolve({ data: { success: true, offline: true } });
+    }
+
+    // ── 4. Diagnostic Logging ─────────────────────────────────
     if (error.response) {
-      // ── Mute expected 404s (initial session check or new animal without AI data) ──
       const isMe404 = error.config.url.includes('/auth/me') && error.response.status === 404;
       const isAI404 = error.config.url.includes('/ai/animal/') && error.response.status === 404;
 
@@ -169,5 +178,18 @@ api.interceptors.response.use(
     return Promise.reject(error);
   }
 );
+
+/**
+ * Standardizes error messages from the backend or network.
+ */
+export const getErrorMessage = (error) => {
+  if (error.response) {
+    const data = error.response.data;
+    return data.message || data.error || `Erreur serveur (${error.response.status})`;
+  } else if (error.request) {
+    return 'Le serveur est injoignable. Vérifiez votre connexion.';
+  }
+  return error.message || 'Une erreur inconnue est survenue.';
+};
 
 export default api;

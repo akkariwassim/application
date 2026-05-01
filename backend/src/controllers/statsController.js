@@ -43,18 +43,30 @@ async function getAnimalStats(req, res, next) {
 async function getFarmStats(req, res, next) {
   try {
     const farmId = new mongoose.Types.ObjectId(req.farm_id);
-    
-    // Aggregate health status counts
-    const HealthLog = require('../models/HealthLog');
-    const recentLogs = await HealthLog.aggregate([
-      { $match: { farm_id: farmId, timestamp: { $gte: new Date(Date.now() - 24*60*60*1000) } } },
-      { $group: { _id: '$status', count: { $sum: 1 } } }
+    const Animal = require('../models/Animal');
+    const Zone = require('../models/Zone');
+    const Alert = require('../models/Alert');
+
+    const [animalCount, zoneCount, activeAlerts, healthSummary] = await Promise.all([
+      Animal.countDocuments({ farm_id: farmId }),
+      Zone.countDocuments({ farm_id: farmId }),
+      Alert.countDocuments({ farm_id: farmId, is_resolved: false }),
+      Animal.aggregate([
+        { $match: { farm_id: farmId } },
+        { $group: { _id: '$status', count: { $sum: 1 } } }
+      ])
     ]);
 
     res.json({ 
       success: true, 
       data: {
-        healthDistribution: recentLogs
+        totals: {
+          animals: animalCount,
+          zones: zoneCount,
+          alerts: activeAlerts
+        },
+        healthDistribution: healthSummary,
+        lastUpdated: new Date()
       }
     });
   } catch (err) {

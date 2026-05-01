@@ -51,19 +51,12 @@ async function register(req, res, next) {
       is_active: true
     });
 
-    // ── NEW: Auto-create Farm and Membership ──
-<<<<<<< HEAD
-    const farm = await Farm.create({
-      name: `${user.name}'s Farm`,
-      owner_id: user._id,
-      description: 'Ferme par défaut créée à l\'inscription',
-=======
+    // ── Auto-create Farm and Membership ──
     // This ensures new users aren't blocked by RBAC (403 Forbidden)
     const farm = await Farm.create({
       name: `${user.name}'s Farm`,
       owner_id: user._id,
       description: 'Default farm created on registration',
->>>>>>> origin/main
       subscription_status: 'trial'
     });
 
@@ -83,13 +76,8 @@ async function register(req, res, next) {
     });
     await user.save();
 
-<<<<<<< HEAD
-    logger.info(`✅ [DB Save] New user & farm created: ${email}`, { farmId: farm._id });
-
-=======
     logger.info(`✅ New user registered with farm: ${farm.name} (${email})`);
     
->>>>>>> origin/main
     res.status(201).json({ 
       success: true, 
       data: {
@@ -173,8 +161,6 @@ async function login(req, res, next) {
     logger.info(`✅ User logged in successfully: ${email}`);
     
     // Fetch memberships to provide a default farm context
-    const Membership = require('../models/Membership');
-    const Farm = require('../models/Farm');
     let primaryMembership = await Membership.findOne({ user_id: user._id }).sort({ created_at: 1 });
 
     if (!primaryMembership) {
