@@ -9,11 +9,12 @@ import MapView, { Polyline, Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import { Ionicons } from '@expo/vector-icons';
 import { getDistance } from 'geolib';
 import api from '../services/api';
-import theme, { COLORS, SPACING, BORDER_RADIUS, SHADOWS, TYPOGRAPHY } from '../config/theme';
+import useThemeStore from '../store/themeStore';
+import { SPACING, BORDER_RADIUS, SHADOWS, TYPOGRAPHY } from '../config/theme';
 
 const { width } = Dimensions.get('window');
 
-function StatCard({ icon, label, value, color }) {
+function StatCard({ icon, label, value, color, COLORS, styles }) {
   return (
     <View style={[styles.statCard, { borderBottomColor: color }]}>
       <View style={[styles.statIcon, { backgroundColor: `${color}15` }]}>
@@ -29,6 +30,10 @@ function StatCard({ icon, label, value, color }) {
 
 export default function HistoryScreen({ route, navigation }) {
   const { animal } = route.params;
+  const { getColors } = useThemeStore();
+  const COLORS = getColors();
+  const styles = createStyles(COLORS);
+  
   const [positions, setPositions] = useState([]);
   const [loading, setLoading]     = useState(true);
   const [period, setPeriod]       = useState('today');
@@ -133,12 +138,16 @@ export default function HistoryScreen({ route, navigation }) {
                 label="Distance" 
                 value={`${(totalDistanceM / 1000).toFixed(2)} km`} 
                 color={COLORS.primary} 
+                COLORS={COLORS}
+                styles={styles}
               />
               <StatCard 
                 icon="location" 
                 label="Positions" 
                 value={String(validPositions.length)} 
                 color={COLORS.success} 
+                COLORS={COLORS}
+                styles={styles}
               />
             </View>
 
@@ -226,7 +235,7 @@ export default function HistoryScreen({ route, navigation }) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS) => StyleSheet.create({
   container: { flex:1, backgroundColor:COLORS.background },
   header: { 
     flexDirection: 'row', 
@@ -240,13 +249,15 @@ const styles = StyleSheet.create({
     width: 40, 
     height: 40, 
     borderRadius: 12, 
-    backgroundColor: 'rgba(255,255,255,0.05)', 
+    backgroundColor: COLORS.background, 
     alignItems: 'center', 
     justifyContent: 'center',
-    marginRight: SPACING.md
+    marginRight: SPACING.md,
+    borderWidth: 1,
+    borderColor: COLORS.border
   },
   headerText: { flex: 1 },
-  title: { color: COLORS.white, fontSize: 18, fontWeight: '800' },
+  title: { color: COLORS.text, fontSize: 18, fontWeight: '800' },
   subtitle: { color: COLORS.textMuted, fontSize: 13 },
   
   scroll: { paddingBottom: 60 },
@@ -280,13 +291,15 @@ const styles = StyleSheet.create({
     alignItems: 'center', 
     gap: SPACING.md,
     borderBottomWidth: 3,
+    borderWidth: 1,
+    borderColor: COLORS.border,
     ...SHADOWS.soft
   },
   statIcon: { width: 36, height: 36, borderRadius: 10, alignItems: 'center', justifyContent: 'center' },
   statLabel: { color: COLORS.textDim, fontSize: 11, fontWeight: '600', textTransform: 'uppercase' },
-  statValue: { color: COLORS.white, fontSize: 16, fontWeight: '800', marginTop: 2 },
+  statValue: { color: COLORS.text, fontSize: 16, fontWeight: '800', marginTop: 2 },
 
-  mapWrapper: { marginHorizontal: SPACING.lg, borderRadius: 24, overflow: 'hidden', height: 200, ...SHADOWS.hard },
+  mapWrapper: { marginHorizontal: SPACING.lg, borderRadius: 24, overflow: 'hidden', height: 200, ...SHADOWS.hard, borderWidth: 1, borderColor: COLORS.border },
   map: { flex: 1 },
   mapOverlayBtn: { 
     position: 'absolute', bottom: 12, right: 12, 
@@ -304,20 +317,20 @@ const styles = StyleSheet.create({
   emptyText: { color: COLORS.textDim, fontSize: 14, marginTop: 12 },
 
   listHeader: { paddingHorizontal: SPACING.lg, marginTop: SPACING.xl, marginBottom: SPACING.md },
-  listTitle: { color: COLORS.white, fontSize: 18, fontWeight: '800' },
+  listTitle: { color: COLORS.text, fontSize: 18, fontWeight: '800' },
   listSubtitle: { color: COLORS.textDim, fontSize: 12 },
 
   logRow: { flexDirection: 'row', paddingHorizontal: SPACING.lg, marginBottom: 0 },
   logTimeCol: { width: 60, alignItems: 'flex-end', paddingTop: 2 },
-  logTime: { color: COLORS.white, fontSize: 13, fontWeight: '700' },
+  logTime: { color: COLORS.text, fontSize: 13, fontWeight: '700' },
   logDate: { color: COLORS.textDim, fontSize: 10, marginTop: 2 },
   logIndicator: { width: 40, alignItems: 'center' },
   logDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: COLORS.primary, marginTop: 6, zIndex: 2 },
   logLine: { width: 2, flex: 1, backgroundColor: COLORS.divider, marginVertical: 4 },
   logBody: { flex: 1, backgroundColor: COLORS.card, borderRadius: 16, padding: 12, marginBottom: 16, borderWidth: 1, borderColor: COLORS.border },
-  logCoords: { color: COLORS.white, fontSize: 14, fontWeight: '600' },
+  logCoords: { color: COLORS.text, fontSize: 14, fontWeight: '600' },
   logTags: { flexDirection: 'row', gap: 10, marginTop: 8 },
-  logTag: { flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: 'rgba(255,255,255,0.05)', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6 },
+  logTag: { flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: COLORS.background, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6 },
   logTagText: { color: COLORS.textMuted, fontSize: 11, fontWeight: '600' },
 
   loader: { padding: 40, alignItems: 'center' },

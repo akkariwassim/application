@@ -142,6 +142,7 @@ zoneSchema.statics.findByAnimal = async function(animalId, farmId) {
   return zone;
 };
 
+zoneSchema.index({ farm_id: 1, name: 1 }, { unique: true });
 zoneSchema.index({ farm_id: 1, is_active: 1 });
 zoneSchema.index({ geometry: '2dsphere' });
 zoneSchema.index({ center: '2dsphere' });

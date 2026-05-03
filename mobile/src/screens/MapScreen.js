@@ -20,6 +20,7 @@ import AnimalMarker from '../components/AnimalMarker';
 import MapControls from '../components/MapUI/MapControls';
 import useMapStore from '../store/mapStore';
 import useThemeStore from '../store/themeStore';
+import DebugOverlay from '../components/MapUI/DebugOverlay';
 
 
 // ── Map State Machine Types ──
@@ -43,11 +44,13 @@ const MemoizedAnimalMarker = React.memo(({ animal, onPress }) => {
     />
   );
 }, (prev, next) => {
-  // Only re-render if critical tracking data changed
+  // ── PHASE 3 OPTIMIZATION: Deep Equality Check ──
   return prev.animal.id === next.animal.id &&
          prev.animal.latitude === next.animal.latitude &&
          prev.animal.longitude === next.animal.longitude &&
          prev.animal.status === next.animal.status &&
+         prev.animal.temperature === next.animal.temperature &&
+         prev.animal.heart_rate === next.animal.heart_rate &&
          prev.animal.last_sync === next.animal.last_sync;
 });
 
@@ -198,11 +201,13 @@ export default function MapScreen({ route }) {
       }
       setMapState(MAP_STATES.READY);
       cleanupTracking();
+      
+      // ── PHASE 3 OPTIMIZATION: Throttled Tracking ──
       locationSub.current = await Location.watchPositionAsync(
         { 
           accuracy: Location.Accuracy.Balanced, 
-          timeInterval: 5000, // Reduced frequency to 5s
-          distanceInterval: 10 // Only update if moved 10m
+          timeInterval: 10000, // Reduced to 10s for stability
+          distanceInterval: 20 // Only update if moved 20m
         },
         loc => {
           if (!loc.coords || loc.coords.accuracy > 50) return; 
@@ -216,31 +221,12 @@ export default function MapScreen({ route }) {
             if (!prev) {
               setMarkerLoc(newLoc);
               setHasLocation(true);
-              
-              // ── AUTO-INITIALIZATION RULE ──
-              // If not locked and no user location yet, center on GPS
-              if (!isLocked && mapRef.current) {
-                mapRef.current.animateToRegion({
-                  ...newLoc,
-                  latitudeDelta: 0.01,
-                  longitudeDelta: 0.01
-                }, 1000);
-              }
               return newLoc;
             }
-            // Ignore tiny noise (less than 5m)
             const dist = getDistance(prev, newLoc);
-            if (dist < 5) return prev;
+            if (dist < 10) return prev; // Ignore noise < 10m
 
-            // Smooth marker movement
-            setMarkerLoc(prevM => {
-              if (!prevM) return newLoc;
-              const alpha = 0.5;
-              return { 
-                latitude: prevM.latitude + (newLoc.latitude - prevM.latitude) * alpha, 
-                longitude: prevM.longitude + (newLoc.longitude - prevM.longitude) * alpha 
-              };
-            });
+            setMarkerLoc(newLoc); // Immediate marker update
             return newLoc;
           });
         }
@@ -250,30 +236,46 @@ export default function MapScreen({ route }) {
 
   useFocusEffect(useCallback(() => { startTracking(); return () => cleanupTracking(); }, []));
 
+  // ── PHASE 3: Stabilized Camera Management ──
+  const lastCameraUpdate = useRef(0);
+  const isCameraMoving = useRef(false);
+
+  const moveCamera = useCallback((config, duration = 1200) => {
+    const now = Date.now();
+    if (now - lastCameraUpdate.current < 6000 || isCameraMoving.current) return;
+    
+    if (mapRef.current) {
+      isCameraMoving.current = true;
+      lastCameraUpdate.current = now;
+      mapRef.current.animateCamera(config, { duration });
+      setTimeout(() => { isCameraMoving.current = false; }, duration + 100);
+    }
+  }, []);
+
   useEffect(() => {
-    if (!mapReadyRef.current || !mapRef.current || isUserDragging.current) return;
+    if (!mapReadyRef.current || isUserDragging.current) return;
     
     // ── PRIORITY 1: Locked Location ──
     if (isLocked && lockedLocation) {
-      mapRef.current.animateCamera({ 
+      moveCamera({ 
         center: { latitude: lockedLocation.latitude, longitude: lockedLocation.longitude }, 
         pitch: 45, 
         altitude: 1200, 
         zoom: 16 
-      }, { duration: 1500 });
+      }, 1500);
       return;
     }
 
     // ── PRIORITY 2: Follow User GPS ──
     if (followUser && userLocation && !selectedAnimal) {
-      mapRef.current.animateCamera({ 
+      moveCamera({ 
         center: { latitude: userLocation.latitude, longitude: userLocation.longitude }, 
         pitch: 45, 
         altitude: 1000, 
         zoom: 17 
-      }, { duration: 1000 });
+      }, 1200);
     }
-  }, [userLocation?.latitude, followUser, !!selectedAnimal, isLocked, lockedLocation?.latitude]);
+  }, [userLocation?.latitude, followUser, !!selectedAnimal, isLocked, lockedLocation?.latitude, moveCamera]);
 
   const handleMapReady = () => {
     if (!mapReadyRef.current) {
@@ -320,6 +322,10 @@ export default function MapScreen({ route }) {
     );
   };
 
+  const handleAnimalPress = useCallback((animal) => {
+    setSelectedAnimal({ ...animal, isZone: false });
+  }, []);
+
   const focusZone = (gf) => {
     setShowZonesList(false);
     const coords = safeParseCoords(gf.polygon_coords);
@@ -353,7 +359,9 @@ export default function MapScreen({ route }) {
     });
   }, [geofences, selectedAnimal?.id]);
 
-  const MapLegend = () => (
+  const styles = useMemo(() => createStyles(COLORS), [isDarkMode]);
+
+  const MapLegend = useMemo(() => (
     <View style={styles.legendContainer}>
       <View style={styles.legendItem}>
         <View style={[styles.legendDot, { backgroundColor: '#22C55E' }]} />
@@ -368,7 +376,7 @@ export default function MapScreen({ route }) {
         <Text style={styles.legendText}>Danger</Text>
       </View>
     </View>
-  );
+  ), [COLORS, styles.legendContainer]);
 
   const renderLoading = () => (
     <View style={styles.fullscreenOverlay}>
@@ -376,58 +384,75 @@ export default function MapScreen({ route }) {
       <Text style={styles.loaderText}>Initialisation SIG...</Text>
     </View>
   );
-  const styles = useMemo(() => createStyles(COLORS), [isDarkMode]);
+
+  const renderError = () => (
+    <View style={styles.fullscreenOverlay}>
+      <Ionicons name="alert-circle" size={60} color={COLORS.danger} />
+      <Text style={styles.loaderText}>Erreur de chargement de la carte</Text>
+      <TouchableOpacity style={styles.retryBtn} onPress={() => startTracking()}>
+        <Text style={styles.retryBtnText}>Réessayer</Text>
+      </TouchableOpacity>
+    </View>
+  );
+
+
+
+
+
+  // ── PHASE 3: Memoized MapView to prevent unnecessary re-renders ──
+  const memoizedMap = useMemo(() => (
+    <MapView
+      ref={mapRef}
+      style={StyleSheet.absoluteFillObject}
+      provider={PROVIDER_GOOGLE}
+      mapType={mapType}
+      onRegionChange={onRegionChange}
+      onRegionChangeComplete={onRegionChangeComplete}
+      onMapReady={handleMapReady}
+      onLongPress={handleLongPress}
+      loadingEnabled={true}
+      tracksViewChanges={false} 
+      pitchEnabled={true}
+      initialRegion={lockedLocation || { latitude: 35.038, longitude: 9.484, latitudeDelta: 0.02, longitudeDelta: 0.02 }}
+    >
+      {isLocked && lockedLocation && (
+        <Marker 
+          coordinate={lockedLocation} 
+          pinColor={COLORS.primary}
+          title="Position Verrouillée"
+          zIndex={2000}
+        >
+          <View style={styles.lockedMarkerContainer}>
+            <View style={styles.lockedMarkerPulse} />
+            <Ionicons name="location" size={30} color={COLORS.primary} />
+          </View>
+        </Marker>
+      )}
+      {mapZones}
+      {markerLoc && (
+        <Marker coordinate={markerLoc} anchor={{ x: 0.5, y: 0.5 }} zIndex={1000} cluster={false}>
+          <View style={styles.userDotContainer}>
+            <Animated.View style={[styles.userPulse, { transform: [{ scale: pulseAnim.interpolate({ inputRange: [0, 1], outputRange: [1, 2.5] }) }], opacity: pulseAnim.interpolate({ inputRange: [0, 1], outputRange: [0.6, 0] }) }]} />
+            <View style={styles.userInternal}><Ionicons name="navigate" size={12} color={COLORS.white} /></View>
+          </View>
+        </Marker>
+      )}
+      {filteredAnimals.map(animal => (
+        <MemoizedAnimalMarker 
+          key={animal.id || animal._id}
+          animal={animal}
+          onPress={() => handleAnimalPress(animal)}
+        />
+      ))}
+    </MapView>
+  ), [mapType, mapZones, filteredAnimals, markerLoc, isLocked, lockedLocation, COLORS, pulseAnim, handleAnimalPress, handleMapReady, handleLongPress, onRegionChange, onRegionChangeComplete, styles]);
 
   if (mapState === MAP_STATES.INITIALIZING) return <View style={styles.container}>{renderLoading()}</View>;
-
+  if (mapState === MAP_STATES.ERROR || mapState === MAP_STATES.DENIED) return <View style={styles.container}>{renderError()}</View>;
 
   return (
     <View style={styles.container}>
-      <MapView
-        ref={mapRef}
-        style={StyleSheet.absoluteFillObject}
-        provider={PROVIDER_GOOGLE}
-        mapType={mapType}
-        onRegionChange={onRegionChange}
-        onRegionChangeComplete={onRegionChangeComplete}
-        onMapReady={handleMapReady}
-        onLongPress={handleLongPress}
-        loadingEnabled={true}
-        tracksViewChanges={false} 
-        pitchEnabled={true}
-        initialRegion={lockedLocation || { latitude: 35.038, longitude: 9.484, latitudeDelta: 0.02, longitudeDelta: 0.02 }}
-      >
-        {isLocked && lockedLocation && (
-          <Marker 
-            coordinate={lockedLocation} 
-            pinColor={COLORS.primary}
-            title="Position Verrouillée"
-            zIndex={2000}
-          >
-            <View style={styles.lockedMarkerContainer}>
-              <View style={styles.lockedMarkerPulse} />
-              <Ionicons name="location" size={30} color={COLORS.primary} />
-            </View>
-          </Marker>
-        )}
-        {mapZones}
-        {markerLoc && (
-          <Marker coordinate={markerLoc} anchor={{ x: 0.5, y: 0.5 }} zIndex={1000} cluster={false}>
-            <View style={styles.userDotContainer}>
-              <Animated.View style={[styles.userPulse, { transform: [{ scale: pulseAnim.interpolate({ inputRange: [0, 1], outputRange: [1, 2.5] }) }], opacity: pulseAnim.interpolate({ inputRange: [0, 1], outputRange: [0.6, 0] }) }]} />
-              <View style={styles.userInternal}><Ionicons name="navigate" size={12} color={COLORS.white} /></View>
-            </View>
-          </Marker>
-        )}
-        {filteredAnimals.map(animal => (
-          <MemoizedAnimalMarker 
-            key={animal.id || animal._id}
-            animal={animal}
-            onPress={() => setSelectedAnimal({ ...animal, isZone: false })}
-          />
-        ))}
-      </MapView>
-
+      {memoizedMap}
       <MapControls 
         followUser={followUser}
         onToggleFollow={() => {
@@ -455,7 +480,8 @@ export default function MapScreen({ route }) {
         </View>
       )}
 
-      <MapLegend />
+      {MapLegend}
+      <DebugOverlay renderCount={renderCount.current} />
 
       {selectedAnimal && (
         <View style={[styles.detailSheet, { paddingBottom: insets.bottom + SPACING.md }]}>
@@ -543,6 +569,7 @@ export default function MapScreen({ route }) {
         </TouchableOpacity>
       </Modal>
     </View>
+
   );
 }
 
@@ -677,5 +704,18 @@ const createStyles = (COLORS) => StyleSheet.create({
   },
   lockBadgeClose: {
     marginLeft: 4,
+  },
+  retryBtn: {
+    marginTop: 20,
+    backgroundColor: COLORS.primary,
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 12,
+    ...SHADOWS.soft
+  },
+  retryBtnText: {
+    color: COLORS.white,
+    fontWeight: '800',
+    fontSize: 15
   }
 });

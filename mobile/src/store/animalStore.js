@@ -65,6 +65,10 @@ const useAnimalStore = create(
 
     if (!isNextPage) {
       set({ isLoading: true, error: null, page: 1, animals: [] });
+      // Safety timeout: stop spinner after 15s even if request hangs
+      setTimeout(() => {
+        if (get().isLoading) set({ isLoading: false, error: 'TIMEOUT' });
+      }, 15000);
     } else {
       set({ isFetchingMore: true });
     }
@@ -99,6 +103,7 @@ const useAnimalStore = create(
   },
 
   fetchAnimal: async (id) => {
+    if (!id || id === 'undefined') return;
     set({ isLoading: true });
     try {
       const { data } = await api.get(`/animals/${id}`);
@@ -110,6 +115,7 @@ const useAnimalStore = create(
   },
 
   fetchHistory: async (id, days = 1) => {
+    if (!id || id === 'undefined') return [];
     try {
       const { data } = await api.get(`/positions/${id}/history`, { params: { days } });
       return data;
@@ -120,6 +126,7 @@ const useAnimalStore = create(
   },
 
   fetchAIAnalysis: async (animalId) => {
+    if (!animalId || animalId === 'undefined') return;
     set({ selectedAnimalAI: null });
     try {
       const { data } = await api.get(`/ai/animal/${animalId}`);
@@ -148,6 +155,7 @@ const useAnimalStore = create(
   },
 
   updateAnimal: async (id, updates) => {
+    if (!id || id === 'undefined') return;
     console.log(`[STORE] Updating animal ${id} with:`, updates);
     try {
       const { data } = await api.put(`/animals/${id}`, updates);
@@ -162,6 +170,7 @@ const useAnimalStore = create(
   },
 
   deleteAnimal: async (id) => {
+    if (!id || id === 'undefined') return;
     const animalToDelete = get().animals.find(a => a.id === id);
     if (!animalToDelete) return;
 
@@ -209,6 +218,7 @@ const useAnimalStore = create(
   },
 
   triggerAction: async (animalId, type, state) => {
+    if (!animalId || animalId === 'undefined') return;
     try {
       const { data } = await api.post(`/animals/${animalId}/action`, { type, state });
       set((stateOld) => ({

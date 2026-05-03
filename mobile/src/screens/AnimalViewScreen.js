@@ -8,23 +8,11 @@ import MapView, { Marker, Circle, PROVIDER_GOOGLE } from 'react-native-maps';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as Location from 'expo-location';
 import useAnimalStore from '../store/animalStore';
+import useThemeStore from '../store/themeStore';
 import { subscribeAnimal, unsubscribeAnimal } from '../services/socketService';
+import { SHADOWS, SPACING, BORDER_RADIUS } from '../config/theme';
 
 const { width } = Dimensions.get('window');
-
-const COLORS = {
-  primary:    '#6366F1', 
-  background: '#0F172A', 
-  surface:    '#1E293B', 
-  card:       'rgba(30, 41, 59, 0.7)',
-  text:       '#F8FAFC', 
-  subtext:    '#94A3B8', 
-  safe:       '#10B981', 
-  warning:    '#F59E0B', 
-  danger:     '#EF4444', 
-  offline:    '#64748B', 
-  border:     'rgba(255, 255, 255, 0.08)',
-};
 
 // Simple Haversine for live distance calculation
 function haversineDist(lat1, lon1, lat2, lon2) {
@@ -44,6 +32,10 @@ export default function AnimalViewScreen({ route, navigation }) {
   const insets = useSafeAreaInsets();
   const { animalId } = route.params;
   const { animals, fetchAnimal, fetchAIAnalysis, selectedAnimalAI } = useAnimalStore();
+  const { getColors } = useThemeStore();
+  const COLORS = getColors();
+  const styles = createStyles(COLORS);
+  
   const animal = animals.find(a => a.id === animalId);
   
   const [loading, setLoading] = useState(!animal);
@@ -52,6 +44,11 @@ export default function AnimalViewScreen({ route, navigation }) {
 
   useEffect(() => {
     const load = async () => {
+      if (!animalId || animalId === 'undefined') {
+        console.warn('[AnimalView] No animalId provided in params');
+        setLoading(false);
+        return;
+      }
       await Promise.all([
         fetchAnimal(animalId),
         fetchAIAnalysis(animalId)
@@ -59,7 +56,9 @@ export default function AnimalViewScreen({ route, navigation }) {
       setLoading(false);
     };
     load();
-    subscribeAnimal(animalId);
+    if (animalId && animalId !== 'undefined') {
+      subscribeAnimal(animalId);
+    }
     
     // Watch user location for live distance
     let sub;
@@ -82,7 +81,9 @@ export default function AnimalViewScreen({ route, navigation }) {
     ).start();
 
     return () => {
-      unsubscribeAnimal(animalId);
+      if (animalId && animalId !== 'undefined') {
+        unsubscribeAnimal(animalId);
+      }
       if (sub) sub.remove();
     };
   }, [animalId]);
@@ -101,7 +102,7 @@ export default function AnimalViewScreen({ route, navigation }) {
     );
   }
 
-  const statusColor = COLORS[animal.status] || COLORS.offline;
+  const statusColor = COLORS.status[animal.status] || COLORS.status.offline;
 
   return (
     <View style={styles.container}>
@@ -268,27 +269,27 @@ export default function AnimalViewScreen({ route, navigation }) {
         <View style={styles.statsPanel}>
           <Text style={styles.panelTitle}>Sensor Connectivity</Text>
           <View style={styles.statsGrid}>
-            <DeviceStat label="Battery" value={`${animal.battery_level || 100}%`} icon={animal.battery_level > 20 ? "battery" : "battery-alert"} color={animal.battery_level > 20 ? COLORS.safe : COLORS.danger} />
-            <DeviceStat label="Signal" value={`${animal.signal_strength || 100}%`} icon="wifi" color={COLORS.primary} />
-            <DeviceStat label="Last Update" value={animal.last_seen ? new Date(animal.last_seen).toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' }) : '--'} icon="clock-outline" color={COLORS.subtext} />
+            <DeviceStat styles={styles} label="Battery" value={`${animal.battery_level || 100}%`} icon={animal.battery_level > 20 ? "battery" : "battery-alert"} color={animal.battery_level > 20 ? COLORS.safe : COLORS.danger} />
+            <DeviceStat styles={styles} label="Signal" value={`${animal.signal_strength || 100}%`} icon="wifi" color={COLORS.primary} />
+            <DeviceStat styles={styles} label="Last Update" value={animal.last_seen ? new Date(animal.last_seen).toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' }) : '--'} icon="clock-outline" color={COLORS.subtext} />
           </View>
         </View>
 
         {/* Identity Section */}
         <View style={styles.infoPanel}>
           <Text style={styles.panelTitle}>Animal Identification</Text>
-          <InfoItem label="Unique ID" value={animal.id} />
-          <InfoItem label="Breed" value={animal.breed || 'Not specified'} />
-          <InfoItem label="Age" value={animal.age ? `${animal.age} years` : 'Unknown'} />
-          <InfoItem label="Weight" value={animal.weight_kg ? `${animal.weight_kg} kg` : '--'} />
-          <InfoItem label="Device ID" value={animal.device_id || 'Not linked'} />
+          <InfoItem styles={styles} label="Unique ID" value={animal.id} />
+          <InfoItem styles={styles} label="Breed" value={animal.breed || 'Not specified'} />
+          <InfoItem styles={styles} label="Age" value={animal.age ? `${animal.age} years` : 'Unknown'} />
+          <InfoItem styles={styles} label="Weight" value={animal.weight_kg ? `${animal.weight_kg} kg` : '--'} />
+          <InfoItem styles={styles} label="Device ID" value={animal.device_id || 'Not linked'} />
         </View>
       </ScrollView>
     </View>
   );
 }
 
-function DeviceStat({ label, value, icon, color }) {
+function DeviceStat({ label, value, icon, color, styles }) {
   return (
     <View style={styles.devStat}>
       <MaterialCommunityIcons name={icon} size={22} color={color} />
@@ -298,7 +299,7 @@ function DeviceStat({ label, value, icon, color }) {
   );
 }
 
-function InfoItem({ label, value }) {
+function InfoItem({ label, value, styles }) {
   return (
     <View style={styles.infoItem}>
       <Text style={styles.infoLabel}>{label}</Text>
@@ -307,7 +308,7 @@ function InfoItem({ label, value }) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS) => StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.background },
   centered: { flex: 1, backgroundColor: COLORS.background, justifyContent: 'center', alignItems: 'center' },
   header: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 20, paddingBottom: 15, backgroundColor: COLORS.surface },
@@ -330,23 +331,23 @@ const styles = StyleSheet.create({
   dashboardGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12, marginBottom: 24 },
   widget: { width: (width - 52) / 2, backgroundColor: COLORS.surface, borderRadius: 24, padding: 18, borderWidth: 1, borderColor: COLORS.border },
   widgetHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 12 },
-  widgetLabel: { color: COLORS.subtext, fontSize: 12, fontWeight: '700', marginLeft: 8 },
+  widgetLabel: { color: COLORS.textMuted, fontSize: 12, fontWeight: '700', marginLeft: 8 },
   widgetValue: { color: COLORS.text, fontSize: 24, fontWeight: '900' },
-  unit: { fontSize: 14, color: COLORS.subtext, fontWeight: '600' },
+  unit: { fontSize: 14, color: COLORS.textDim, fontWeight: '600' },
   widgetStatus: { alignSelf: 'flex-start', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 8, marginTop: 10 },
   widgetStatusText: { fontSize: 10, fontWeight: '800', textTransform: 'uppercase' },
-  widgetHint: { color: COLORS.subtext, fontSize: 10, marginTop: 8, fontWeight: '600' },
+  widgetHint: { color: COLORS.textDim, fontSize: 10, marginTop: 8, fontWeight: '600' },
 
   statsPanel: { backgroundColor: COLORS.surface, borderRadius: 28, padding: 20, marginBottom: 20, borderWidth: 1, borderColor: COLORS.border },
   panelTitle: { color: COLORS.text, fontSize: 16, fontWeight: '800', marginBottom: 20 },
   statsGrid: { flexDirection: 'row', justifyContent: 'space-between' },
   devStat: { alignItems: 'center', flex: 1 },
   devStatValue: { color: COLORS.text, fontSize: 15, fontWeight: '800', marginTop: 8 },
-  devStatLabel: { color: COLORS.subtext, fontSize: 10, fontWeight: '700', marginTop: 2, textTransform: 'uppercase' },
+  devStatLabel: { color: COLORS.textMuted, fontSize: 10, fontWeight: '700', marginTop: 2, textTransform: 'uppercase' },
 
   infoPanel: { backgroundColor: COLORS.surface, borderRadius: 28, padding: 20, borderWidth: 1, borderColor: COLORS.border },
   infoItem: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: COLORS.border },
-  infoLabel: { color: COLORS.subtext, fontSize: 13, fontWeight: '600' },
+  infoLabel: { color: COLORS.textMuted, fontSize: 13, fontWeight: '600' },
   infoValue: { color: COLORS.text, fontSize: 14, fontWeight: '700' },
 
   // AI Panel Styles
@@ -359,7 +360,7 @@ const styles = StyleSheet.create({
   aiContent: {},
   riskRow: { marginBottom: 20 },
   riskInfo: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 8 },
-  riskLabel: { color: COLORS.subtext, fontSize: 12, fontWeight: '700' },
+  riskLabel: { color: COLORS.textMuted, fontSize: 12, fontWeight: '700' },
   riskValue: { fontSize: 18, fontWeight: '900' },
   progressBarBg: { height: 8, backgroundColor: COLORS.border, borderRadius: 4, overflow: 'hidden' },
   progressBarFill: { height: '100%', borderRadius: 4 },
@@ -367,7 +368,7 @@ const styles = StyleSheet.create({
   detailItem: { backgroundColor: COLORS.background, padding: 12, borderRadius: 16 },
   detailTitle: { color: COLORS.primary, fontSize: 11, fontWeight: '800', marginBottom: 4, textTransform: 'uppercase' },
   detailText: { color: COLORS.text, fontSize: 13, fontWeight: '600', lineHeight: 18 },
-  aiConfidence: { color: COLORS.subtext, fontSize: 10, textAlign: 'right', fontStyle: 'italic' },
+  aiConfidence: { color: COLORS.textDim, fontSize: 10, textAlign: 'right', fontStyle: 'italic' },
   aiEmpty: { padding: 20, alignItems: 'center', gap: 10 },
-  aiEmptyText: { color: COLORS.subtext, fontSize: 13, fontWeight: '600' },
+  aiEmptyText: { color: COLORS.textMuted, fontSize: 13, fontWeight: '600' },
 });
