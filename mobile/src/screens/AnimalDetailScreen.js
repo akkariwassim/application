@@ -9,32 +9,9 @@ import * as Yup from 'yup';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import useAnimalStore from '../store/animalStore';
 import useGeofenceStore from '../store/geofenceStore';
+import useThemeStore from '../store/themeStore';
 
 const { width } = Dimensions.get('window');
-
-const COLORS = {
-  primary:    '#6366F1', 
-  background: '#0F172A', 
-  surface:    '#1E293B', 
-  card:       '#1E2A45', 
-  text:       '#F8FAFC', 
-  subtext:    '#94A3B8', 
-  danger:     '#EF4444', 
-  safe:       '#10B981',
-  success:    '#10B981',
-  warning:    '#F59E0B',
-  info:       '#6366F1',
-  border:     'rgba(255, 255, 255, 0.08)',
-  textDim:    '#94A3B8',
-  white:      '#FFFFFF',
-  offline:    '#64748B',
-  status: {
-    safe:    '#10B981',
-    warning: '#F59E0B',
-    danger:  '#EF4444',
-    offline: '#64748B',
-  }
-};
 
 const ANIMAL_TYPES = [
   { id: 'bovine', label: 'Bovin', icon: 'cow' },
@@ -57,11 +34,11 @@ const AnimalSchema = Yup.object().shape({
 });
 
 // ── UTILITY: Health Widget ──
-const HealthWidget = ({ title, value, unit, icon, color, subValue, pulse }) => (
+const HealthWidget = ({ title, value, unit, icon, color, subValue, pulse, COLORS, styles }) => (
   <View style={styles.healthWidget}>
     <View style={[styles.healthIcon, { backgroundColor: color + '22' }]}>
       <MaterialCommunityIcons name={icon} size={24} color={color} />
-      {pulse && <View style={[styles.pulse, { backgroundColor: color }]} />}
+      {pulse && <View style={[styles.pulse, { backgroundColor: color, borderColor: COLORS.white }]} />}
     </View>
     <View style={styles.healthInfo}>
       <Text style={styles.healthTitle}>{title}</Text>
@@ -78,6 +55,10 @@ export default function AnimalDetailScreen({ route, navigation }) {
   const insets = useSafeAreaInsets();
   const { animal: initialAnimal, mode, initialLocation, initialZoneId } = route.params || {};
   const isCreate = mode === 'create';
+  
+  const { getColors } = useThemeStore();
+  const COLORS = getColors();
+  const styles = createStyles(COLORS);
   
   const [isEditing, setIsEditing] = useState(isCreate);
   const [saving, setSaving] = useState(false);
@@ -320,19 +301,19 @@ export default function AnimalDetailScreen({ route, navigation }) {
             <View style={styles.healthGrid}>
               <HealthWidget 
                 title="Cœur" value={isSensorOffline ? '--' : (animal.heart_rate || '--')} unit="BPM" 
-                icon="heart" color={bpmStatus.color} subValue={bpmStatus.label} pulse={!isSensorOffline}
+                icon="heart" color={bpmStatus.color} subValue={bpmStatus.label} pulse={!isSensorOffline} COLORS={COLORS} styles={styles}
               />
               <HealthWidget 
                 title="Temp" value={isSensorOffline ? '--' : (typeof animal.temperature === 'number' ? animal.temperature.toFixed(1) : '--')} unit="°C" 
-                icon="thermometer" color={COLORS.danger} subValue="Stable"
+                icon="thermometer" color={COLORS.danger} subValue="Stable" COLORS={COLORS} styles={styles}
               />
               <HealthWidget 
                 title="Batterie" value={animal.battery_level || '--'} unit="%" 
-                icon="battery" color={COLORS.success} subValue="Correct"
+                icon="battery" color={COLORS.success} subValue="Correct" COLORS={COLORS} styles={styles}
               />
               <HealthWidget 
                 title="Signal" value={animal.gps_signal || '--'} unit="%" 
-                icon="wifi" color={COLORS.info} subValue="Excellent"
+                icon="wifi" color={COLORS.info} subValue="Excellent" COLORS={COLORS} styles={styles}
               />
             </View>
 
@@ -343,16 +324,22 @@ export default function AnimalDetailScreen({ route, navigation }) {
                 name="Buzzer" icon="volume-high" 
                 active={animal.actuators?.buzzer} 
                 onToggle={() => handleAction('buzzer', animal.actuators?.buzzer)} 
+                COLORS={COLORS}
+                styles={styles}
               />
               <ActuatorRow 
                 name="LED" icon="lightbulb" 
                 active={animal.actuators?.led} 
                 onToggle={() => handleAction('led', animal.actuators?.led)} 
+                COLORS={COLORS}
+                styles={styles}
               />
               <ActuatorRow 
                 name="Relais" icon="power" 
                 active={animal.actuators?.relay} 
                 onToggle={() => handleAction('relay', animal.actuators?.relay)} 
+                COLORS={COLORS}
+                styles={styles}
               />
             </View>
           </View>
@@ -362,10 +349,10 @@ export default function AnimalDetailScreen({ route, navigation }) {
   );
 }
 
-const ActuatorRow = ({ name, icon, active, onToggle }) => (
+const ActuatorRow = ({ name, icon, active, onToggle, COLORS, styles }) => (
   <View style={styles.actuatorRow}>
     <View style={styles.actuatorLabel}>
-      <MaterialCommunityIcons name={icon} size={24} color={active ? COLORS.primary : COLORS.subtext} />
+      <MaterialCommunityIcons name={icon} size={24} color={active ? COLORS.primary : COLORS.textMuted} />
       <Text style={styles.actuatorText}>{name}</Text>
     </View>
     <TouchableOpacity 
@@ -377,7 +364,7 @@ const ActuatorRow = ({ name, icon, active, onToggle }) => (
   </View>
 );
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS) => StyleSheet.create({
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingBottom: 15, backgroundColor: COLORS.surface },
   backBtn: { width: 40, height: 40, borderRadius: 12, backgroundColor: COLORS.background, justifyContent: 'center', alignItems: 'center' },
   editBtn: { width: 40, height: 40, borderRadius: 12, backgroundColor: COLORS.surface, justifyContent: 'center', alignItems: 'center', borderWidth: 1, borderColor: COLORS.border },
@@ -388,7 +375,7 @@ const styles = StyleSheet.create({
   section: { marginBottom: 25 },
   sectionLabel: { color: COLORS.primary, fontSize: 12, fontWeight: '800', textTransform: 'uppercase', marginBottom: 15 },
   field: { marginBottom: 15 },
-  label: { color: COLORS.subtext, fontSize: 13, fontWeight: '600', marginBottom: 8 },
+  label: { color: COLORS.textMuted, fontSize: 13, fontWeight: '600', marginBottom: 8 },
   input: { backgroundColor: COLORS.surface, borderRadius: 12, height: 50, paddingHorizontal: 15, color: COLORS.text, borderWidth: 1, borderColor: COLORS.border },
   inputErr: { borderColor: COLORS.danger },
   err: { color: COLORS.danger, fontSize: 12, marginTop: 4 },
@@ -396,11 +383,11 @@ const styles = StyleSheet.create({
   typeGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   typeBtn: { width: (width - 60) / 3, height: 70, backgroundColor: COLORS.surface, borderRadius: 15, justifyContent: 'center', alignItems: 'center', borderWidth: 1, borderColor: COLORS.border },
   typeBtnActive: { backgroundColor: COLORS.primary, borderColor: COLORS.primary },
-  typeBtnText: { color: COLORS.subtext, fontSize: 11, fontWeight: '700', marginTop: 4 },
+  typeBtnText: { color: COLORS.textMuted, fontSize: 11, fontWeight: '700', marginTop: 4 },
 
   deviceBubble: { paddingHorizontal: 12, paddingVertical: 8, backgroundColor: COLORS.surface, borderRadius: 10, marginRight: 8, borderWidth: 1, borderColor: COLORS.border },
   deviceBubbleActive: { backgroundColor: COLORS.primary, borderColor: COLORS.primary },
-  deviceBubbleText: { color: COLORS.subtext, fontSize: 12, fontWeight: '600' },
+  deviceBubbleText: { color: COLORS.textMuted, fontSize: 12, fontWeight: '600' },
 
   zoneCard: { padding: 12, backgroundColor: COLORS.surface, borderRadius: 12, marginRight: 8, borderWidth: 1, borderColor: COLORS.border },
   zoneCardActive: { borderColor: COLORS.primary, backgroundColor: COLORS.primary + '11' },
@@ -415,7 +402,7 @@ const styles = StyleSheet.create({
   statusBadge: { flexDirection: 'row', alignItems: 'center', backgroundColor: COLORS.surface, paddingHorizontal: 12, paddingVertical: 6, borderRadius: 20 },
   statusDot: { width: 8, height: 8, borderRadius: 4, marginRight: 8 },
   statusText: { color: COLORS.text, fontSize: 12, fontWeight: '700' },
-  lastSync: { color: COLORS.subtext, fontSize: 12, marginTop: 8 },
+  lastSync: { color: COLORS.textMuted, fontSize: 12, marginTop: 8 },
 
   sectionHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 15 },
   sectionTitle: { color: COLORS.text, fontSize: 16, fontWeight: '800', marginBottom: 15, marginTop: 10 },
@@ -426,10 +413,10 @@ const styles = StyleSheet.create({
   healthWidget: { width: (width - 52) / 2, backgroundColor: COLORS.surface, borderRadius: 20, padding: 15, flexDirection: 'row', alignItems: 'center' },
   healthIcon: { width: 44, height: 44, borderRadius: 15, justifyContent: 'center', alignItems: 'center', marginRight: 12 },
   healthInfo: { flex: 1 },
-  healthTitle: { color: COLORS.subtext, fontSize: 11, fontWeight: '600' },
+  healthTitle: { color: COLORS.textMuted, fontSize: 11, fontWeight: '600' },
   healthValueRow: { flexDirection: 'row', alignItems: 'baseline' },
   healthValue: { color: COLORS.text, fontSize: 18, fontWeight: '800' },
-  healthUnit: { color: COLORS.subtext, fontSize: 10, marginLeft: 2 },
+  healthUnit: { color: COLORS.textMuted, fontSize: 10, marginLeft: 2 },
   healthSub: { fontSize: 10, fontWeight: '700', marginTop: 2 },
 
   actuatorCard: { backgroundColor: COLORS.surface, borderRadius: 20, padding: 15, marginBottom: 25 },
@@ -438,8 +425,8 @@ const styles = StyleSheet.create({
   actuatorText: { color: COLORS.text, fontSize: 14, fontWeight: '700', marginLeft: 12 },
   toggle: { width: 50, height: 28, borderRadius: 15, backgroundColor: COLORS.background, padding: 3, justifyContent: 'center' },
   toggleActive: { backgroundColor: COLORS.primary },
-  toggleCircle: { width: 22, height: 22, borderRadius: 11, backgroundColor: COLORS.subtext },
+  toggleCircle: { width: 22, height: 22, borderRadius: 11, backgroundColor: COLORS.textDim },
   toggleCircleActive: { backgroundColor: COLORS.white, alignSelf: 'flex-end' },
 
-  pulse: { position: 'absolute', top: 5, right: 5, width: 8, height: 8, borderRadius: 4 },
+  pulse: { position: 'absolute', top: 5, right: 5, width: 8, height: 8, borderRadius: 4, borderWidth: 1.5 },
 });

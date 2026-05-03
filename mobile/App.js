@@ -21,6 +21,7 @@ import { SHADOWS } from './src/config/theme';
 
 import { startConnectivityMonitoring, stopConnectivityMonitoring } from './src/services/connectivityService';
 import SyncStatusIndicator from './src/components/SyncStatusIndicator';
+import GlobalErrorBoundary from './src/components/ErrorBoundary';
 
 
 // Screens
@@ -47,61 +48,7 @@ const Stack = createStackNavigator();
 
 
 
-// ── ErrorBoundary — catches React render errors and logs them to terminal ──
-class ErrorBoundary extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = { hasError: false, error: null };
-  }
 
-  static getDerivedStateFromError(error) {
-    return { hasError: true, error };
-  }
-
-  componentDidCatch(error, info) {
-    const sep = '─'.repeat(60);
-    // This goes straight to the Metro terminal
-    console.error(
-      `\n🔴 [PHONE ERROR] REACT RENDER ERROR\n${sep}\n` +
-      `Message  : ${error?.message}\n` +
-      `Component: ${info?.componentStack?.trim()}\n` +
-      `Stack    :\n${error?.stack}\n${sep}`
-    );
-  }
-
-  render() {
-    if (this.state.hasError) {
-      return (
-        <View style={errStyles.container}>
-          <Text style={errStyles.title}>💥 App Crashed</Text>
-          <Text style={errStyles.subtitle}>Check your Metro terminal for the full error.</Text>
-          <ScrollView style={errStyles.box}>
-            <Text style={errStyles.msg}>{this.state.error?.message}</Text>
-            <Text style={errStyles.stack}>{this.state.error?.stack}</Text>
-          </ScrollView>
-          <TouchableOpacity
-            style={errStyles.btn}
-            onPress={() => this.setState({ hasError: false, error: null })}
-          >
-            <Text style={errStyles.btnText}>↺  Try Again</Text>
-          </TouchableOpacity>
-        </View>
-      );
-    }
-    return this.props.children;
-  }
-}
-
-const errStyles = StyleSheet.create({
-  container: { flex:1, backgroundColor:'#0A0F1E', padding:24, justifyContent:'center' },
-  title:     { color:'#EF4444', fontSize:22, fontWeight:'800', marginBottom:8 },
-  subtitle:  { color:'#94A3B8', fontSize:13, marginBottom:16 },
-  box:       { backgroundColor:'#131929', borderRadius:12, padding:12, maxHeight:300, marginBottom:20 },
-  msg:       { color:'#F59E0B', fontWeight:'700', fontSize:13, marginBottom:8 },
-  stack:     { color:'#94A3B8', fontSize:11, fontFamily:'monospace' },
-  btn:       { backgroundColor:'#4F46E5', borderRadius:12, height:48, alignItems:'center', justifyContent:'center' },
-  btnText:   { color:'#fff', fontWeight:'700', fontSize:15 },
-});
 
 // ── Auth Stack ──────────────────────────────────────────────
 function AuthNavigator() {
@@ -264,7 +211,7 @@ export default function App() {
   }
 
   return (
-    <ErrorBoundary>
+    <GlobalErrorBoundary>
       <GestureHandlerRootView style={{ flex: 1 }}>
         <SafeAreaProvider>
           <SyncStatusIndicator />
@@ -273,7 +220,7 @@ export default function App() {
           </NavigationContainer>
         </SafeAreaProvider>
       </GestureHandlerRootView>
-    </ErrorBoundary>
+    </GlobalErrorBoundary>
   );
 }
 

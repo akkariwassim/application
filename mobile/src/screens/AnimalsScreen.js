@@ -73,7 +73,7 @@ export default function AnimalsScreen({ navigation }) {
   const renderAnimalItem = ({ item }) => (
     <TouchableOpacity 
       style={styles.card}
-      onPress={() => navigation.navigate('AnimalView', { animal: item })}
+      onPress={() => navigation.navigate('AnimalView', { animalId: item.id || item._id, animal: item })}
       onLongPress={() => handleDelete(item)}
     >
       <View style={styles.cardHeader}>

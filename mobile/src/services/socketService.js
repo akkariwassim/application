@@ -74,9 +74,27 @@ export async function connectSocket({
     console.error('[Socket] Connection error:', err.message);
   });
 
-  if (onPositionUpdate) {
+  // ── PHASE 3 OPTIMIZATION: Client-side Batching ──
+  let positionBuffer = new Map();
+  let bufferTimeout = null;
+
+  const flushBuffer = () => {
+    if (positionBuffer.size > 0 && onBatchUpdate) {
+      onBatchUpdate(Array.from(positionBuffer.values()));
+      positionBuffer.clear();
+    }
+    bufferTimeout = null;
+  };
+
+  if (onPositionUpdate || onBatchUpdate) {
     socket.on('position-update', (data) => {
-      onPositionUpdate(data);
+      // Buffer the update
+      positionBuffer.set(data.animalId, data);
+      
+      // Schedule a flush if not already scheduled
+      if (!bufferTimeout) {
+        bufferTimeout = setTimeout(flushBuffer, 1000); // Flush every 1s
+      }
     });
   }
 

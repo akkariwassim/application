@@ -12,6 +12,10 @@ const useGeofenceStore = create(
 
   fetchGeofences: async () => {
     set({ isLoading: true, error: null });
+    // Safety timeout: stop spinner after 15s even if request hangs
+    setTimeout(() => {
+      if (get().isLoading) set({ isLoading: false, error: 'TIMEOUT' });
+    }, 15000);
     try {
       const { data } = await api.get('/geofences');
       set({ geofences: data, isLoading: false });

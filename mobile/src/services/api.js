@@ -60,6 +60,15 @@ api.interceptors.request.use(
       config.url = `/api${separator}${config.url}`;
     }
 
+    // 4. Attach unique request ID for tracing
+    config.headers['x-request-id'] = Math.random().toString(36).substring(2, 11).toUpperCase();
+
+    // 5. Safety Guard: Block requests with 'undefined' in URL
+    if (config.url && config.url.includes('/undefined')) {
+      console.error(`[API Guard] Blocked invalid request: ${config.method?.toUpperCase()} ${config.url}`);
+      return Promise.reject(new Error('INVALID_URL_UNDEFINED'));
+    }
+
     return config;
   },
   (error) => Promise.reject(error)

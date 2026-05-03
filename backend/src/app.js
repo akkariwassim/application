@@ -29,9 +29,13 @@ const backupRoutes     = require('./routes/backups');
 
 // Middleware
 const errorHandler   = require('./middleware/errorHandler');
+const requestLogger  = require('./middleware/requestLogger');
 
 const app  = express();
 const server = http.createServer(app);
+
+// ── Request ID & Logging ──────────────────────────────────────
+app.use(requestLogger);
 
 // ── Global Error Traps (IOT Reliability) ──────────
 process.on('uncaughtException', (err) => {
