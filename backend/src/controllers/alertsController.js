@@ -1,6 +1,7 @@
 'use strict';
 
 const Alert = require('../models/Alert');
+const response = require('../utils/responseHelper');
 
 /**
  * GET /api/alerts
@@ -16,7 +17,7 @@ async function getAlerts(req, res, next) {
     if (type) query.type = type;
     
     const alerts = await Alert.find(query).sort({ created_at: -1 });
-    res.json({ success: true, data: alerts });
+    return response.success(res, alerts);
   } catch (err) {
     next(err);
   }
@@ -29,12 +30,8 @@ async function getAlert(req, res, next) {
   try {
     const { id } = req.params;
     const alert = await Alert.findOne({ _id: id, farm_id: req.farm_id });
-    if (!alert) return res.status(404).json({ 
-      success: false,
-      error: 'ALERT_NOT_FOUND',
-      message: 'Alerte non trouvée.'
-    });
-    res.json({ success: true, data: alert });
+    if (!alert) return response.error(res, 'Alerte non trouvée.', 404, 'ALERT_NOT_FOUND');
+    return response.success(res, alert);
   } catch (err) {
     next(err);
   }
@@ -52,12 +49,8 @@ async function acknowledgeAlert(req, res, next) {
       { new: true }
     );
     
-    if (!alert) return res.status(404).json({ 
-      success: false,
-      error: 'ALERT_NOT_FOUND',
-      message: 'Alerte non trouvée.'
-    });
-    res.json({ success: true, data: alert });
+    if (!alert) return response.error(res, 'Alerte non trouvée.', 404, 'ALERT_NOT_FOUND');
+    return response.success(res, alert);
   } catch (err) {
     next(err);
   }
@@ -75,12 +68,8 @@ async function resolveAlert(req, res, next) {
       { new: true }
     );
     
-    if (!alert) return res.status(404).json({ 
-      success: false,
-      error: 'ALERT_NOT_FOUND',
-      message: 'Alerte non trouvée.'
-    });
-    res.json({ success: true, data: alert });
+    if (!alert) return response.error(res, 'Alerte non trouvée.', 404, 'ALERT_NOT_FOUND');
+    return response.success(res, alert);
   } catch (err) {
     next(err);
   }
@@ -93,12 +82,8 @@ async function deleteAlert(req, res, next) {
   try {
     const { id } = req.params;
     const result = await Alert.deleteOne({ _id: id, farm_id: req.farm_id });
-    if (result.deletedCount === 0) return res.status(404).json({ 
-      success: false,
-      error: 'ALERT_NOT_FOUND',
-      message: 'Alerte non trouvée.'
-    });
-    res.json({ success: true, data: { message: 'Alerte supprimée avec succès.' } });
+    if (result.deletedCount === 0) return response.error(res, 'Alerte non trouvée.', 404, 'ALERT_NOT_FOUND');
+    return response.success(res, { message: 'Alerte supprimée avec succès.' });
   } catch (err) {
     next(err);
   }

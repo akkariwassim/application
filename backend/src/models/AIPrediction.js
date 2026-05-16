@@ -29,6 +29,7 @@ const aiPredictionSchema = new mongoose.Schema({
     min: 0,
     max: 100,
   },
+  prediction: String,
   cause: String,
   recommendation: String,
   confidence: Number,

@@ -8,6 +8,7 @@ const geofenceService = require('../services/geofenceService');
 const aiService       = require('../services/aiService');
 const socketConfig    = require('../config/socket');
 const logger          = require('../utils/logger');
+const response        = require('../utils/responseHelper');
 
 /**
  * Update animal position /api/positions
@@ -20,7 +21,7 @@ async function submitPosition(req, res, next) {
       temperature, heart_rate, battery_level, gps_signal, activity 
     } = req.body;
     
-    // 1. Update the Animal with latest metrics (ONLY provided fields)
+    // 1. Update the Animal with latest metrics
     const updatePayload = { 
       last_seen: new Date(),
       last_sync: new Date()
@@ -34,26 +35,21 @@ async function submitPosition(req, res, next) {
     if (gps_signal !== undefined)     updatePayload.signal_strength = gps_signal;
     if (activity !== undefined)       updatePayload.activity       = activity;
 
-    // Find animal first to get its farm if req.farm_id is missing (e.g. legacy firmware)
     const animal = await Animal.findOneAndUpdate(
       { _id: animalId, farm_id: req.farm_id },
       { $set: updatePayload },
       { new: true }
     );
     
-    if (!animal) return res.status(404).json({ 
-      success: false,
-      error: 'ANIMAL_NOT_FOUND',
-      message: 'Animal non trouvé.' 
-    });
+    if (!animal) return response.error(res, 'Animal non trouvé.', 404, 'ANIMAL_NOT_FOUND');
 
-    // 2. Log Historical Data (Movement & Health)
+    // 2. Log Historical Data (Movement & Health) - Background
     const statsService = require('../services/statsService');
     statsService.logMetrics(animal, {
       latitude, longitude, temperature, heart_rate, activity, battery_level, gps_signal
     }).catch(err => logger.error(`Stats logging failed: ${err.message}`));
 
-    // 2b. Trigger AI Prediction (Asynchronous)
+    // 2b. Trigger AI Prediction (Asynchronous) - Background
     aiService.processAIPrediction(animal, { 
       latitude, longitude, temperature, heart_rate, activity 
     }).catch(err => {
@@ -72,55 +68,15 @@ async function submitPosition(req, res, next) {
       timestamp: animal.last_seen
     });
 
-    // 4. Geofence & Alert Monitoring
+    // 4. Geofence & Alert Monitoring - Try to process synchronously for immediate safety
     try {
       const { processZoneMonitoring } = require('../services/alertService');
       await processZoneMonitoring(animal, { latitude, longitude });
     } catch (alertErr) {
       logger.error(`Alert monitoring failed for animal ${animalId}: ${alertErr.message}`);
-      
-      // Fallback geofence logic if alertService fails
-      try {
-        const activeZone = await Zone.findByAnimal(animalId, animal.farm_id);
-        if (activeZone && activeZone.is_active) {
-          let coords = [];
-          if (activeZone.type === 'polygon' && activeZone.polygon_coords) {
-            coords = typeof activeZone.polygon_coords === 'string' 
-              ? JSON.parse(activeZone.polygon_coords) 
-              : activeZone.polygon_coords;
-          }
-
-          const isInside = geofenceService.checkInside(
-            { lat: latitude, lng: longitude },
-            activeZone.type,
-            activeZone.radius,
-            coords,
-            activeZone.location ? activeZone.location.coordinates : null
-          );
-
-          if (!isInside) {
-            await Alert.create({
-              animal_id: animalId,
-              user_id: req.user.id,
-              farm_id: req.farm_id,
-              type: 'exit',
-              zone_id: activeZone._id,
-              message: `L'animal ${animal.name} a quitté sa zone "${activeZone.name}"!`
-            });
-            socketConfig.emitAlert(req.farm_id, animalId, {
-              type: 'exit',
-              animalId,
-              animalName: animal.name,
-              message: `Alerte: ${animal.name} hors zone!`
-            });
-          }
-        }
-      } catch (gErr) {
-        logger.error(`Fallback geofence evaluation failed: ${gErr.message}`);
-      }
     }
 
-    res.json({ success: true, data: { message: 'Position mise à jour.', animal } });
+    return response.success(res, { message: 'Position mise à jour.', animal });
   } catch (err) {
     next(err);
   }
@@ -144,7 +100,7 @@ async function getHistory(req, res, next) {
       timestamp: { $gte: startDate }
     }).sort({ timestamp: 1 });
     
-    res.json({ success: true, data: history });
+    return response.success(res, history);
   } catch (err) {
     next(err);
   }
@@ -161,12 +117,8 @@ async function getLatest(req, res, next) {
       farm_id: req.farm_id 
     }).sort({ timestamp: -1 });
     
-    if (!latest) return res.status(404).json({ 
-      success: false,
-      error: 'NO_HISTORY',
-      message: 'Aucun historique trouvé.' 
-    });
-    res.json({ success: true, data: latest });
+    if (!latest) return response.error(res, 'Aucun historique trouvé.', 404, 'NO_HISTORY');
+    return response.success(res, latest);
   } catch (err) {
     next(err);
   }

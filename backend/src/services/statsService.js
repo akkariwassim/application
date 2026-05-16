@@ -7,12 +7,25 @@ const { haversineDistance } = require('./geofenceService');
 const logger = require('../utils/logger');
 
 class StatsService {
+  constructor() {
+    this.lastLogTime = new Map();
+  }
   
   /**
    * Logs a new position and vital signs into historical collections.
    */
   async logMetrics(animal, data) {
     try {
+      const now = Date.now();
+      const lastLog = this.lastLogTime.get(animal._id.toString()) || 0;
+      
+      // Throttle: Only log if 5 mins passed OR status is not safe
+      if (now - lastLog < 5 * 60 * 1000 && animal.status === 'safe') {
+        return;
+      }
+      
+      this.lastLogTime.set(animal._id.toString(), now);
+
       const { latitude, longitude, temperature, heart_rate, activity, speed } = data;
       
       // 1. Log Movement

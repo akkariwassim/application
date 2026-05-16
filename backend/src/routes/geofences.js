@@ -14,11 +14,12 @@ router.use(checkRole([]));
 router.get('/',      geofencesController.getGeofences);
 router.post('/', [
   body('name').trim().notEmpty().withMessage('Le nom de la zone est requis'),
-  body('type').isIn(['circle', 'polygon']).withMessage('Le type doit être circle ou polygon'),
+  body('type').optional().isIn(['circle', 'polygon']).withMessage('Le type doit être circle ou polygon'),
   body('centerLat').optional().isFloat({ min: -90, max: 90 }),
   body('centerLon').optional().isFloat({ min: -180, max: 180 }),
   body('radiusM').optional().isFloat({ min: 1 }),
   body('polygonCoords').optional().isArray(),
+  body('polygon_coords').optional().isArray(),
   validate
 ], geofencesController.createGeofence);
 router.put('/:id',   [

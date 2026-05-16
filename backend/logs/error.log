@@ -99,3 +99,4 @@
     at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
 2026-04-27 13:23:13 [error]: ❌ Registration failed for hamdighofran13@gmail.com: User validation failed: role: `farmer` is not a valid enum value for path `role`.
 >>>>>>> origin/main
+2026-05-14 00:43:39 [error]: ❌ CRITICAL: Error connecting to MongoDB!

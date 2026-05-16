@@ -21,14 +21,21 @@ const ANIMAL_TYPES = [
   { id: 'other', label: 'Autre', icon: 'paw' }
 ];
 
-const TYPES = ['bovine', 'ovine', 'caprine', 'equine', 'other'];
-const TYPE_ICONS = { bovine: 'cow', ovine: 'sheep', caprine: 'sheep', equine: 'horse-variant', other: 'paw' };
+const TYPES = ['cow', 'sheep', 'goat', 'camel', 'horse', 'bovine', 'ovine', 'caprine', 'equine', 'other'];
+const TYPE_ICONS = { 
+  cow: 'cow', sheep: 'sheep', goat: 'sheep', camel: 'camel', horse: 'horse-variant',
+  bovine: 'cow', ovine: 'sheep', caprine: 'sheep', equine: 'horse-variant', other: 'paw' 
+};
 
 const AnimalSchema = Yup.object().shape({
   name:     Yup.string().required('Nom requis'),
   type:     Yup.string().oneOf(TYPES).required(),
-  age:      Yup.number().min(0).max(50).nullable(),
-  weightKg: Yup.number().min(0).nullable(),
+  age:      Yup.number()
+    .transform((value, originalValue) => originalValue === '' ? null : value)
+    .min(0).max(50).nullable(),
+  weightKg: Yup.number()
+    .transform((value, originalValue) => originalValue === '' ? null : value)
+    .min(0).nullable(),
   deviceId: Yup.string().nullable(),
   rfidTag:  Yup.string().nullable(),
 });

@@ -23,7 +23,8 @@ const MapControls = ({
   onToggleHistory,
   onOpenFilters,
   isLocked,
-  onToggleLock
+  onToggleLock,
+  onAddAnimal
 }) => {
   return (
     <View style={styles.container}>
@@ -91,6 +92,14 @@ const MapControls = ({
           activeOpacity={0.8}
         >
           <Ionicons name="layers" size={20} color={COLORS.white} />
+        </TouchableOpacity>
+
+        <TouchableOpacity 
+          style={styles.fabSmall} 
+          onPress={onAddAnimal} 
+          activeOpacity={0.8}
+        >
+          <Ionicons name="add-circle" size={24} color={COLORS.white} />
         </TouchableOpacity>
 
         <TouchableOpacity 
