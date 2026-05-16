@@ -20,7 +20,21 @@ async function getGeofences(req, res, next) {
  */
 async function createGeofence(req, res, next) {
   try {
-    const { type, name, centerLat, centerLon, radiusM, polygonCoords, isActive, isPrimary, zoneType, priorityLevel, fillColor, areaSqm } = req.body;
+    const { 
+      type, name, centerLat, centerLon, radiusM, polygonCoords,
+      isActive, isPrimary, zoneType, priorityLevel, fillColor, areaSqm,
+      // Support snake_case fallbacks
+      polygon_coords, zone_type, center_lat, center_lon, radius_m, area_sqm
+    } = req.body;
+    
+    const finalType = type || 'polygon';
+    const finalName = name;
+    const finalPolygonCoords = polygonCoords || polygon_coords;
+    const finalZoneType = zoneType || zone_type || type || 'grazing';
+    const finalLat = parseFloat(centerLat || center_lat || 0);
+    const finalLon = parseFloat(centerLon || center_lon || 0);
+    const finalRadius = parseFloat(radiusM || radius_m || 0);
+    const finalArea = parseFloat(areaSqm || area_sqm || 0);
     
     // Check for unique name
     if (name) {
@@ -40,7 +54,7 @@ async function createGeofence(req, res, next) {
       return [parseFloat(p.longitude || p.lon || p.lng), parseFloat(p.latitude || p.lat)];
     };
 
-    let coordinates = polygonCoords;
+    let coordinates = finalPolygonCoords;
     if (typeof coordinates === 'string') {
       try { coordinates = JSON.parse(coordinates); } catch (e) { /* ignore */ }
     }
@@ -78,26 +92,26 @@ async function createGeofence(req, res, next) {
     const zone = await Zone.create({
       user_id: req.user.id,
       farm_id: req.farm_id,
-      name,
+      name: finalName,
       description: req.body.description,
-      zone_type: zoneType || type || 'grazing',
-      polygon_coords: polygonCoords, // store original for app
+      zone_type: finalZoneType,
+      polygon_coords: finalPolygonCoords,
       geometry: {
         type: 'Polygon',
         coordinates: normalizedCoords
       },
-      center_lat: lat,
-      center_lon: lon,
+      center_lat: finalLat,
+      center_lon: finalLon,
       center: {
         type: 'Point',
-        coordinates: [lon, lat]
+        coordinates: [finalLon, finalLat]
       },
-      radiusM,
+      radiusM: finalRadius,
       is_active: isActive !== undefined ? isActive : true,
       is_primary: isPrimary || 0,
       priority_level: priorityLevel || 1,
       fill_color: fillColor || '#4F46E5',
-      area_sqm: areaSqm
+      area_sqm: finalArea
     });
     
     res.status(201).json({ success: true, data: zone });
@@ -112,7 +126,10 @@ async function createGeofence(req, res, next) {
 async function updateGeofence(req, res, next) {
   try {
     const { id } = req.params;
-    const { name, centerLat, centerLon, polygonCoords, isActive, isPrimary, zoneType, priorityLevel, fillColor, areaSqm } = req.body;
+    const { 
+      name, centerLat, centerLon, polygonCoords, isActive, isPrimary, zoneType, priorityLevel, fillColor, areaSqm,
+      polygon_coords, zone_type, center_lat, center_lon, radius_m, area_sqm
+    } = req.body;
     
     // Check for unique name (exclude self)
     if (name) {
@@ -131,12 +148,13 @@ async function updateGeofence(req, res, next) {
     if (req.body.description) updateData.description = req.body.description;
     if (isActive !== undefined) updateData.is_active = isActive;
     if (isPrimary !== undefined) updateData.is_primary = isPrimary;
-    if (zoneType) updateData.zone_type = zoneType;
+    if (zoneType || zone_type) updateData.zone_type = zoneType || zone_type;
     if (priorityLevel) updateData.priority_level = priorityLevel;
     if (fillColor) updateData.fill_color = fillColor;
-    if (areaSqm) updateData.area_sqm = areaSqm;
+    if (areaSqm || area_sqm) updateData.area_sqm = areaSqm || area_sqm;
     
-    if (polygonCoords) {
+    const finalPolygonCoords = polygonCoords || polygon_coords;
+    if (finalPolygonCoords) {
       const toPoint = (p) => {
         if (Array.isArray(p)) return [parseFloat(p[0]), parseFloat(p[1])];
         return [parseFloat(p.longitude || p.lon || p.lng), parseFloat(p.latitude || p.lat)];
@@ -166,19 +184,22 @@ async function updateGeofence(req, res, next) {
         }
       }
       
-      updateData.polygon_coords = polygonCoords; // keep raw
+      updateData.polygon_coords = finalPolygonCoords; // keep raw
       updateData.geometry = {
         type: 'Polygon',
         coordinates: normalized
       };
     }
 
-    if (centerLat !== undefined && centerLon !== undefined) {
-      updateData.center_lat = parseFloat(centerLat);
-      updateData.center_lon = parseFloat(centerLon);
+    const finalLat = centerLat !== undefined ? centerLat : center_lat;
+    const finalLon = centerLon !== undefined ? centerLon : center_lon;
+
+    if (finalLat !== undefined && finalLon !== undefined) {
+      updateData.center_lat = parseFloat(finalLat);
+      updateData.center_lon = parseFloat(finalLon);
       updateData.center = {
         type: 'Point',
-        coordinates: [parseFloat(centerLon), parseFloat(centerLat)]
+        coordinates: [parseFloat(finalLon), parseFloat(finalLat)]
       };
     }
 

@@ -1,0 +1,34 @@
+AI Training Report
+==================
+
+Random Forest:
+  Accuracy: 0.7612
+  Precision: 0.7637
+  Recall: 0.7612
+  F1: 0.7622
+
+XGBoost:
+  Accuracy: 0.7352
+  Precision: 0.7415
+  Recall: 0.7352
+  F1: 0.7372
+
+LightGBM:
+  Accuracy: 0.7226
+  Precision: 0.7319
+  Recall: 0.7226
+  F1: 0.7253
+
+Logistic Regression:
+  Accuracy: 0.5131
+  Precision: 0.4973
+  Recall: 0.5131
+  F1: 0.4981
+
+Gradient Boosting:
+  Accuracy: 0.6451
+  Precision: 0.6527
+  Recall: 0.6451
+  F1: 0.6480
+
+Best Model: Random Forest

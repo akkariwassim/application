@@ -123,7 +123,7 @@ export default function AnimalsScreen({ navigation }) {
           </View>
           <TouchableOpacity 
             style={styles.addBtn} 
-            onPress={() => navigation.navigate('Map')} // Use Map for adding or a separate form
+            onPress={() => navigation.navigate('AnimalDetail', { mode: 'create' })}
           >
             <Ionicons name="add" size={28} color={COLORS.white} />
           </TouchableOpacity>

@@ -56,11 +56,16 @@ export default function GeofenceScreen({ navigation, route }) {
     }
     
     try {
+      const centroid = calculateCentroid(newPolygon);
       const zoneData = {
         name: zoneName,
-        polygon_coords: newPolygon,
-        zone_type: zoneType,
-        is_active: true
+        type: 'polygon', // Mandatory field for backend
+        polygonCoords: newPolygon, // CamelCase to match backend validation
+        zoneType: zoneType,
+        centerLat: centroid?.latitude,
+        centerLon: centroid?.longitude,
+        areaSqm: area,
+        isActive: true
       };
 
       if (editingId) {

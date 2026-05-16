@@ -5,8 +5,28 @@ const logger = require('../utils/logger');
 const AIPrediction = require('../models/AIPrediction');
 const Alert = require('../models/Alert');
 const socketConfig = require('../config/socket');
+const Animal = require('../models/Animal');
 
 const AI_SERVICE_URL = process.env.AI_SERVICE_URL || 'http://ai-service:8000';
+
+/**
+ * Call AI Microservice with retries
+ */
+async function callAIService(payload, retries = 3) {
+  for (let i = 0; i < retries; i++) {
+    try {
+      const response = await axios.post(`${AI_SERVICE_URL}/ai/predict`, payload, {
+        timeout: 5000
+      });
+      return response.data;
+    } catch (err) {
+      if (i === retries - 1) throw err;
+      const delay = Math.pow(2, i) * 1000;
+      logger.warn(`AI Service attempt ${i + 1} failed. Retrying in ${delay}ms...`);
+      await new Promise(resolve => setTimeout(resolve, delay));
+    }
+  }
+}
 
 /**
  * Call AI Microservice and save results
@@ -16,22 +36,18 @@ async function processAIPrediction(animal, sensorData) {
     const payload = {
       animal_id: animal._id.toString(),
       temperature: sensorData.temperature,
-      heart_rate: animal.heart_rate || 80, // Default if not set
+      heart_rate: animal.heart_rate || 80, 
       activity: sensorData.activity,
-      speed: 0.1, // TODO: Calculate based on historical distance
+      speed: sensorData.speed || 0.1,
       gps: {
         latitude: sensorData.latitude,
         longitude: sensorData.longitude
       }
     };
 
-    logger.info(`Sending data to AI Service for animal ${animal._id}`);
+    logger.info(`🤖 AI Request: animal=${animal.name} temp=${payload.temperature}°C`);
     
-    const response = await axios.post(`${AI_SERVICE_URL}/ai/predict`, payload, {
-      timeout: 5000
-    });
-
-    const prediction = response.data;
+    const prediction = await callAIService(payload);
 
     // Save to DB
     const savedPrediction = await AIPrediction.create({
@@ -40,6 +56,7 @@ async function processAIPrediction(animal, sensorData) {
       farm_id: animal.farm_id,
       status: prediction.status,
       risk_score: prediction.risk_score,
+      prediction: prediction.prediction,
       cause: prediction.cause,
       recommendation: prediction.recommendation,
       confidence: prediction.confidence
@@ -47,7 +64,7 @@ async function processAIPrediction(animal, sensorData) {
 
     // Handle Critical Status
     if (prediction.status === 'CRITICAL') {
-      logger.warn(`AI CRITICAL ALERT for animal ${animal.name}: ${prediction.cause}`);
+      logger.error(`🚨 AI CRITICAL ALERT [${animal.name}]: ${prediction.cause}`);
       
       const alert = await Alert.create({
         animal_id: animal._id,
@@ -66,15 +83,18 @@ async function processAIPrediction(animal, sensorData) {
         }
       });
 
+      // Update animal status to danger
+      await Animal.findByIdAndUpdate(animal._id, { $set: { status: 'danger' } });
+
       // Broadcast via Socket
       socketConfig.emitAlert(animal.farm_id, animal._id, alert);
+      socketConfig.emitStatusChange(animal.farm_id, animal._id, 'danger');
     }
 
     return savedPrediction;
 
   } catch (err) {
-    logger.error(`AI Service Error: ${err.message}`);
-    // Non-blocking error, we don't want to fail the whole ingestion
+    logger.error(`❌ AI Service Final Error: ${err.message}`);
     return null;
   }
 }

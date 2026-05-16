@@ -759,3 +759,258 @@
 2026-05-03 21:21:49 [info]: [Data Audit] GET /api/geofences
 2026-05-03 21:21:51 [info]: [Data Audit] GET /api/stats/farm
 2026-05-03 21:21:55 [info]: [Data Audit] GET /api/alerts?
+2026-05-14 00:43:39 [error]: ❌ CRITICAL: Error connecting to MongoDB!
+2026-05-15 21:43:46 [info]: ✅ MongoDB Connected: ac-lokdmj8-shard-00-02.7zypd8b.mongodb.net
+2026-05-15 21:43:46 [info]: 🚀 Server running on http://localhost:3000
+2026-05-15 21:43:46 [info]:    Environment: development
+2026-05-15 21:44:56 [info]: [REQ] d19e6097-67e4-454c-8d98-942ed620c90f - POST /api/auth/login
+2026-05-15 21:44:56 [info]: [Data Audit] POST /api/auth/login
+2026-05-15 21:44:56 [info]: ✅ User logged in successfully: akkariwassim11@gmail.com
+2026-05-15 21:44:56 [info]: [RES] d19e6097-67e4-454c-8d98-942ed620c90f - POST /api/auth/login - Status: 200 - 567ms
+2026-05-15 21:44:56 [info]: [REQ] ab8ce102-ec80-4627-b4d7-391200fc1437 - GET /api/memberships/my
+2026-05-15 21:44:56 [info]: [Data Audit] GET /api/memberships/my
+2026-05-15 21:44:56 [info]: [RES] ab8ce102-ec80-4627-b4d7-391200fc1437 - GET /api/memberships/my - Status: 200 - 133ms
+2026-05-15 21:44:57 [info]: [REQ] fae9420e-afce-45a8-89d3-388190deb797 - GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-05-15 21:44:57 [info]: [Data Audit] GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-05-15 21:44:57 [info]: [REQ] 1d1a9b53-256a-4134-8906-a131cc231b65 - GET /api/geofences
+2026-05-15 21:44:57 [info]: [Data Audit] GET /api/geofences
+2026-05-15 21:44:57 [info]: [RES] fae9420e-afce-45a8-89d3-388190deb797 - GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20 - Status: 200 - 160ms
+2026-05-15 21:44:57 [info]: [RES] 1d1a9b53-256a-4134-8906-a131cc231b65 - GET /api/geofences - Status: 200 - 199ms
+2026-05-15 21:44:57 [info]: Socket connected: QdHtArOC5N3ju8sjAAAB (user 69ef6185425e89f7bf220be6)
+2026-05-15 21:44:57 [info]: [REQ] a5270001-327e-48f9-8f42-404dd8c7c127 - POST /api/auth/login
+2026-05-15 21:44:57 [info]: [Data Audit] POST /api/auth/login
+2026-05-15 21:44:58 [info]: ✅ User logged in successfully: akkariwassim11@gmail.com
+2026-05-15 21:44:58 [info]: [RES] a5270001-327e-48f9-8f42-404dd8c7c127 - POST /api/auth/login - Status: 200 - 606ms
+2026-05-15 21:44:58 [info]: [REQ] 260d18c6-a7f3-4d79-acfe-7a6c201619e0 - POST /api/auth/login
+2026-05-15 21:44:58 [info]: [Data Audit] POST /api/auth/login
+2026-05-15 21:44:59 [info]: ✅ User logged in successfully: akkariwassim11@gmail.com
+2026-05-15 21:44:59 [info]: [RES] 260d18c6-a7f3-4d79-acfe-7a6c201619e0 - POST /api/auth/login - Status: 200 - 873ms
+2026-05-15 21:45:50 [info]: [REQ] 324c6a89-dc47-4ea6-a7f1-0c1220547a36 - GET /api/geofences
+2026-05-15 21:45:50 [info]: [Data Audit] GET /api/geofences
+2026-05-15 21:45:50 [info]: [RES] 324c6a89-dc47-4ea6-a7f1-0c1220547a36 - GET /api/geofences - Status: 304 - 184ms
+2026-05-15 21:45:59 [info]: [REQ] 3a520623-3ce7-484d-b3c2-5fc1fab80cf4 - GET /api/stats/farm
+2026-05-15 21:45:59 [info]: [Data Audit] GET /api/stats/farm
+2026-05-15 21:45:59 [info]: [RES] 3a520623-3ce7-484d-b3c2-5fc1fab80cf4 - GET /api/stats/farm - Status: 200 - 170ms
+2026-05-15 21:46:25 [info]: [REQ] 00186632-8d99-4740-8d9b-2000cd6343c5 - PUT /api/geofences/69f4e5b576bad4a89bb5a04f
+2026-05-15 21:46:25 [info]: [Data Audit] PUT /api/geofences/69f4e5b576bad4a89bb5a04f
+2026-05-15 21:46:25 [info]: [RES] 00186632-8d99-4740-8d9b-2000cd6343c5 - PUT /api/geofences/69f4e5b576bad4a89bb5a04f - Status: 200 - 187ms
+2026-05-15 21:46:25 [info]: [REQ] 1cae445c-d4c7-4572-bec6-9739df23a9fd - GET /api/geofences
+2026-05-15 21:46:25 [info]: [Data Audit] GET /api/geofences
+2026-05-15 21:46:25 [info]: [RES] 1cae445c-d4c7-4572-bec6-9739df23a9fd - GET /api/geofences - Status: 200 - 86ms
+2026-05-15 21:46:35 [info]: [REQ] 2ee5e564-6ee6-460a-911f-e6343391ac3a - PUT /api/geofences/69f4eb1476bad4a89bb5a062
+2026-05-15 21:46:35 [info]: [Data Audit] PUT /api/geofences/69f4eb1476bad4a89bb5a062
+2026-05-15 21:46:35 [info]: [RES] 2ee5e564-6ee6-460a-911f-e6343391ac3a - PUT /api/geofences/69f4eb1476bad4a89bb5a062 - Status: 200 - 259ms
+2026-05-15 21:46:35 [info]: [REQ] 8fe6f03b-d891-42ca-8330-eed2a3e58f35 - GET /api/geofences
+2026-05-15 21:46:35 [info]: [Data Audit] GET /api/geofences
+2026-05-15 21:46:35 [info]: [RES] 8fe6f03b-d891-42ca-8330-eed2a3e58f35 - GET /api/geofences - Status: 200 - 105ms
+2026-05-15 21:46:58 [info]: [REQ] 93553717-996e-48da-844d-c74305fc4306 - GET /api/alerts?
+2026-05-15 21:46:58 [info]: [Data Audit] GET /api/alerts?
+2026-05-15 21:46:58 [info]: [RES] 93553717-996e-48da-844d-c74305fc4306 - GET /api/alerts? - Status: 200 - 91ms
+2026-05-15 21:47:04 [info]: [REQ] 7ff1a478-a785-4608-889e-6413d6614bae - GET /api/animals/69f4eb2c76bad4a89bb5a063
+2026-05-15 21:47:04 [info]: [Data Audit] GET /api/animals/69f4eb2c76bad4a89bb5a063
+2026-05-15 21:47:04 [info]: [REQ] d3bf3b9d-9f0e-4929-b0a5-fdd3d3a02d3b - GET /api/ai/animal/69f4eb2c76bad4a89bb5a063
+2026-05-15 21:47:04 [info]: [Data Audit] GET /api/ai/animal/69f4eb2c76bad4a89bb5a063
+2026-05-15 21:47:04 [info]: [RES] d3bf3b9d-9f0e-4929-b0a5-fdd3d3a02d3b - GET /api/ai/animal/69f4eb2c76bad4a89bb5a063 - Status: 404 - 45ms
+2026-05-15 21:47:04 [info]: [RES] 7ff1a478-a785-4608-889e-6413d6614bae - GET /api/animals/69f4eb2c76bad4a89bb5a063 - Status: 200 - 106ms
+2026-05-15 21:48:12 [info]: Socket disconnected: QdHtArOC5N3ju8sjAAAB — ping timeout
+2026-05-15 21:48:41 [info]: Socket connected: XjTKEwhXv_xZGdLcAAAD (user 69ef6185425e89f7bf220be6)
+2026-05-15 21:49:26 [info]: Socket disconnected: XjTKEwhXv_xZGdLcAAAD — ping timeout
+2026-05-16 21:38:54 [info]: ✅ MongoDB Connected: ac-lokdmj8-shard-00-01.7zypd8b.mongodb.net
+2026-05-16 21:38:54 [info]: 🚀 Server running on http://localhost:3000
+2026-05-16 21:38:54 [info]:    Environment: development
+2026-05-16 21:39:29 [info]: [REQ] 37076289-76e9-497a-8441-b21609645a27 - GET /api/auth/me
+2026-05-16 21:39:29 [info]: [Data Audit] GET /api/auth/me
+2026-05-16 21:39:29 [info]: [RES] 37076289-76e9-497a-8441-b21609645a27 - GET /api/auth/me - Status: 401 - 28ms
+2026-05-16 21:39:29 [info]: [REQ] 24b9d076-5bf4-435b-af83-8d20b65015ec - POST /api/auth/refresh
+2026-05-16 21:39:29 [info]: [Data Audit] POST /api/auth/refresh
+2026-05-16 21:39:31 [info]: [RES] 24b9d076-5bf4-435b-af83-8d20b65015ec - POST /api/auth/refresh - Status: 200 - 1995ms
+2026-05-16 21:39:32 [info]: [REQ] e7ad0848-fab4-40bf-8556-03772477e8ab - GET /api/auth/me
+2026-05-16 21:39:32 [info]: [Data Audit] GET /api/auth/me
+2026-05-16 21:39:32 [info]: [RES] e7ad0848-fab4-40bf-8556-03772477e8ab - GET /api/auth/me - Status: 200 - 547ms
+2026-05-16 21:39:32 [info]: [REQ] 10578bb2-2b3e-47d1-9446-032ac5eddffd - GET /api/memberships/my
+2026-05-16 21:39:32 [info]: [Data Audit] GET /api/memberships/my
+2026-05-16 21:39:33 [info]: [RES] 10578bb2-2b3e-47d1-9446-032ac5eddffd - GET /api/memberships/my - Status: 200 - 169ms
+2026-05-16 21:39:33 [info]: [REQ] 6b7661f2-3901-45ec-ab3c-64d0dcf98139 - GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-05-16 21:39:33 [info]: [Data Audit] GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-05-16 21:39:33 [info]: [REQ] fd6fee23-f10d-4197-ae8f-6c58a570aa9e - GET /api/geofences
+2026-05-16 21:39:33 [info]: [Data Audit] GET /api/geofences
+2026-05-16 21:39:33 [info]: [RES] 6b7661f2-3901-45ec-ab3c-64d0dcf98139 - GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20 - Status: 304 - 237ms
+2026-05-16 21:39:33 [info]: Socket connected: sv7x4QuS02Lso7MrAAAB (user 69ef6185425e89f7bf220be6)
+2026-05-16 21:39:33 [info]: [RES] fd6fee23-f10d-4197-ae8f-6c58a570aa9e - GET /api/geofences - Status: 304 - 172ms
+2026-05-16 21:39:36 [info]: [REQ] 62622e8e-e58e-4656-a5a7-70b39c729adf - GET /api/alerts?
+2026-05-16 21:39:36 [info]: [Data Audit] GET /api/alerts?
+2026-05-16 21:39:37 [info]: [RES] 62622e8e-e58e-4656-a5a7-70b39c729adf - GET /api/alerts? - Status: 304 - 1713ms
+2026-05-16 21:39:39 [info]: [REQ] f3fd486b-4e35-4cf3-ba5c-6d853ae509e4 - GET /api/geofences
+2026-05-16 21:39:39 [info]: [Data Audit] GET /api/geofences
+2026-05-16 21:39:39 [info]: [RES] f3fd486b-4e35-4cf3-ba5c-6d853ae509e4 - GET /api/geofences - Status: 304 - 95ms
+2026-05-16 21:39:41 [info]: [REQ] 08c4fc56-1459-409b-96f2-ace2b06d08f0 - GET /api/animals/69f4eb2c76bad4a89bb5a063
+2026-05-16 21:39:41 [info]: [Data Audit] GET /api/animals/69f4eb2c76bad4a89bb5a063
+2026-05-16 21:39:41 [info]: [REQ] 03140568-2043-4b7c-98d4-c39be5379739 - GET /api/ai/animal/69f4eb2c76bad4a89bb5a063
+2026-05-16 21:39:41 [info]: [Data Audit] GET /api/ai/animal/69f4eb2c76bad4a89bb5a063
+2026-05-16 21:39:41 [info]: [RES] 03140568-2043-4b7c-98d4-c39be5379739 - GET /api/ai/animal/69f4eb2c76bad4a89bb5a063 - Status: 404 - 78ms
+2026-05-16 21:39:41 [info]: [RES] 08c4fc56-1459-409b-96f2-ace2b06d08f0 - GET /api/animals/69f4eb2c76bad4a89bb5a063 - Status: 304 - 105ms
+2026-05-16 21:40:47 [info]: [REQ] aaeb835d-fda5-45b1-b84a-75826a1243bf - GET /api/stats/farm
+2026-05-16 21:40:47 [info]: [Data Audit] GET /api/stats/farm
+2026-05-16 21:40:47 [info]: [RES] aaeb835d-fda5-45b1-b84a-75826a1243bf - GET /api/stats/farm - Status: 200 - 144ms
+2026-05-16 21:42:23 [info]: [REQ] f39bc1dc-fbac-4be7-a617-a8b6dba54520 - POST /api/auth/logout
+2026-05-16 21:42:23 [info]: [Data Audit] POST /api/auth/logout
+2026-05-16 21:42:23 [info]: User logged out
+2026-05-16 21:42:23 [info]: [RES] f39bc1dc-fbac-4be7-a617-a8b6dba54520 - POST /api/auth/logout - Status: 200 - 67ms
+2026-05-16 21:42:23 [info]: Socket disconnected: sv7x4QuS02Lso7MrAAAB — client namespace disconnect
+2026-05-16 21:42:56 [info]: [REQ] 2bf8b66b-63ca-44d0-ad33-c10d40f3210a - POST /api/auth/login
+2026-05-16 21:42:56 [info]: [Data Audit] POST /api/auth/login
+2026-05-16 21:42:56 [info]: ✅ User logged in successfully: akkariwassim11@gmail.com
+2026-05-16 21:42:56 [info]: [RES] 2bf8b66b-63ca-44d0-ad33-c10d40f3210a - POST /api/auth/login - Status: 200 - 362ms
+2026-05-16 21:42:56 [info]: [REQ] 820e3e1b-2153-4a41-b4f1-fd3c313d2923 - GET /api/memberships/my
+2026-05-16 21:42:56 [info]: [Data Audit] GET /api/memberships/my
+2026-05-16 21:42:57 [info]: [RES] 820e3e1b-2153-4a41-b4f1-fd3c313d2923 - GET /api/memberships/my - Status: 200 - 93ms
+2026-05-16 21:42:57 [info]: [REQ] d994d4de-867b-4553-8014-d0aa4445c5a7 - GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-05-16 21:42:57 [info]: [Data Audit] GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-05-16 21:42:57 [info]: [REQ] 069d7192-a242-4cd3-ba71-d24712411d44 - GET /api/geofences
+2026-05-16 21:42:57 [info]: [Data Audit] GET /api/geofences
+2026-05-16 21:42:57 [info]: Socket connected: Kswgb8kP9AOafpRTAAAD (user 69ef6185425e89f7bf220be6)
+2026-05-16 21:42:57 [info]: [RES] 069d7192-a242-4cd3-ba71-d24712411d44 - GET /api/geofences - Status: 304 - 88ms
+2026-05-16 21:42:57 [info]: [RES] d994d4de-867b-4553-8014-d0aa4445c5a7 - GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20 - Status: 304 - 679ms
+2026-05-16 21:43:11 [info]: [REQ] c95a5a73-fdf0-4fe0-9179-1f0c23ec2f6f - GET /api/geofences
+2026-05-16 21:43:11 [info]: [Data Audit] GET /api/geofences
+2026-05-16 21:43:12 [info]: [RES] c95a5a73-fdf0-4fe0-9179-1f0c23ec2f6f - GET /api/geofences - Status: 304 - 1053ms
+2026-05-16 21:43:54 [info]: [REQ] 1ed876d6-0f0e-442b-881e-426a47c11355 - GET /api/animals/69f4eb2c76bad4a89bb5a063
+2026-05-16 21:43:54 [info]: [Data Audit] GET /api/animals/69f4eb2c76bad4a89bb5a063
+2026-05-16 21:43:54 [info]: [REQ] 5add8ec7-0114-4697-a55c-7cfbd2a07ff5 - GET /api/ai/animal/69f4eb2c76bad4a89bb5a063
+2026-05-16 21:43:54 [info]: [Data Audit] GET /api/ai/animal/69f4eb2c76bad4a89bb5a063
+2026-05-16 21:43:54 [info]: [RES] 5add8ec7-0114-4697-a55c-7cfbd2a07ff5 - GET /api/ai/animal/69f4eb2c76bad4a89bb5a063 - Status: 404 - 44ms
+2026-05-16 21:43:54 [info]: [RES] 1ed876d6-0f0e-442b-881e-426a47c11355 - GET /api/animals/69f4eb2c76bad4a89bb5a063 - Status: 304 - 90ms
+2026-05-16 21:43:57 [info]: [REQ] 57efde66-6d01-420b-aa0b-958982231c62 - GET /api/animals/69f4e5d176bad4a89bb5a050
+2026-05-16 21:43:57 [info]: [Data Audit] GET /api/animals/69f4e5d176bad4a89bb5a050
+2026-05-16 21:43:57 [info]: [REQ] 47e470fa-d333-47f7-9437-cca2ae5808c7 - GET /api/ai/animal/69f4e5d176bad4a89bb5a050
+2026-05-16 21:43:57 [info]: [Data Audit] GET /api/ai/animal/69f4e5d176bad4a89bb5a050
+2026-05-16 21:43:57 [info]: [RES] 47e470fa-d333-47f7-9437-cca2ae5808c7 - GET /api/ai/animal/69f4e5d176bad4a89bb5a050 - Status: 404 - 47ms
+2026-05-16 21:43:57 [info]: [RES] 57efde66-6d01-420b-aa0b-958982231c62 - GET /api/animals/69f4e5d176bad4a89bb5a050 - Status: 200 - 94ms
+2026-05-16 21:44:08 [info]: [REQ] f11b818a-1030-4648-889d-812112d528ca - GET /api/stats/farm
+2026-05-16 21:44:08 [info]: [Data Audit] GET /api/stats/farm
+2026-05-16 21:44:08 [info]: [RES] f11b818a-1030-4648-889d-812112d528ca - GET /api/stats/farm - Status: 200 - 102ms
+2026-05-16 21:44:23 [info]: [REQ] 3e156d7a-b36c-4911-93e2-a0823da01b94 - GET /api/alerts?
+2026-05-16 21:44:23 [info]: [Data Audit] GET /api/alerts?
+2026-05-16 21:44:25 [info]: [RES] 3e156d7a-b36c-4911-93e2-a0823da01b94 - GET /api/alerts? - Status: 304 - 2287ms
+2026-05-16 21:44:35 [info]: [REQ] 2467e2b9-a7b7-431e-ae55-14449af4e44a - GET /api/animals/69f4e5d176bad4a89bb5a050
+2026-05-16 21:44:35 [info]: [Data Audit] GET /api/animals/69f4e5d176bad4a89bb5a050
+2026-05-16 21:44:35 [info]: [REQ] a613b049-57a3-40f3-a25c-4d79313bcf92 - GET /api/ai/animal/69f4e5d176bad4a89bb5a050
+2026-05-16 21:44:35 [info]: [Data Audit] GET /api/ai/animal/69f4e5d176bad4a89bb5a050
+2026-05-16 21:44:35 [info]: [RES] a613b049-57a3-40f3-a25c-4d79313bcf92 - GET /api/ai/animal/69f4e5d176bad4a89bb5a050 - Status: 404 - 117ms
+2026-05-16 21:44:35 [info]: [RES] 2467e2b9-a7b7-431e-ae55-14449af4e44a - GET /api/animals/69f4e5d176bad4a89bb5a050 - Status: 304 - 240ms
+2026-05-16 21:46:20 [info]: [REQ] c40a9c50-034f-4ae0-8686-cadd054924db - POST /api/geofences
+2026-05-16 21:46:20 [info]: [Data Audit] POST /api/geofences
+2026-05-16 21:46:20 [info]: [RES] c40a9c50-034f-4ae0-8686-cadd054924db - POST /api/geofences - Status: 422 - 159ms
+2026-05-16 21:47:48 [info]: Socket disconnected: Kswgb8kP9AOafpRTAAAD — transport close
+2026-05-16 21:51:07 [info]: Socket connected: -C3swbde3iL9QRPkAAAF (user 69ef6185425e89f7bf220be6)
+2026-05-16 21:52:47 [info]: Socket disconnected: -C3swbde3iL9QRPkAAAF — client namespace disconnect
+2026-05-16 21:52:59 [info]: [REQ] bff770d1-0a4e-4c98-84a8-8b067a0151ef - GET /api/auth/me
+2026-05-16 21:52:59 [info]: [Data Audit] GET /api/auth/me
+2026-05-16 21:52:59 [info]: [RES] bff770d1-0a4e-4c98-84a8-8b067a0151ef - GET /api/auth/me - Status: 200 - 131ms
+2026-05-16 21:52:59 [info]: [REQ] 6c1bf9cd-548c-4044-883c-a777766bafb9 - GET /api/memberships/my
+2026-05-16 21:52:59 [info]: [Data Audit] GET /api/memberships/my
+2026-05-16 21:53:00 [info]: [RES] 6c1bf9cd-548c-4044-883c-a777766bafb9 - GET /api/memberships/my - Status: 200 - 98ms
+2026-05-16 21:53:00 [info]: [REQ] c4d0ecb8-7d51-4ef8-a0e1-505cdd753092 - GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-05-16 21:53:00 [info]: [Data Audit] GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-05-16 21:53:00 [info]: Socket connected: GW00T51FDZdQL6ZzAAAH (user 69ef6185425e89f7bf220be6)
+2026-05-16 21:53:00 [info]: [REQ] 76060468-baca-4e28-b21d-cb249e8b0741 - GET /api/geofences
+2026-05-16 21:53:00 [info]: [Data Audit] GET /api/geofences
+2026-05-16 21:53:00 [info]: [RES] c4d0ecb8-7d51-4ef8-a0e1-505cdd753092 - GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20 - Status: 304 - 130ms
+2026-05-16 21:53:00 [info]: [RES] 76060468-baca-4e28-b21d-cb249e8b0741 - GET /api/geofences - Status: 200 - 142ms
+2026-05-16 21:53:10 [info]: [REQ] 9e272c3f-4e82-4ff7-87dc-7159ef00dd9b - GET /api/alerts?
+2026-05-16 21:53:10 [info]: [Data Audit] GET /api/alerts?
+2026-05-16 21:53:10 [info]: [RES] 9e272c3f-4e82-4ff7-87dc-7159ef00dd9b - GET /api/alerts? - Status: 304 - 108ms
+2026-05-16 21:53:10 [info]: [REQ] 931e6691-55d4-4c34-b887-49f2a10aa0fb - GET /api/geofences
+2026-05-16 21:53:10 [info]: [Data Audit] GET /api/geofences
+2026-05-16 21:53:11 [info]: [RES] 931e6691-55d4-4c34-b887-49f2a10aa0fb - GET /api/geofences - Status: 304 - 168ms
+2026-05-16 21:53:35 [info]: [REQ] 0ca4ed4d-7eda-4b9e-b609-6ec9ea787a78 - POST /api/geofences
+2026-05-16 21:53:35 [info]: [Data Audit] POST /api/geofences
+2026-05-16 21:53:35 [info]: [RES] 0ca4ed4d-7eda-4b9e-b609-6ec9ea787a78 - POST /api/geofences - Status: 201 - 550ms
+2026-05-16 21:53:36 [info]: [REQ] 9c9c35d9-4c85-4881-acd8-5a3ecf777833 - GET /api/geofences
+2026-05-16 21:53:36 [info]: [Data Audit] GET /api/geofences
+2026-05-16 21:53:36 [info]: [RES] 9c9c35d9-4c85-4881-acd8-5a3ecf777833 - GET /api/geofences - Status: 200 - 207ms
+2026-05-16 21:55:58 [info]: [REQ] 9d624249-ec6e-434b-87a8-a18d3dcd12e1 - GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-05-16 21:55:58 [info]: [Data Audit] GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-05-16 21:55:58 [info]: [REQ] 0205770d-fe4d-426c-8864-675b02c9b206 - GET /api/geofences
+2026-05-16 21:55:58 [info]: [Data Audit] GET /api/geofences
+2026-05-16 21:55:59 [info]: [RES] 0205770d-fe4d-426c-8864-675b02c9b206 - GET /api/geofences - Status: 304 - 225ms
+2026-05-16 21:55:59 [info]: [RES] 9d624249-ec6e-434b-87a8-a18d3dcd12e1 - GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20 - Status: 304 - 451ms
+2026-05-16 21:56:23 [info]: Socket disconnected: GW00T51FDZdQL6ZzAAAH — client namespace disconnect
+2026-05-16 21:56:31 [info]: [REQ] 9a400fe0-bd52-4734-a0bd-b4709c1ad314 - GET /api/auth/me
+2026-05-16 21:56:31 [info]: [Data Audit] GET /api/auth/me
+2026-05-16 21:56:31 [info]: [RES] 9a400fe0-bd52-4734-a0bd-b4709c1ad314 - GET /api/auth/me - Status: 200 - 90ms
+2026-05-16 21:56:31 [info]: [REQ] 1f8f750c-0335-4467-94d0-93dc9ea97ae1 - GET /api/memberships/my
+2026-05-16 21:56:31 [info]: [Data Audit] GET /api/memberships/my
+2026-05-16 21:56:32 [info]: [RES] 1f8f750c-0335-4467-94d0-93dc9ea97ae1 - GET /api/memberships/my - Status: 200 - 681ms
+2026-05-16 21:56:32 [info]: [REQ] 70aceac6-c7cb-4442-9536-e38ff9a2e289 - GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-05-16 21:56:32 [info]: [Data Audit] GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-05-16 21:56:32 [info]: Socket connected: 0wttGFzvDLaoJFCYAAAJ (user 69ef6185425e89f7bf220be6)
+2026-05-16 21:56:32 [info]: [REQ] 33cb3c5b-1378-4c6b-9a05-c16b9e18f28d - GET /api/geofences
+2026-05-16 21:56:32 [info]: [Data Audit] GET /api/geofences
+2026-05-16 21:56:32 [info]: [RES] 70aceac6-c7cb-4442-9536-e38ff9a2e289 - GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20 - Status: 304 - 94ms
+2026-05-16 21:56:32 [info]: [RES] 33cb3c5b-1378-4c6b-9a05-c16b9e18f28d - GET /api/geofences - Status: 304 - 88ms
+2026-05-16 21:56:40 [info]: [REQ] 658e2fdb-f365-4ca0-baef-0bc07ef07c70 - POST /api/auth/logout
+2026-05-16 21:56:40 [info]: [Data Audit] POST /api/auth/logout
+2026-05-16 21:56:40 [info]: User logged out
+2026-05-16 21:56:40 [info]: [RES] 658e2fdb-f365-4ca0-baef-0bc07ef07c70 - POST /api/auth/logout - Status: 200 - 73ms
+2026-05-16 21:56:40 [info]: Socket disconnected: 0wttGFzvDLaoJFCYAAAJ — client namespace disconnect
+2026-05-16 21:57:09 [info]: [REQ] a8656f9f-7b7e-4270-9547-5c2e3cb71373 - POST /api/auth/register
+2026-05-16 21:57:09 [info]: [Data Audit] POST /api/auth/register
+2026-05-16 21:57:09 [info]: ✅ New user registered with farm: Bachar's Farm (bacharbenhassine@gmail.com)
+2026-05-16 21:57:09 [info]: [RES] a8656f9f-7b7e-4270-9547-5c2e3cb71373 - POST /api/auth/register - Status: 201 - 633ms
+2026-05-16 21:57:10 [info]: [REQ] 5e7e8a06-057a-434a-911d-1e8005db364a - GET /api/memberships/my
+2026-05-16 21:57:10 [info]: [Data Audit] GET /api/memberships/my
+2026-05-16 21:57:10 [info]: [RES] 5e7e8a06-057a-434a-911d-1e8005db364a - GET /api/memberships/my - Status: 200 - 106ms
+2026-05-16 21:57:10 [info]: [REQ] 562ba867-a6b4-4710-ba45-d81c8a923399 - GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-05-16 21:57:10 [info]: [Data Audit] GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20
+2026-05-16 21:57:10 [info]: [REQ] 2b3fea59-4699-4dc5-8812-fc5fbce674af - GET /api/geofences
+2026-05-16 21:57:10 [info]: [Data Audit] GET /api/geofences
+2026-05-16 21:57:10 [info]: Socket connected: eLBArV3YkuGYebGuAAAL (user 6a08da2530989765ae5cc326)
+2026-05-16 21:57:10 [info]: [RES] 562ba867-a6b4-4710-ba45-d81c8a923399 - GET /api/animals?search=&sortBy=created_at&sortOrder=desc&page=1&limit=20 - Status: 200 - 100ms
+2026-05-16 21:57:10 [info]: [RES] 2b3fea59-4699-4dc5-8812-fc5fbce674af - GET /api/geofences - Status: 200 - 87ms
+2026-05-16 21:58:12 [info]: [REQ] bfdc67ca-b018-42bd-b5ed-a76aa0252d3f - GET /api/geofences
+2026-05-16 21:58:12 [info]: [Data Audit] GET /api/geofences
+2026-05-16 21:58:12 [info]: [RES] bfdc67ca-b018-42bd-b5ed-a76aa0252d3f - GET /api/geofences - Status: 304 - 93ms
+2026-05-16 21:58:46 [info]: [REQ] 5d50c900-60ef-430e-a9e1-ceb1b3ff2d45 - POST /api/geofences
+2026-05-16 21:58:46 [info]: [Data Audit] POST /api/geofences
+2026-05-16 21:58:47 [info]: [RES] 5d50c900-60ef-430e-a9e1-ceb1b3ff2d45 - POST /api/geofences - Status: 201 - 218ms
+2026-05-16 21:58:47 [info]: [REQ] 5ddbdd56-11d1-4a54-bed0-8b806c14812c - GET /api/geofences
+2026-05-16 21:58:47 [info]: [Data Audit] GET /api/geofences
+2026-05-16 21:58:47 [info]: [RES] 5ddbdd56-11d1-4a54-bed0-8b806c14812c - GET /api/geofences - Status: 200 - 120ms
+2026-05-16 21:58:49 [info]: [REQ] b21a9ada-7205-4057-a692-1a0574987202 - GET /api/alerts?
+2026-05-16 21:58:49 [info]: [Data Audit] GET /api/alerts?
+2026-05-16 21:58:49 [info]: [RES] b21a9ada-7205-4057-a692-1a0574987202 - GET /api/alerts? - Status: 304 - 92ms
+2026-05-16 21:58:52 [info]: [REQ] 34aaac66-0ba1-42b3-a9da-6f09aa2390e4 - GET /api/geofences
+2026-05-16 21:58:52 [info]: [Data Audit] GET /api/geofences
+2026-05-16 21:58:52 [info]: [REQ] 48e212aa-c8af-4fd0-89d8-7f6037102e33 - GET /api/devices?status=free
+2026-05-16 21:58:52 [info]: [Data Audit] GET /api/devices?status=free
+2026-05-16 21:58:52 [info]: [RES] 34aaac66-0ba1-42b3-a9da-6f09aa2390e4 - GET /api/geofences - Status: 304 - 93ms
+2026-05-16 21:58:52 [info]: [RES] 48e212aa-c8af-4fd0-89d8-7f6037102e33 - GET /api/devices?status=free - Status: 200 - 83ms
+2026-05-16 21:59:26 [info]: [REQ] ba16b90e-36b6-4074-8890-23a1fedd3b4c - POST /api/animals
+2026-05-16 21:59:26 [info]: [Data Audit] POST /api/animals
+2026-05-16 21:59:26 [info]: Creating animal "Test 8" with coords: lat=35.42051531600615, lon=10.997429229319096
+2026-05-16 21:59:26 [info]: [RES] ba16b90e-36b6-4074-8890-23a1fedd3b4c - POST /api/animals - Status: 201 - 208ms
+2026-05-16 21:59:46 [info]: [REQ] 8251280a-fc95-4344-9e2b-3592092f29a9 - GET /api/geofences
+2026-05-16 21:59:46 [info]: [Data Audit] GET /api/geofences
+2026-05-16 21:59:46 [info]: [REQ] 43de4c4d-903a-4cd6-93d6-6f59dd38abac - GET /api/devices?status=free
+2026-05-16 21:59:46 [info]: [Data Audit] GET /api/devices?status=free
+2026-05-16 21:59:46 [info]: [RES] 8251280a-fc95-4344-9e2b-3592092f29a9 - GET /api/geofences - Status: 304 - 87ms
+2026-05-16 21:59:46 [info]: [RES] 43de4c4d-903a-4cd6-93d6-6f59dd38abac - GET /api/devices?status=free - Status: 304 - 86ms
+2026-05-16 22:00:00 [info]: [REQ] 5db828f0-155c-4846-8e65-449ee30008e1 - GET /api/geofences
+2026-05-16 22:00:00 [info]: [Data Audit] GET /api/geofences
+2026-05-16 22:00:00 [info]: [REQ] 39449fca-da0c-4a99-b220-03c88c448942 - GET /api/devices?status=free
+2026-05-16 22:00:00 [info]: [Data Audit] GET /api/devices?status=free
+2026-05-16 22:00:00 [info]: [RES] 39449fca-da0c-4a99-b220-03c88c448942 - GET /api/devices?status=free - Status: 304 - 99ms
+2026-05-16 22:00:00 [info]: [RES] 5db828f0-155c-4846-8e65-449ee30008e1 - GET /api/geofences - Status: 304 - 362ms
+2026-05-16 22:00:07 [info]: [REQ] cdb296b0-0f18-453d-afe4-d7f2cd322842 - POST /api/animals/6a08daae30989765ae5cc32b/action
+2026-05-16 22:00:07 [info]: [Data Audit] POST /api/animals/6a08daae30989765ae5cc32b/action
+2026-05-16 22:00:08 [info]: [RES] cdb296b0-0f18-453d-afe4-d7f2cd322842 - POST /api/animals/6a08daae30989765ae5cc32b/action - Status: 200 - 435ms
+2026-05-16 22:00:09 [info]: [REQ] 8c26c0e4-328e-495a-81bc-53e0b7f8f605 - POST /api/animals/6a08daae30989765ae5cc32b/action
+2026-05-16 22:00:09 [info]: [Data Audit] POST /api/animals/6a08daae30989765ae5cc32b/action
+2026-05-16 22:00:10 [info]: [RES] 8c26c0e4-328e-495a-81bc-53e0b7f8f605 - POST /api/animals/6a08daae30989765ae5cc32b/action - Status: 200 - 698ms
+2026-05-16 22:05:44 [info]: [REQ] 5b058e46-c9e7-40e7-ba8e-e4480de722c4 - GET /api/stats/farm
+2026-05-16 22:05:44 [info]: [Data Audit] GET /api/stats/farm
+2026-05-16 22:05:44 [info]: [RES] 5b058e46-c9e7-40e7-ba8e-e4480de722c4 - GET /api/stats/farm - Status: 200 - 407ms
+2026-05-16 22:05:58 [info]: [REQ] 09ec0d46-4224-454d-ab84-b6e7de627e41 - GET /api/memberships
+2026-05-16 22:05:58 [info]: [Data Audit] GET /api/memberships
+2026-05-16 22:05:58 [info]: [RES] 09ec0d46-4224-454d-ab84-b6e7de627e41 - GET /api/memberships - Status: 200 - 150ms

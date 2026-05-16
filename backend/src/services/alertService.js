@@ -49,7 +49,7 @@ async function createGeofenceAlert({ animalId, userId, farmId, latitude, longitu
     });
 
     // Update animal status
-    await Animal.findByIdAndUpdate(animalId, { $set: { status: 'out_of_zone' } });
+    await Animal.findByIdAndUpdate(animalId, { $set: { status: 'danger' } });
 
     const alertPayload = {
       id: alert._id,
@@ -62,7 +62,7 @@ async function createGeofenceAlert({ animalId, userId, farmId, latitude, longitu
     };
 
     emitAlert(farmId, animalId, alertPayload);
-    emitStatusChange(farmId, animalId, 'out_of_zone');
+    emitStatusChange(farmId, animalId, 'danger');
 
     logger.warn(`🚨 Geofence breach — animal ${animalId}: ${message}`);
     
@@ -143,8 +143,8 @@ async function createHealthAlert({ animalId, userId, farmId, type, severity, mes
  * Mark an animal as safe and resolve any active breach alerts.
  */
 async function markAnimalSafe(animalId, userId, farmId) {
-  const animal = await Animal.findByIdAndUpdate(animalId, { $set: { status: 'healthy' } }, { new: true });
-  emitStatusChange(farmId, animalId, 'healthy');
+  const animal = await Animal.findByIdAndUpdate(animalId, { $set: { status: 'safe' } }, { new: true });
+  emitStatusChange(farmId, animalId, 'safe');
 
   // Trigger zone evaluation
   if (animal && animal.current_zone_id) {
@@ -195,7 +195,7 @@ async function processZoneMonitoring(animal, currentPos) {
             zoneId: primaryZone._id,
             zoneName: primaryZone.name
           });
-        } else if (animal.status === 'out_of_zone' || animal.status === 'warning') {
+        } else if (animal.status === 'danger' || animal.status === 'warning') {
           // Animal returned to its assigned zone
           await markAnimalSafe(animalId, userId, farmId);
         }

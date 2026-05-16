@@ -468,6 +468,16 @@ export default function MapScreen({ route }) {
         socketConnected={socketConnected}
         isLocked={isLocked}
         onToggleLock={unlockLocation}
+        onAddAnimal={() => {
+          const center = currentRegion || userLocation || { latitude: 0, longitude: 0 };
+          navigation.navigate('Animals', { 
+            screen: 'AnimalDetail', 
+            params: { 
+              mode: 'create', 
+              initialLocation: { latitude: center.latitude, longitude: center.longitude } 
+            } 
+          });
+        }}
       />
 
       {isLocked && (

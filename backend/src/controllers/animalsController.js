@@ -7,12 +7,7 @@ const Device = require('../models/Device');
 const socketConfig = require('../config/socket');
 const zoneMonitorService = require('../services/zoneMonitorService');
 const logger = require('../utils/logger');
-
-const isAtZero = (lat, lon) => {
-  const l = parseFloat(lat);
-  const n = parseFloat(lon);
-  return isNaN(l) || isNaN(n) || (Math.abs(l) < 0.001 && Math.abs(n) < 0.001);
-};
+const response = require('../utils/responseHelper');
 
 /**
  * GET /api/animals
@@ -33,12 +28,10 @@ async function getAnimals(req, res, next) {
 
     const query = { farm_id: req.farm_id };
 
-    // ── Filters ───────────────────────────────────────────────────
     if (status) query.status = status;
     if (type)   query.type = type;
     if (zone_id) query.current_zone_id = zone_id;
 
-    // ── Search ────────────────────────────────────────────────────
     if (search) {
       query.$or = [
         { name: { $regex: search, $options: 'i' } },
@@ -56,7 +49,6 @@ async function getAnimals(req, res, next) {
         .skip(skip)
         .limit(limitInt),
       Animal.countDocuments(query),
-      // Aggregate stats for the farm
       Animal.aggregate([
         { $match: { farm_id: new mongoose.Types.ObjectId(req.farm_id) } },
         { $group: { 
@@ -66,24 +58,20 @@ async function getAnimals(req, res, next) {
       ])
     ]);
 
-    // Format stats into a clean object
     const statsObj = { total, safe: 0, warning: 0, danger: 0, offline: 0 };
     stats.forEach(s => {
       if (s._id) statsObj[s._id] = s.count;
     });
 
-    res.json({
-      success: true,
-      data: {
-        animals,
-        stats: statsObj,
-        pagination: {
-          total,
-          page: parseInt(page),
-          limit: limitInt,
-          pages: Math.ceil(total / limitInt),
-          hasMore: skip + animals.length < total
-        }
+    return response.success(res, {
+      animals,
+      stats: statsObj,
+      pagination: {
+        total,
+        page: parseInt(page),
+        limit: limitInt,
+        pages: Math.ceil(total / limitInt),
+        hasMore: skip + animals.length < total
       }
     });
   } catch (err) {
@@ -98,12 +86,8 @@ async function getAnimal(req, res, next) {
   try {
     const { id } = req.params;
     const animal = await Animal.findOne({ _id: id, farm_id: req.farm_id });
-    if (!animal) return res.status(404).json({ 
-      success: false,
-      error: 'ANIMAL_NOT_FOUND',
-      message: 'Animal non trouvé.' 
-    });
-    res.json({ success: true, data: animal });
+    if (!animal) return response.error(res, 'Animal non trouvé.', 404, 'ANIMAL_NOT_FOUND');
+    return response.success(res, animal);
   } catch (err) {
     next(err);
   }
@@ -118,38 +102,26 @@ async function createAnimal(req, res, next) {
             weightKg, birthDate, rfidTag, deviceId, 
             colorHex, notes, avatarUrl, currentZoneId, current_zone_id } = req.body;
 
-    // 1. Strict Duplicate Check (Professional Conflict Handling)
     if (deviceId && deviceId.trim()) {
       const existing = await Animal.findOne({ device_id: deviceId.trim() });
       if (existing) {
-        return res.status(409).json({ 
-          success: false,
-          error: 'DUPLICATE_DEVICE', 
-          field: 'device_id',
-          message: `Le collier ${deviceId} est déjà assigné à ${existing.name}.` 
-        });
+        return response.error(res, `Le collier ${deviceId} est déjà assigné à ${existing.name}.`, 409, 'DUPLICATE_DEVICE');
       }
     }
 
     if (rfidTag && rfidTag.trim()) {
       const existing = await Animal.findOne({ rfid_tag: rfidTag.trim() });
       if (existing) {
-        return res.status(409).json({ 
-          success: false,
-          error: 'DUPLICATE_DEVICE', 
-          field: 'rfid_tag',
-          message: `Le tag RFID ${rfidTag} est déjà utilisé.` 
-        });
+        return response.error(res, `Le tag RFID ${rfidTag} est déjà utilisé.`, 409, 'DUPLICATE_DEVICE');
       }
     }
-    console.log(`[BACKEND] Creating animal "${name}" with coords:`, { latitude, longitude });
+    
     logger.info(`Creating animal "${name}" with coords: lat=${latitude}, lon=${longitude}`);
 
     let finalLat = parseFloat(latitude);
     let finalLon = parseFloat(longitude);
     const finalZoneId = currentZoneId || current_zone_id || null;
 
-    // ── FALLBACK: If no coordinates provided, try to use Zone Center ──
     if ((isNaN(finalLat) || finalLat === 0) && finalZoneId) {
       const zone = await Zone.findById(finalZoneId);
       if (zone) {
@@ -159,11 +131,9 @@ async function createAnimal(req, res, next) {
       }
     }
 
-    // Default to 0 if still NaN
     if (isNaN(finalLat)) finalLat = 0;
     if (isNaN(finalLon)) finalLon = 0;
 
-    // 3. Data Construction (Omit empty strings to satisfy sparse index)
     const animal = await Animal.create({
       user_id: req.user.id,
       farm_id: req.farm_id,
@@ -185,7 +155,6 @@ async function createAnimal(req, res, next) {
       last_seen: new Date()
     });
 
-    // ── Sync Device Status ──
     if (animal.device_id) {
       await Device.findOneAndUpdate(
         { device_id: animal.device_id },
@@ -193,28 +162,11 @@ async function createAnimal(req, res, next) {
       );
     }
     
-    res.status(201).json({ success: true, data: animal });
+    return response.success(res, animal, 201);
   } catch (err) {
     if (err.code === 11000) {
-      // ── Identify the exact clashing field from the MongoDB error ──
-      const conflictQuery = err.keyValue ? { ...err.keyValue } : null;
-      
-      let existing = null;
-      if (conflictQuery) {
-        existing = await Animal.findOne(conflictQuery).lean();
-      }
-
-      const conflictMsg = existing 
-        ? `L'animal "${existing.name}" utilise déjà cet ID/RFID.`
-        : 'Ce device_id ou rfid_tag est déjà utilisé par un autre animal.';
-
-      return res.status(400).json({ 
-        success: false,
-        error: 'DUPLICATE_DEVICE', 
-        message: conflictMsg,
-        field: Object.keys(err.keyValue || {})[0],
-        existingAnimal: existing ? { id: existing.id || existing._id, name: existing.name } : null
-      });
+      const conflictMsg = 'Ce device_id ou rfid_tag est déjà utilisé par un autre animal.';
+      return response.error(res, conflictMsg, 400, 'DUPLICATE_DEVICE');
     }
     next(err);
   }
@@ -228,7 +180,6 @@ async function updateAnimal(req, res, next) {
     const { id } = req.params;
     const updates = { ...req.body };
     
-    // Remap camelCase
     if (updates.weightKg) { updates.weight_kg = updates.weightKg; delete updates.weightKg; }
     if (updates.birthDate) { updates.birth_date = updates.birthDate; delete updates.birthDate; }
     if (updates.rfidTag) { updates.rfid_tag = updates.rfidTag; delete updates.rfidTag; }
@@ -238,27 +189,11 @@ async function updateAnimal(req, res, next) {
     if (updates.heartRate) { updates.heart_rate = updates.heartRate; delete updates.heartRate; }
     if (updates.batteryLevel) { updates.battery_level = updates.batteryLevel; delete updates.batteryLevel; }
     if (updates.signalStrength) { updates.signal_strength = updates.signalStrength; delete updates.signalStrength; }
-    
-    if (updates.currentZoneId) { 
-      updates.current_zone_id = updates.currentZoneId; 
-      delete updates.currentZoneId; 
-    }
+    if (updates.currentZoneId) { updates.current_zone_id = updates.currentZoneId; delete updates.currentZoneId; }
 
     const existing = await Animal.findOne({ _id: id, farm_id: req.farm_id });
-    if (!existing) return res.status(404).json({ 
-      success: false, 
-      error: 'ANIMAL_NOT_FOUND',
-      message: 'Animal non trouvé.'
-    });
+    if (!existing) return response.error(res, 'Animal non trouvé.', 404, 'ANIMAL_NOT_FOUND');
 
-    const currentLat = updates.latitude !== undefined ? updates.latitude : existing.latitude;
-    const currentLon = updates.longitude !== undefined ? updates.longitude : existing.longitude;
-    const zoneId = updates.current_zone_id || existing.current_zone_id;
-
-    console.log(`[BACKEND] Updating animal "${existing.name}" (${id}). Coords in request:`, { 
-      latitude: updates.latitude, 
-      longitude: updates.longitude 
-    });
     logger.info(`Updating animal "${existing.name}": lat=${updates.latitude}, lon=${updates.longitude}`);
 
     const animal = await Animal.findOneAndUpdate(
@@ -267,13 +202,8 @@ async function updateAnimal(req, res, next) {
       { new: true, runValidators: true }
     );
     
-    if (!animal) return res.status(404).json({ 
-      success: false,
-      error: 'ANIMAL_NOT_FOUND',
-      message: 'Animal non trouvé.'
-    });
+    if (!animal) return response.error(res, 'Animal non trouvé.', 404, 'ANIMAL_NOT_FOUND');
 
-    // Trigger zone evaluation
     if (animal.current_zone_id) {
       zoneMonitorService.evaluateZone(animal.current_zone_id).catch(err => logger.error(`Zone evaluation failed: ${err.message}`));
     }
@@ -281,7 +211,7 @@ async function updateAnimal(req, res, next) {
       zoneMonitorService.evaluateZone(existing.current_zone_id).catch(err => logger.error(`Old zone evaluation failed: ${err.message}`));
     }
 
-    res.json({ success: true, data: animal });
+    return response.success(res, animal);
   } catch (err) {
     next(err);
   }
@@ -294,13 +224,8 @@ async function deleteAnimal(req, res, next) {
   try {
     const { id } = req.params;
     const animal = await Animal.findOne({ _id: id, farm_id: req.farm_id });
-    if (!animal) return res.status(404).json({ 
-      success: false,
-      error: 'ANIMAL_NOT_FOUND',
-      message: 'Animal non trouvé.'
-    });
+    if (!animal) return response.error(res, 'Animal non trouvé.', 404, 'ANIMAL_NOT_FOUND');
 
-    // ── Release Device Status ──
     if (animal.device_id) {
       await Device.findOneAndUpdate(
         { device_id: animal.device_id },
@@ -309,7 +234,7 @@ async function deleteAnimal(req, res, next) {
     }
 
     await Animal.deleteOne({ _id: id });
-    res.json({ success: true, data: { message: 'Animal deleted successfully and device released.' } });
+    return response.success(res, { message: 'Animal deleted successfully and device released.' });
   } catch (err) {
     next(err);
   }
@@ -322,10 +247,10 @@ async function getZone(req, res, next) {
   try {
     const { id } = req.params;
     const animal = await Animal.findOne({ _id: id, farm_id: req.farm_id });
-    if (!animal || !animal.current_zone_id) return res.json({ success: true, data: null });
+    if (!animal || !animal.current_zone_id) return response.success(res, null);
     
     const zone = await Zone.findById(animal.current_zone_id);
-    res.json({ success: true, data: zone });
+    return response.success(res, zone);
   } catch (err) {
     next(err);
   }
@@ -344,12 +269,8 @@ async function setZone(req, res, next) {
       { new: true }
     );
     
-    if (!animal) return res.status(404).json({ 
-      success: false,
-      error: 'ANIMAL_NOT_FOUND',
-      message: 'Animal non trouvé.'
-    });
-    res.json({ success: true, data: animal });
+    if (!animal) return response.error(res, 'Animal non trouvé.', 404, 'ANIMAL_NOT_FOUND');
+    return response.success(res, animal);
   } catch (err) {
     next(err);
   }
@@ -383,7 +304,7 @@ async function bulkCreateAnimals(req, res, next) {
       }
     }
 
-    res.json({ success: true, data: results });
+    return response.success(res, results);
   } catch (err) {
     next(err);
   }
@@ -399,34 +320,22 @@ async function triggerAction(req, res, next) {
     const { type, state } = req.body;
 
     const animal = await Animal.findOne({ _id: id, farm_id: req.farm_id });
-    if (!animal) return res.status(404).json({
-      success: false,
-      error: 'ANIMAL_NOT_FOUND',
-      message: 'Animal non trouvé.'
-    });
+    if (!animal) return response.error(res, 'Animal non trouvé.', 404, 'ANIMAL_NOT_FOUND');
 
-    // 1. Persist state in DB (optional but Good for UI feedback)
     if (animal.actuators) {
       animal.actuators[type] = state;
       animal.markModified('actuators');
       await animal.save();
     }
 
-    // 2. Broadcast Command via WebSocket
-    const socketConfig = require('../config/socket');
     const io = socketConfig.getIO();
-    
-    // Emit to animal specific room which devices or monitoring apps are listening to
     io.to(`animal:${id}`).emit('hardware-command', { 
       animalId: id,
-      type, // 'buzzer', 'led', 'relay'
+      type, 
       state 
     });
 
-    res.json({ 
-      success: true, 
-      data: animal 
-    });
+    return response.success(res, animal);
   } catch (err) {
     next(err);
   }

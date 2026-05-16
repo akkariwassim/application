@@ -1,27 +1,22 @@
-FROM python:3.11
+FROM python:3.11-slim
 
 WORKDIR /app
 
-# Ensure pip is up to date
-RUN pip install --no-cache-dir --upgrade pip
+# Install system dependencies for LightGBM
+RUN apt-get update && apt-get install -y \
+    libgomp1 \
+    && rm -rf /var/lib/apt/lists/*
 
-# Install dependencies directly to avoid local file issues
-RUN pip install --no-cache-dir \
-    fastapi \
-    uvicorn \
-    pandas \
-    numpy \
-    scikit-learn \
-    xgboost \
-    python-dotenv \
-    pydantic \
-    joblib
+# Copy requirements and install
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the rest of the application
 COPY . .
 
-# Pre-train models
-RUN python training/trainer.py
+# Run training to ensure models are present
+# Note: In a real production CI/CD, this would be done before building the image
+RUN python train.py
 
 EXPOSE 8000
 

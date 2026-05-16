@@ -5,6 +5,7 @@ const Farm       = require('../models/Farm');
 const Membership = require('../models/Membership');
 const jwt        = require('jsonwebtoken');
 const logger     = require('../utils/logger');
+const response   = require('../utils/responseHelper');
 
 // Helper to generate tokens
 const generateTokens = (userId) => {
@@ -35,11 +36,7 @@ async function register(req, res, next) {
     const existing = await User.findOne({ email });
     if (existing) {
       logger.warn(`Registration failed: Email already taken - ${email}`);
-      return res.status(400).json({ 
-        success: false,
-        error: 'EMAIL_TAKEN', 
-        message: 'Cet e-mail est déjà utilisé par un autre compte.' 
-      });
+      return response.error(res, 'Cet e-mail est déjà utilisé par un autre compte.', 400, 'EMAIL_TAKEN');
     }
     
     const user = await User.create({
@@ -78,29 +75,22 @@ async function register(req, res, next) {
 
     logger.info(`✅ New user registered with farm: ${farm.name} (${email})`);
     
-    res.status(201).json({ 
-      success: true, 
-      data: {
-        user: {
-          id: user._id,
-          name: user.name,
-          email: user.email,
-          role: user.role
-        },
-        farmId: farm._id,
-        accessToken,
-        refreshToken
-      }
-    });
+    return response.success(res, {
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role
+      },
+      farmId: farm._id,
+      accessToken,
+      refreshToken
+    }, 201);
   } catch (err) {
     logger.error(`❌ Registration failed for ${req.body.email}: ${err.message}`);
     // If it's a Mongoose validation error, provide more detail
     if (err.name === 'ValidationError') {
-      return res.status(400).json({ 
-        success: false,
-        error: 'VALIDATION_ERROR', 
-        message: Object.values(err.errors).map(e => e.message).join(', ') 
-      });
+      return response.error(res, Object.values(err.errors).map(e => e.message).join(', '), 400, 'VALIDATION_ERROR');
     }
     next(err);
   }
@@ -117,30 +107,18 @@ async function login(req, res, next) {
     const user = await User.findOne({ email }).select('+password');
     if (!user) {
       logger.warn(`Login failed: User not found - ${email}`);
-      return res.status(401).json({ 
-        success: false,
-        error: 'INVALID_CREDENTIALS', 
-        message: 'Aucun compte trouvé avec cet e-mail.' 
-      });
+      return response.error(res, 'Aucun compte trouvé avec cet e-mail.', 401, 'INVALID_CREDENTIALS');
     }
 
     const isMatch = await user.comparePassword(password);
     if (!isMatch) {
       logger.warn(`Login failed: Incorrect password - ${email}`);
-      return res.status(401).json({ 
-        success: false,
-        error: 'INVALID_CREDENTIALS', 
-        message: 'E-mail ou mot de passe incorrect.' 
-      });
+      return response.error(res, 'E-mail ou mot de passe incorrect.', 401, 'INVALID_CREDENTIALS');
     }
     
     if (!user.is_active) {
       logger.warn(`Login failed: Account disabled - ${email}`);
-      return res.status(403).json({ 
-        success: false,
-        error: 'ACCOUNT_DISABLED', 
-        message: 'Votre compte est désactivé. Veuillez contacter l\'administrateur.' 
-      });
+      return response.error(res, 'Votre compte est désactivé. Veuillez contacter l\'administrateur.', 403, 'ACCOUNT_DISABLED');
     }
     
     const { accessToken, refreshToken } = generateTokens(user._id);
@@ -176,19 +154,16 @@ async function login(req, res, next) {
       });
     }
 
-    res.json({ 
-      success: true,
-      data: {
-        user: {
-          id: user._id,
-          name: user.name,
-          email: user.email,
-          role: user.role
-        }, 
-        farmId: primaryMembership ? primaryMembership.farm_id : null,
-        accessToken, 
-        refreshToken 
-      }
+    return response.success(res, {
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role
+      }, 
+      farmId: primaryMembership ? primaryMembership.farm_id : null,
+      accessToken, 
+      refreshToken 
     });
   } catch (err) {
     logger.error(`Error in login: ${err.message}`);
@@ -202,11 +177,7 @@ async function login(req, res, next) {
 async function getMe(req, res, next) {
   try {
     const user = await User.findById(req.user.id);
-    if (!user) return res.status(404).json({ 
-      success: false,
-      error: 'USER_NOT_FOUND',
-      message: 'Utilisateur non trouvé.' 
-    });
+    if (!user) return response.error(res, 'Utilisateur non trouvé.', 404, 'USER_NOT_FOUND');
 
     const Membership = require('../models/Membership');
     const Farm = require('../models/Farm');
@@ -226,15 +197,12 @@ async function getMe(req, res, next) {
       memberships = [membership];
     }
 
-    res.json({ 
-      success: true, 
-      data: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        memberships
-      }
+    return response.success(res, {
+      id: user._id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      memberships
     });
   } catch (err) {
     next(err);
@@ -248,11 +216,7 @@ async function refreshToken(req, res, next) {
   try {
     const { refreshToken: incomingToken } = req.body;
     if (!incomingToken) {
-      return res.status(400).json({ 
-        success: false,
-        error: 'TOKEN_REQUIRED', 
-        message: 'Token de rafraîchissement manquant.' 
-      });
+      return response.error(res, 'Token de rafraîchissement manquant.', 400, 'TOKEN_REQUIRED');
     }
 
     const decoded = jwt.verify(incomingToken, process.env.JWT_REFRESH_SECRET);
@@ -260,11 +224,7 @@ async function refreshToken(req, res, next) {
 
     if (!user || !user.refresh_tokens.find(t => t.token === incomingToken)) {
       logger.warn(`Refresh failed: Token invalid or user not found - ${decoded.id}`);
-      return res.status(401).json({ 
-        success: false,
-        error: 'INVALID_TOKEN', 
-        message: 'Session expirée ou invalide.' 
-      });
+      return response.error(res, 'Session expirée ou invalide.', 401, 'INVALID_TOKEN');
     }
 
     // Generate new pair
@@ -279,14 +239,10 @@ async function refreshToken(req, res, next) {
     await user.save();
 
     logger.debug(`Session refreshed for user: ${user.email}`);
-    res.json({ success: true, data: tokens });
+    return response.success(res, tokens);
   } catch (err) {
     logger.error(`Error in refreshToken: ${err.message}`);
-    res.status(401).json({ 
-      success: false,
-      error: 'INVALID_TOKEN', 
-      message: 'Session expirée.' 
-    });
+    return response.error(res, 'Session expirée.', 401, 'INVALID_TOKEN');
   }
 }
 
@@ -303,7 +259,7 @@ async function logout(req, res, next) {
       );
     }
     logger.info('User logged out');
-    res.json({ success: true, data: { message: 'Logged out successfully' } });
+    return response.success(res, { message: 'Logged out successfully' });
   } catch (err) {
     logger.error(`Error in logout: ${err.message}`);
     next(err);
@@ -321,10 +277,7 @@ async function forgotPassword(req, res, next) {
     
     if (!user) {
       // Don't reveal if user exists for security
-      return res.json({ 
-        success: true, 
-        data: { message: 'Si cet e-mail existe dans notre système, un lien de réinitialisation sera envoyé.' } 
-      });
+      return response.success(res, { message: 'Si cet e-mail existe dans notre système, un lien de réinitialisation sera envoyé.' });
     }
 
     // Generate a simple token (in production use crypto.randomBytes)
@@ -338,10 +291,7 @@ async function forgotPassword(req, res, next) {
     logger.info(`[SIMULATION] Password reset email for ${email}:`);
     logger.info(`[SIMULATION] Link: http://localhost:3000/reset-password?token=${resetToken}`);
 
-    res.json({ 
-      success: true, 
-      data: { message: 'Si cet e-mail existe dans notre système, un lien de réinitialisation sera envoyé.' } 
-    });
+    return response.success(res, { message: 'Si cet e-mail existe dans notre système, un lien de réinitialisation sera envoyé.' });
   } catch (err) {
     next(err);
   }
@@ -356,11 +306,7 @@ async function resetPassword(req, res, next) {
     const { token, newPassword } = req.body;
     
     if (!token || !newPassword) {
-      return res.status(400).json({ 
-        success: false, 
-        error: 'MISSING_FIELDS', 
-        message: 'Token et nouveau mot de passe requis.' 
-      });
+      return response.error(res, 'Token et nouveau mot de passe requis.', 400, 'MISSING_FIELDS');
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
@@ -370,11 +316,7 @@ async function resetPassword(req, res, next) {
 
     const user = await User.findById(decoded.id);
     if (!user) {
-      return res.status(404).json({ 
-        success: false, 
-        error: 'USER_NOT_FOUND', 
-        message: 'Utilisateur non trouvé.' 
-      });
+      return response.error(res, 'Utilisateur non trouvé.', 404, 'USER_NOT_FOUND');
     }
 
     user.password = newPassword;
@@ -382,14 +324,10 @@ async function resetPassword(req, res, next) {
     await user.save();
 
     logger.info(`Password reset successful for user: ${user.email}`);
-    res.json({ success: true, data: { message: 'Mot de passe réinitialisé avec succès.' } });
+    return response.success(res, { message: 'Mot de passe réinitialisé avec succès.' });
   } catch (err) {
     logger.error(`Reset password failed: ${err.message}`);
-    res.status(401).json({ 
-      success: false, 
-      error: 'INVALID_TOKEN', 
-      message: 'Lien de réinitialisation invalide ou expiré.' 
-    });
+    return response.error(res, 'Lien de réinitialisation invalide ou expiré.', 401, 'INVALID_TOKEN');
   }
 }
 

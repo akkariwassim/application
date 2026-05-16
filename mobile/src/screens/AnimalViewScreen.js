@@ -35,8 +35,21 @@ export default function AnimalViewScreen({ route, navigation }) {
   const { getColors } = useThemeStore();
   const COLORS = getColors();
   const styles = createStyles(COLORS);
+  const mapRef = useRef(null);
   
   const animal = animals.find(a => a.id === animalId);
+
+  const MemoizedMarker = useMemo(() => React.memo(({ coordinate, color }) => (
+    <Marker coordinate={coordinate}>
+      <View style={[styles.animalMarker, { borderColor: color }]}>
+        <MaterialCommunityIcons name="paw" size={18} color={color} />
+      </View>
+    </Marker>
+  ), (prev, next) => (
+    prev.coordinate.latitude === next.coordinate.latitude &&
+    prev.coordinate.longitude === next.coordinate.longitude &&
+    prev.color === next.color
+  )), [styles.animalMarker]);
   
   const [loading, setLoading] = useState(!animal);
   const [userLocation, setUserLocation] = useState(null);
@@ -66,7 +79,11 @@ export default function AnimalViewScreen({ route, navigation }) {
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (status === 'granted') {
         sub = await Location.watchPositionAsync(
-          { accuracy: Location.Accuracy.Balanced, distanceInterval: 5 },
+          { 
+            accuracy: Location.Accuracy.Balanced, 
+            distanceInterval: 15, // Higher interval for performance
+            timeInterval: 5000     // 5s throttle
+          },
           loc => setUserLocation(loc.coords)
         );
       }
@@ -93,6 +110,17 @@ export default function AnimalViewScreen({ route, navigation }) {
     const d = haversineDist(userLocation.latitude, userLocation.longitude, parseFloat(animal.latitude), parseFloat(animal.longitude));
     return d > 1000 ? `${(d/1000).toFixed(2)} km` : `${Math.round(d)} m`;
   }, [userLocation, animal?.latitude, animal?.longitude]);
+
+  // Auto-follow animal on map
+  useEffect(() => {
+    if (mapRef.current && animal?.latitude && animal?.longitude) {
+      mapRef.current.animateCamera({
+        center: { latitude: parseFloat(animal.latitude), longitude: parseFloat(animal.longitude) },
+        pitch: 45,
+        zoom: 17
+      }, { duration: 1000 });
+    }
+  }, [animal?.latitude, animal?.longitude]);
 
   if (loading || !animal) {
     return (
@@ -127,21 +155,21 @@ export default function AnimalViewScreen({ route, navigation }) {
         {/* Real-time Map Visual */}
         <View style={styles.mapCard}>
           <MapView
+            ref={mapRef}
             style={styles.map}
             provider={PROVIDER_GOOGLE}
             mapType="hybrid"
-            region={{
+            initialRegion={{
               latitude: parseFloat(animal.latitude || 35.038),
               longitude: parseFloat(animal.longitude || 9.484),
               latitudeDelta: 0.005,
               longitudeDelta: 0.005,
             }}
           >
-            <Marker coordinate={{ latitude: parseFloat(animal.latitude), longitude: parseFloat(animal.longitude) }}>
-              <View style={[styles.animalMarker, { borderColor: statusColor }]}>
-                <MaterialCommunityIcons name="paw" size={18} color={statusColor} />
-              </View>
-            </Marker>
+            <MemoizedMarker 
+              coordinate={{ latitude: parseFloat(animal.latitude), longitude: parseFloat(animal.longitude) }} 
+              color={statusColor}
+            />
             {userLocation && (
               <Marker coordinate={userLocation}>
                 <View style={styles.userMarker}>
@@ -245,6 +273,10 @@ export default function AnimalViewScreen({ route, navigation }) {
               </View>
 
               <View style={styles.aiDetails}>
+                <View style={styles.detailItem}>
+                  <Text style={styles.detailTitle}>AI Analysis</Text>
+                  <Text style={[styles.detailText, { fontWeight: '800', color: COLORS.text }]}>{selectedAnimalAI.prediction}</Text>
+                </View>
                 <View style={styles.detailItem}>
                   <Text style={styles.detailTitle}>Probable Cause</Text>
                   <Text style={styles.detailText}>{selectedAnimalAI.cause}</Text>
